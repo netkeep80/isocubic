@@ -1,0 +1,37 @@
+{
+  "id": "ice_frozen_001",
+  "prompt": "прозрачный лёд с трещинами и пузырьками воздуха",
+  "base": {
+    "color": [0.75, 0.9, 0.95],
+    "roughness": 0.1,
+    "transparency": 0.7
+  },
+  "gradients": [
+    {
+      "axis": "y",
+      "factor": 0.2,
+      "color_shift": [0.05, 0.1, 0.15]
+    },
+    {
+      "axis": "radial",
+      "factor": 0.15,
+      "color_shift": [-0.1, -0.05, 0.0]
+    }
+  ],
+  "noise": {
+    "type": "crackle",
+    "scale": 5.0,
+    "octaves": 4,
+    "persistence": 0.6
+  },
+  "physics": {
+    "material": "glass",
+    "density": 0.92,
+    "break_pattern": "shatter"
+  },
+  "meta": {
+    "name": "Замёрзший лёд",
+    "tags": ["ice", "frozen", "cold", "transparent", "winter"],
+    "author": "isocubic"
+  }
+}

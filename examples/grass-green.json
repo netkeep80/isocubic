@@ -1,0 +1,33 @@
+{
+  "id": "grass_green_001",
+  "prompt": "зелёная трава с почвой снизу",
+  "base": {
+    "color": [0.2, 0.55, 0.15],
+    "roughness": 0.9,
+    "transparency": 1.0
+  },
+  "gradients": [
+    {
+      "axis": "y",
+      "factor": 0.6,
+      "color_shift": [0.2, -0.25, 0.1]
+    }
+  ],
+  "noise": {
+    "type": "perlin",
+    "scale": 20.0,
+    "octaves": 5,
+    "persistence": 0.5,
+    "mask": "top_70%"
+  },
+  "physics": {
+    "material": "organic",
+    "density": 0.4,
+    "break_pattern": "crumble"
+  },
+  "meta": {
+    "name": "Зелёная трава",
+    "tags": ["grass", "green", "natural", "outdoor", "terrain"],
+    "author": "isocubic"
+  }
+}
