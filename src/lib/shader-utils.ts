@@ -4,7 +4,7 @@
  */
 
 import * as THREE from 'three'
-import type { SpectralCube, GradientAxis, NoiseType } from '../types/cube'
+import type { SpectralCube, GradientAxis, NoiseType, BoundaryMode } from '../types/cube'
 import { CUBE_DEFAULTS } from '../types/cube'
 
 /**
@@ -38,6 +38,22 @@ export function noiseTypeToInt(type: NoiseType | undefined): number {
       return 3
     default:
       return 0
+  }
+}
+
+/**
+ * Maps boundary mode string to shader integer
+ */
+export function boundaryModeToInt(mode: BoundaryMode | undefined): number {
+  switch (mode) {
+    case 'none':
+      return 0
+    case 'smooth':
+      return 1
+    case 'hard':
+      return 2
+    default:
+      return 1 // Default to smooth
   }
 }
 
@@ -93,10 +109,24 @@ export function parseMask(mask: string | undefined): { start: number; end: numbe
 }
 
 /**
- * Creates shader uniforms from SpectralCube configuration
+ * Options for creating shader uniforms
  */
-export function createUniforms(config: SpectralCube): Record<string, THREE.IUniform> {
-  const { base, gradients = [], noise } = config
+export interface CreateUniformsOptions {
+  /** Grid position of this cube for seamless stitching [x, y, z] */
+  gridPosition?: [number, number, number]
+}
+
+/**
+ * Creates shader uniforms from SpectralCube configuration
+ * @param config - The cube configuration
+ * @param options - Optional parameters for grid positioning and stitching
+ */
+export function createUniforms(
+  config: SpectralCube,
+  options: CreateUniformsOptions = {}
+): Record<string, THREE.IUniform> {
+  const { base, gradients = [], noise, boundary } = config
+  const { gridPosition = [0, 0, 0] } = options
 
   // Process gradients (max 4)
   const gradientCount = Math.min(gradients.length, 4)
@@ -146,5 +176,12 @@ export function createUniforms(config: SpectralCube): Record<string, THREE.IUnif
     uLightDirection: { value: new THREE.Vector3(1, 1, 1).normalize() },
     uLightColor: { value: new THREE.Vector3(1, 1, 1) },
     uAmbientIntensity: { value: 0.3 },
+
+    // Boundary stitching
+    uBoundaryMode: { value: boundaryModeToInt(boundary?.mode ?? CUBE_DEFAULTS.boundary.mode) },
+    uNeighborInfluence: {
+      value: boundary?.neighbor_influence ?? CUBE_DEFAULTS.boundary.neighbor_influence,
+    },
+    uGridPosition: { value: new THREE.Vector3(gridPosition[0], gridPosition[1], gridPosition[2]) },
   }
 }

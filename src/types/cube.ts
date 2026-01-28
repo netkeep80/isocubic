@@ -21,6 +21,9 @@ export type MaterialType = 'stone' | 'wood' | 'metal' | 'glass' | 'organic' | 'c
 /** Material break pattern when destroyed */
 export type BreakPattern = 'crumble' | 'shatter' | 'splinter' | 'melt' | 'dissolve'
 
+/** Boundary mode for cube edge stitching */
+export type BoundaryMode = 'none' | 'smooth' | 'hard'
+
 /**
  * Base material properties
  */
@@ -90,6 +93,17 @@ export interface CubeMeta {
 }
 
 /**
+ * Boundary stitching settings for seamless cube connections
+ * Used when rendering multiple cubes in a grid to ensure smooth transitions
+ */
+export interface CubeBoundary {
+  /** Mode for boundary interpolation: none (no blending), smooth (interpolated), hard (sharp edges) */
+  mode?: BoundaryMode
+  /** Coefficient of influence from neighboring cubes (0-1), affects gradient and color blending */
+  neighbor_influence?: number
+}
+
+/**
  * Complete SpectralCube configuration
  * Defines all properties for a parametric cube in the isocubic editor
  */
@@ -108,6 +122,8 @@ export interface SpectralCube {
   physics?: CubePhysics
   /** Metadata and tags for organization */
   meta?: CubeMeta
+  /** Boundary stitching settings for seamless cube grid connections */
+  boundary?: CubeBoundary
 }
 
 /**
@@ -128,6 +144,10 @@ export const CUBE_DEFAULTS = {
     material: 'stone' as MaterialType,
     density: 2.5,
     break_pattern: 'crumble' as BreakPattern,
+  },
+  boundary: {
+    mode: 'smooth' as BoundaryMode,
+    neighbor_influence: 0.5,
   },
 } as const
 
@@ -153,6 +173,10 @@ export function createDefaultCube(id: string): SpectralCube {
       material: CUBE_DEFAULTS.physics.material,
       density: CUBE_DEFAULTS.physics.density,
       break_pattern: CUBE_DEFAULTS.physics.break_pattern,
+    },
+    boundary: {
+      mode: CUBE_DEFAULTS.boundary.mode,
+      neighbor_influence: CUBE_DEFAULTS.boundary.neighbor_influence,
     },
     meta: {
       created: new Date().toISOString(),

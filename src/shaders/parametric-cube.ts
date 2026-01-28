@@ -7,11 +7,16 @@
  * Vertex shader for parametric cube
  * - Passes local and world positions for gradient/noise calculations
  * - Transforms normals for lighting
+ * - Calculates global position for seamless stitching
  */
 export const vertexShader = /* glsl */ `
-varying vec3 vPosition;      // Local position for gradient/noise calculation
-varying vec3 vNormal;        // Normal vector for lighting
-varying vec3 vWorldPosition; // World position for global noise continuity
+varying vec3 vPosition;       // Local position for gradient/noise calculation
+varying vec3 vNormal;         // Normal vector for lighting
+varying vec3 vWorldPosition;  // World position for global noise continuity
+varying vec3 vGlobalPosition; // Global grid position for seamless stitching
+
+// Grid position uniform for stitching calculations
+uniform vec3 uGridPosition;   // Position of this cube in the grid (e.g., [0,0,0], [1,0,0], etc.)
 
 void main() {
     // Pass local position for gradient/noise calculations
@@ -23,6 +28,10 @@ void main() {
     // Calculate world position for seamless noise between adjacent cubes
     vec4 worldPos = modelMatrix * vec4(position, 1.0);
     vWorldPosition = worldPos.xyz;
+
+    // Calculate global position: grid position + local position (assuming unit cubes)
+    // This provides continuous coordinates across cube boundaries
+    vGlobalPosition = uGridPosition + position + 0.5; // Shift to [0,1] per cube
 
     // Standard transformation
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
@@ -37,12 +46,14 @@ void main() {
  * - Perlin, Worley, and Crackle noise patterns
  * - Region-based noise masking
  * - Basic diffuse lighting
+ * - Seamless boundary stitching between adjacent cubes
  */
 export const fragmentShader = /* glsl */ `
 // Varyings from vertex shader
 varying vec3 vPosition;
 varying vec3 vNormal;
 varying vec3 vWorldPosition;
+varying vec3 vGlobalPosition;
 
 // Base material uniforms
 uniform vec3 uBaseColor;        // RGB [0,1]
@@ -68,6 +79,11 @@ uniform int uNoiseMaskAxis;      // 0=y(default), 1=x, 2=z
 uniform vec3 uLightDirection;
 uniform vec3 uLightColor;
 uniform float uAmbientIntensity;
+
+// Boundary stitching uniforms
+uniform int uBoundaryMode;           // 0=none, 1=smooth, 2=hard
+uniform float uNeighborInfluence;    // [0,1] blend factor for neighbor influence
+uniform vec3 uGridPosition;          // Position of this cube in the grid
 
 // ============================================================
 // NOISE FUNCTIONS
@@ -199,7 +215,8 @@ float computeNoise(vec3 p, int noiseType, int octaves, float persistence) {
 // GRADIENT FUNCTIONS
 // ============================================================
 
-float getGradientFactor(vec3 pos, int axis) {
+// Get gradient factor using local position (for single cube)
+float getLocalGradientFactor(vec3 pos, int axis) {
     // Normalize position to [0,1] range (assuming cube is -0.5 to 0.5)
     vec3 normalizedPos = pos + 0.5;
 
@@ -218,6 +235,40 @@ float getGradientFactor(vec3 pos, int axis) {
     }
 }
 
+// Get gradient factor using global position (for seamless multi-cube grids)
+float getGlobalGradientFactor(vec3 globalPos, vec3 gridPos, int axis) {
+    if (axis == 0) {
+        // X-axis gradient - continuous across grid
+        return fract(globalPos.x);
+    } else if (axis == 1) {
+        // Y-axis gradient - continuous across grid
+        return fract(globalPos.y);
+    } else if (axis == 2) {
+        // Z-axis gradient - continuous across grid
+        return fract(globalPos.z);
+    } else {
+        // Radial gradient from global center
+        vec3 relativePos = globalPos - gridPos - 0.5;
+        return length(relativePos) * 2.0;
+    }
+}
+
+// Get gradient factor based on boundary mode
+float getGradientFactor(vec3 localPos, vec3 globalPos, vec3 gridPos, int axis, int boundaryMode, float neighborInfluence) {
+    if (boundaryMode == 0) {
+        // No stitching - use local coordinates only
+        return getLocalGradientFactor(localPos, axis);
+    } else if (boundaryMode == 1) {
+        // Smooth stitching - blend local and global
+        float localFactor = getLocalGradientFactor(localPos, axis);
+        float globalFactor = getGlobalGradientFactor(globalPos, gridPos, axis);
+        return mix(localFactor, globalFactor, neighborInfluence);
+    } else {
+        // Hard stitching - use global coordinates for continuity
+        return getGlobalGradientFactor(globalPos, gridPos, axis);
+    }
+}
+
 // ============================================================
 // MAIN FRAGMENT SHADER
 // ============================================================
@@ -226,22 +277,36 @@ void main() {
     // Start with base color
     vec3 color = uBaseColor;
 
-    // Apply gradients
+    // Apply gradients with boundary stitching support
     for (int i = 0; i < 4; i++) {
         if (i >= uGradientCount) break;
 
-        float gradientPos = getGradientFactor(vPosition, uGradientAxis[i]);
+        float gradientPos = getGradientFactor(
+            vPosition,
+            vGlobalPosition,
+            uGridPosition,
+            uGradientAxis[i],
+            uBoundaryMode,
+            uNeighborInfluence
+        );
         float factor = gradientPos * uGradientFactor[i];
         color += uGradientColorShift[i] * factor;
     }
 
-    // Apply noise
+    // Apply noise with seamless stitching
     if (uNoiseType > 0) {
-        // Use world position for seamless noise across cube boundaries
-        vec3 noisePos = vWorldPosition * uNoiseScale;
+        // Choose noise position based on boundary mode
+        vec3 noisePos;
+        if (uBoundaryMode == 0) {
+            // No stitching - use world position
+            noisePos = vWorldPosition * uNoiseScale;
+        } else {
+            // Use global grid position for seamless noise across boundaries
+            noisePos = vGlobalPosition * uNoiseScale;
+        }
         float noiseValue = computeNoise(noisePos, uNoiseType, uNoiseOctaves, uNoisePersistence);
 
-        // Apply mask based on local position
+        // Apply mask based on local position (mask is per-cube, not global)
         float maskPos;
         if (uNoiseMaskAxis == 1) {
             maskPos = vPosition.x + 0.5; // Normalize to [0,1]
@@ -321,4 +386,9 @@ export const defaultUniforms = {
   uLightDirection: { value: [1, 1, 1] },
   uLightColor: { value: [1, 1, 1] },
   uAmbientIntensity: { value: 0.3 },
+
+  // Boundary stitching
+  uBoundaryMode: { value: 1 }, // Default to smooth
+  uNeighborInfluence: { value: 0.5 },
+  uGridPosition: { value: [0, 0, 0] },
 }

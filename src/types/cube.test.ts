@@ -150,6 +150,96 @@ describe('SpectralCube Schema Validation', () => {
       const result = validateCube(cube)
       expect(result.valid).toBe(true)
     })
+
+    it('should create cube with default boundary settings', () => {
+      const cube = createDefaultCube('boundary_test_001')
+
+      expect(cube.boundary).toBeDefined()
+      expect(cube.boundary?.mode).toBe('smooth')
+      expect(cube.boundary?.neighbor_influence).toBe(0.5)
+    })
+  })
+
+  describe('Boundary Settings Validation', () => {
+    it('should validate cube with boundary settings', () => {
+      const cubeWithBoundary = {
+        id: 'boundary_test',
+        base: {
+          color: [0.5, 0.5, 0.5],
+        },
+        boundary: {
+          mode: 'smooth',
+          neighbor_influence: 0.5,
+        },
+      }
+
+      const result = validateCube(cubeWithBoundary)
+      expect(result.valid).toBe(true)
+    })
+
+    it('should validate cube with none boundary mode', () => {
+      const cubeWithBoundary = {
+        id: 'boundary_none_test',
+        base: {
+          color: [0.5, 0.5, 0.5],
+        },
+        boundary: {
+          mode: 'none',
+          neighbor_influence: 0,
+        },
+      }
+
+      const result = validateCube(cubeWithBoundary)
+      expect(result.valid).toBe(true)
+    })
+
+    it('should validate cube with hard boundary mode', () => {
+      const cubeWithBoundary = {
+        id: 'boundary_hard_test',
+        base: {
+          color: [0.5, 0.5, 0.5],
+        },
+        boundary: {
+          mode: 'hard',
+          neighbor_influence: 1.0,
+        },
+      }
+
+      const result = validateCube(cubeWithBoundary)
+      expect(result.valid).toBe(true)
+    })
+
+    it('should reject invalid boundary mode', () => {
+      const invalidCube = {
+        id: 'invalid_boundary_test',
+        base: {
+          color: [0.5, 0.5, 0.5],
+        },
+        boundary: {
+          mode: 'invalid_mode',
+          neighbor_influence: 0.5,
+        },
+      }
+
+      const result = validateCube(invalidCube)
+      expect(result.valid).toBe(false)
+    })
+
+    it('should reject neighbor_influence out of range', () => {
+      const invalidCube = {
+        id: 'invalid_influence_test',
+        base: {
+          color: [0.5, 0.5, 0.5],
+        },
+        boundary: {
+          mode: 'smooth',
+          neighbor_influence: 1.5, // Out of range [0,1]
+        },
+      }
+
+      const result = validateCube(invalidCube)
+      expect(result.valid).toBe(false)
+    })
   })
 })
 

@@ -24,6 +24,8 @@ export interface ParametricCubeProps {
   animate?: boolean
   /** Rotation speed (radians per second) */
   rotationSpeed?: number
+  /** Grid position for seamless stitching [x, y, z] - used when rendering cube grids */
+  gridPosition?: [number, number, number]
 }
 
 /**
@@ -34,6 +36,7 @@ export interface ParametricCubeProps {
  * - Support for gradients, noise, and material properties
  * - Seamless noise at cube boundaries via world coordinates
  * - Optional animation
+ * - Grid position support for seamless boundary stitching in CubeGrid
  */
 export function ParametricCube({
   config,
@@ -41,13 +44,14 @@ export function ParametricCube({
   scale = 1,
   animate = false,
   rotationSpeed = 0.5,
+  gridPosition = [0, 0, 0],
 }: ParametricCubeProps) {
   const meshRef = useRef<THREE.Mesh>(null)
 
   // Create shader material with uniforms derived from config
-  // The material is recreated when config changes to ensure proper updates
+  // The material is recreated when config or gridPosition changes
   const shaderMaterial = useMemo(() => {
-    const uniforms = createUniforms(config)
+    const uniforms = createUniforms(config, { gridPosition })
 
     return new THREE.ShaderMaterial({
       vertexShader,
@@ -56,7 +60,7 @@ export function ParametricCube({
       transparent: (config.base.transparency ?? 1) < 1,
       side: THREE.FrontSide,
     })
-  }, [config])
+  }, [config, gridPosition])
 
   // Animation frame for rotation
   useFrame((_, delta) => {

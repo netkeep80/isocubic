@@ -12,6 +12,11 @@ describe('Parametric Cube Shader Module', () => {
       expect(vertexShader).toContain('varying vec3 vPosition')
       expect(vertexShader).toContain('varying vec3 vNormal')
       expect(vertexShader).toContain('varying vec3 vWorldPosition')
+      expect(vertexShader).toContain('varying vec3 vGlobalPosition')
+    })
+
+    it('should declare grid position uniform for boundary stitching', () => {
+      expect(vertexShader).toContain('uniform vec3 uGridPosition')
     })
 
     it('should have main function', () => {
@@ -40,6 +45,13 @@ describe('Parametric Cube Shader Module', () => {
       expect(fragmentShader).toContain('varying vec3 vPosition')
       expect(fragmentShader).toContain('varying vec3 vNormal')
       expect(fragmentShader).toContain('varying vec3 vWorldPosition')
+      expect(fragmentShader).toContain('varying vec3 vGlobalPosition')
+    })
+
+    it('should declare boundary stitching uniforms', () => {
+      expect(fragmentShader).toContain('uniform int uBoundaryMode')
+      expect(fragmentShader).toContain('uniform float uNeighborInfluence')
+      expect(fragmentShader).toContain('uniform vec3 uGridPosition')
     })
 
     it('should declare base material uniforms', () => {
@@ -105,8 +117,17 @@ describe('Parametric Cube Shader Module', () => {
       )
     })
 
-    it('should implement getGradientFactor function', () => {
-      expect(fragmentShader).toContain('float getGradientFactor(vec3 pos, int axis)')
+    it('should implement getGradientFactor functions for boundary stitching', () => {
+      // Local gradient factor for single cube mode
+      expect(fragmentShader).toContain('float getLocalGradientFactor(vec3 pos, int axis)')
+      // Global gradient factor for seamless multi-cube grids
+      expect(fragmentShader).toContain(
+        'float getGlobalGradientFactor(vec3 globalPos, vec3 gridPos, int axis)'
+      )
+      // Main gradient factor with boundary mode support
+      expect(fragmentShader).toContain(
+        'float getGradientFactor(vec3 localPos, vec3 globalPos, vec3 gridPos, int axis, int boundaryMode, float neighborInfluence)'
+      )
     })
 
     it('should handle all gradient axes in getGradientFactor', () => {
@@ -198,6 +219,18 @@ describe('Parametric Cube Shader Module', () => {
 
     it('should have uAmbientIntensity with default 0.3', () => {
       expect(defaultUniforms.uAmbientIntensity.value).toBe(0.3)
+    })
+
+    it('should have uBoundaryMode with default 1 (smooth)', () => {
+      expect(defaultUniforms.uBoundaryMode.value).toBe(1)
+    })
+
+    it('should have uNeighborInfluence with default 0.5', () => {
+      expect(defaultUniforms.uNeighborInfluence.value).toBe(0.5)
+    })
+
+    it('should have uGridPosition with default [0,0,0]', () => {
+      expect(defaultUniforms.uGridPosition.value).toEqual([0, 0, 0])
     })
   })
 })

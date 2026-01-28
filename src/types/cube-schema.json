@@ -178,6 +178,26 @@
         }
       },
       "additionalProperties": false
+    },
+    "boundary": {
+      "type": "object",
+      "description": "Boundary stitching settings for seamless cube grid connections",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "description": "Mode for boundary interpolation: none (no blending), smooth (interpolated), hard (sharp edges)",
+          "enum": ["none", "smooth", "hard"],
+          "default": "smooth"
+        },
+        "neighbor_influence": {
+          "type": "number",
+          "description": "Coefficient of influence from neighboring cubes (0-1), affects gradient and color blending",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.5
+        }
+      },
+      "additionalProperties": false
     }
   },
   "required": ["id", "base"],
