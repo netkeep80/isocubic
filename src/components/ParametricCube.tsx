@@ -9,6 +9,7 @@ import * as THREE from 'three'
 import { vertexShader, fragmentShader } from '../shaders/parametric-cube'
 import { createUniforms } from '../lib/shader-utils'
 import type { SpectralCube } from '../types/cube'
+import type { LODLevel, LODLevelSettings } from '../types/lod'
 
 /**
  * Props for the ParametricCube component
@@ -26,6 +27,10 @@ export interface ParametricCubeProps {
   rotationSpeed?: number
   /** Grid position for seamless stitching [x, y, z] - used when rendering cube grids */
   gridPosition?: [number, number, number]
+  /** LOD level to apply (0 = full detail, 4 = lowest detail) */
+  lodLevel?: LODLevel
+  /** Custom LOD settings (overrides defaults if provided) */
+  lodSettings?: LODLevelSettings
 }
 
 /**
@@ -37,6 +42,7 @@ export interface ParametricCubeProps {
  * - Seamless noise at cube boundaries via world coordinates
  * - Optional animation
  * - Grid position support for seamless boundary stitching in CubeGrid
+ * - LOD (Level of Detail) support for performance optimization
  */
 export function ParametricCube({
   config,
@@ -45,13 +51,19 @@ export function ParametricCube({
   animate = false,
   rotationSpeed = 0.5,
   gridPosition = [0, 0, 0],
+  lodLevel,
+  lodSettings,
 }: ParametricCubeProps) {
   const meshRef = useRef<THREE.Mesh>(null)
 
   // Create shader material with uniforms derived from config
-  // The material is recreated when config or gridPosition changes
+  // The material is recreated when config, gridPosition, or LOD settings change
   const shaderMaterial = useMemo(() => {
-    const uniforms = createUniforms(config, { gridPosition })
+    const uniforms = createUniforms(config, {
+      gridPosition,
+      lodLevel,
+      lodSettings,
+    })
 
     return new THREE.ShaderMaterial({
       vertexShader,
@@ -60,7 +72,7 @@ export function ParametricCube({
       transparent: (config.base.transparency ?? 1) < 1,
       side: THREE.FrontSide,
     })
-  }, [config, gridPosition])
+  }, [config, gridPosition, lodLevel, lodSettings])
 
   // Animation frame for rotation
   useFrame((_, delta) => {
