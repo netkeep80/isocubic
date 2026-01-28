@@ -4,6 +4,7 @@ import { Gallery } from './components/Gallery'
 import { ExportPanel } from './components/ExportPanel'
 import { ParamEditor } from './components/ParamEditor'
 import { CubePreview } from './components/CubePreview'
+import { PromptGenerator } from './components/PromptGenerator'
 import type { SpectralCube } from './types/cube'
 import { createDefaultCube } from './types/cube'
 
@@ -71,6 +72,11 @@ function App() {
 
   // Handle cube update from ParamEditor
   const handleCubeUpdate = useCallback((cube: SpectralCube) => {
+    setCurrentCube(cube)
+  }, [])
+
+  // Handle cube generation from PromptGenerator
+  const handleCubeGenerated = useCallback((cube: SpectralCube) => {
     setCurrentCube(cube)
   }, [])
 
@@ -217,6 +223,7 @@ function App() {
 
           {activeTab === 'tools' && (
             <section className="app__mobile-panel">
+              <PromptGenerator onCubeGenerated={handleCubeGenerated} />
               <ExportPanel
                 currentCube={currentCube}
                 onCubeLoad={handleCubeLoad}
@@ -279,6 +286,7 @@ function App() {
             </section>
 
             <section className="app__section app__section--sidebar">
+              <PromptGenerator onCubeGenerated={handleCubeGenerated} />
               <ParamEditor currentCube={currentCube} onCubeUpdate={handleCubeUpdate} />
               <ExportPanel
                 currentCube={currentCube}
@@ -311,6 +319,7 @@ function App() {
 
         {/* Right side: Parameter editor and tools */}
         <section className="app__section app__section--sidebar">
+          <PromptGenerator onCubeGenerated={handleCubeGenerated} />
           <ParamEditor currentCube={currentCube} onCubeUpdate={handleCubeUpdate} />
           <ExportPanel
             currentCube={currentCube}
