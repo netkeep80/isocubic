@@ -660,7 +660,12 @@ function collectGradients(tokens: string[]): CubeGradient[] {
     if (pattern) {
       for (const grad of pattern) {
         if (!usedAxes.has(grad.axis)) {
-          gradients.push({ ...grad })
+          // Convert colorShift to color_shift for CubeGradient type
+          gradients.push({
+            axis: grad.axis,
+            factor: grad.factor,
+            color_shift: grad.colorShift,
+          })
           usedAxes.add(grad.axis)
         }
       }
