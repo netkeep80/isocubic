@@ -3,6 +3,7 @@
  * Configures jsdom environment and testing utilities
  */
 
+import { beforeEach } from 'vitest'
 import '@testing-library/jest-dom'
 
 // Mock localStorage for tests
