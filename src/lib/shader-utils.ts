@@ -6,6 +6,8 @@
 import * as THREE from 'three'
 import type { SpectralCube, GradientAxis, NoiseType, BoundaryMode } from '../types/cube'
 import { CUBE_DEFAULTS } from '../types/cube'
+import type { LODLevel, LODLevelSettings } from '../types/lod'
+import { DEFAULT_LOD_SETTINGS } from '../types/lod'
 
 /**
  * Maps gradient axis string to shader integer
@@ -114,22 +116,77 @@ export function parseMask(mask: string | undefined): { start: number; end: numbe
 export interface CreateUniformsOptions {
   /** Grid position of this cube for seamless stitching [x, y, z] */
   gridPosition?: [number, number, number]
+  /** LOD level to apply (0 = full detail, 4 = lowest detail) */
+  lodLevel?: LODLevel
+  /** Custom LOD settings (overrides defaults if provided) */
+  lodSettings?: LODLevelSettings
+}
+
+/**
+ * Get LOD settings for a given level
+ */
+export function getLODSettings(
+  lodLevel: LODLevel | undefined,
+  customSettings?: LODLevelSettings
+): LODLevelSettings | null {
+  if (lodLevel === undefined) return null
+  if (customSettings) return customSettings
+  return DEFAULT_LOD_SETTINGS[lodLevel]
+}
+
+/**
+ * Apply LOD settings to noise octaves
+ */
+export function applyLODToOctaves(
+  originalOctaves: number,
+  lodSettings: LODLevelSettings | null
+): number {
+  if (!lodSettings) return originalOctaves
+  if (!lodSettings.enableNoise) return 0
+  return Math.min(originalOctaves, lodSettings.noiseOctaves)
+}
+
+/**
+ * Apply LOD settings to gradient count
+ */
+export function applyLODToGradientCount(
+  originalCount: number,
+  lodSettings: LODLevelSettings | null
+): number {
+  if (!lodSettings) return originalCount
+  return Math.min(originalCount, lodSettings.maxGradients)
+}
+
+/**
+ * Apply LOD settings to boundary mode
+ */
+export function applyLODToBoundaryMode(
+  originalMode: number,
+  lodSettings: LODLevelSettings | null
+): number {
+  if (!lodSettings) return originalMode
+  if (!lodSettings.enableBoundaryStitching) return 0 // 'none' mode
+  return originalMode
 }
 
 /**
  * Creates shader uniforms from SpectralCube configuration
  * @param config - The cube configuration
- * @param options - Optional parameters for grid positioning and stitching
+ * @param options - Optional parameters for grid positioning, stitching, and LOD
  */
 export function createUniforms(
   config: SpectralCube,
   options: CreateUniformsOptions = {}
 ): Record<string, THREE.IUniform> {
   const { base, gradients = [], noise, boundary } = config
-  const { gridPosition = [0, 0, 0] } = options
+  const { gridPosition = [0, 0, 0], lodLevel, lodSettings: customLodSettings } = options
 
-  // Process gradients (max 4)
-  const gradientCount = Math.min(gradients.length, 4)
+  // Get LOD settings if LOD level is specified
+  const lodSettings = getLODSettings(lodLevel, customLodSettings)
+
+  // Process gradients (max 4, but may be further limited by LOD)
+  const baseGradientCount = Math.min(gradients.length, 4)
+  const gradientCount = applyLODToGradientCount(baseGradientCount, lodSettings)
   const gradientAxis: number[] = [0, 0, 0, 0]
   const gradientFactor: number[] = [0, 0, 0, 0]
   const gradientColorShift: THREE.Vector3[] = [
@@ -149,6 +206,22 @@ export function createUniforms(
   // Process noise mask
   const maskParams = parseMask(noise?.mask)
 
+  // Apply LOD to noise octaves
+  const baseOctaves = noise?.octaves ?? CUBE_DEFAULTS.noise.octaves
+  const noiseOctaves = applyLODToOctaves(baseOctaves, lodSettings)
+
+  // Apply LOD to boundary mode
+  const baseBoundaryMode = boundaryModeToInt(boundary?.mode ?? CUBE_DEFAULTS.boundary.mode)
+  const boundaryMode = applyLODToBoundaryMode(baseBoundaryMode, lodSettings)
+
+  // Determine if noise should be enabled at all (LOD may disable it)
+  const noiseType =
+    lodSettings && !lodSettings.enableNoise
+      ? 0
+      : noise
+        ? noiseTypeToInt(noise.type ?? CUBE_DEFAULTS.noise.type)
+        : 0
+
   return {
     // Base material
     uBaseColor: {
@@ -163,10 +236,10 @@ export function createUniforms(
     uGradientFactor: { value: gradientFactor },
     uGradientColorShift: { value: gradientColorShift },
 
-    // Noise
-    uNoiseType: { value: noise ? noiseTypeToInt(noise.type ?? CUBE_DEFAULTS.noise.type) : 0 },
+    // Noise (with LOD applied)
+    uNoiseType: { value: noiseType },
     uNoiseScale: { value: noise?.scale ?? CUBE_DEFAULTS.noise.scale },
-    uNoiseOctaves: { value: noise?.octaves ?? CUBE_DEFAULTS.noise.octaves },
+    uNoiseOctaves: { value: noiseOctaves },
     uNoisePersistence: { value: noise?.persistence ?? CUBE_DEFAULTS.noise.persistence },
     uNoiseMaskStart: { value: maskParams.start },
     uNoiseMaskEnd: { value: maskParams.end },
@@ -177,8 +250,8 @@ export function createUniforms(
     uLightColor: { value: new THREE.Vector3(1, 1, 1) },
     uAmbientIntensity: { value: 0.3 },
 
-    // Boundary stitching
-    uBoundaryMode: { value: boundaryModeToInt(boundary?.mode ?? CUBE_DEFAULTS.boundary.mode) },
+    // Boundary stitching (with LOD applied)
+    uBoundaryMode: { value: boundaryMode },
     uNeighborInfluence: {
       value: boundary?.neighbor_influence ?? CUBE_DEFAULTS.boundary.neighbor_influence,
     },

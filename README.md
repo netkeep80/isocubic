@@ -130,9 +130,11 @@ npm run dev
 isocubic/
 ├── src/
 │   ├── components/        # React-компоненты
-│   │   ├── ParametricCube.tsx # Параметрический куб с шейдером
+│   │   ├── ParametricCube.tsx # Параметрический куб с шейдером (с поддержкой LOD)
 │   │   ├── EnergyCube.tsx     # Энергетический куб с FFT визуализацией
 │   │   ├── CubePreview.tsx    # 3D-превью куба с интерактивным управлением
+│   │   ├── CubeGrid.tsx       # Сетка кубов с бесшовной сшивкой
+│   │   ├── LODCubeGrid.tsx    # Сетка кубов с автоматическим LOD управлением
 │   │   ├── ParamEditor.tsx    # Редактор параметров (TODO)
 │   │   ├── PromptGenerator.tsx # Генерация по промпту (TODO)
 │   │   ├── Gallery.tsx        # Галерея примеров
@@ -143,14 +145,16 @@ isocubic/
 │   │   ├── energy-cube.glsl      # Энергетический шейдер
 │   │   └── energy-cube.ts        # TypeScript модуль для энергетических кубов
 │   ├── lib/               # Утилиты
-│   │   ├── shader-utils.ts    # Утилиты для шейдеров
+│   │   ├── shader-utils.ts    # Утилиты для шейдеров (с поддержкой LOD)
+│   │   ├── lod-system.ts      # LOD-система для оптимизации рендеринга
 │   │   ├── tinyLLM.ts         # ИИ-генератор (TODO)
 │   │   ├── storage.ts         # Работа с хранилищем
 │   │   ├── validation.ts      # Валидация схемы
 │   │   ├── fft-wasm.ts        # FFT модуль (WASM + JS fallback)
 │   │   └── energyPhysics.ts   # Физика энергии для магических объектов
 │   ├── types/             # TypeScript-типы
-│   │   └── cube.ts
+│   │   ├── cube.ts
+│   │   └── lod.ts             # Типы для LOD-системы
 │   └── App.tsx
 ├── wasm-fft/              # Rust WASM модуль для FFT
 │   ├── Cargo.toml             # Rust конфигурация
@@ -214,9 +218,9 @@ isocubic/
 - [x] Физика энергии (ISSUE 15)
 - [x] Интеграция с боем и разрушением (ISSUE 16)
 
-### Фаза 3: Оптимизация
+### Фаза 3: Оптимизация (текущая)
 
-- [ ] LOD-система
+- [x] LOD-система (ISSUE 17)
 - [ ] WebGPU compute-шейдеры
 - [ ] Расширенный ИИ
 - [ ] Система "стопок кубиков"
