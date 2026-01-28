@@ -1,2 +1,2 @@
 # isocubic
-isocubic game engine
+isocubic web editor
