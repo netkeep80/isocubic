@@ -1,0 +1,37 @@
+{
+  "id": "sand_desert_001",
+  "prompt": "жёлтый пустынный песок с мелкой рябью",
+  "base": {
+    "color": [0.85, 0.75, 0.5],
+    "roughness": 0.95,
+    "transparency": 1.0
+  },
+  "gradients": [
+    {
+      "axis": "y",
+      "factor": 0.2,
+      "color_shift": [-0.1, -0.08, -0.05]
+    },
+    {
+      "axis": "x",
+      "factor": 0.1,
+      "color_shift": [0.05, 0.03, 0.0]
+    }
+  ],
+  "noise": {
+    "type": "perlin",
+    "scale": 25.0,
+    "octaves": 3,
+    "persistence": 0.35
+  },
+  "physics": {
+    "material": "organic",
+    "density": 1.6,
+    "break_pattern": "crumble"
+  },
+  "meta": {
+    "name": "Пустынный песок",
+    "tags": ["sand", "desert", "yellow", "natural", "terrain"],
+    "author": "isocubic"
+  }
+}

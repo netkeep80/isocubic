@@ -1,0 +1,32 @@
+{
+  "id": "marble_white_001",
+  "prompt": "белый мрамор с серыми прожилками",
+  "base": {
+    "color": [0.95, 0.93, 0.9],
+    "roughness": 0.15,
+    "transparency": 1.0
+  },
+  "gradients": [
+    {
+      "axis": "radial",
+      "factor": 0.1,
+      "color_shift": [-0.05, -0.05, -0.03]
+    }
+  ],
+  "noise": {
+    "type": "worley",
+    "scale": 4.0,
+    "octaves": 6,
+    "persistence": 0.7
+  },
+  "physics": {
+    "material": "stone",
+    "density": 2.7,
+    "break_pattern": "shatter"
+  },
+  "meta": {
+    "name": "Белый мрамор",
+    "tags": ["marble", "white", "luxury", "polished", "elegant"],
+    "author": "isocubic"
+  }
+}

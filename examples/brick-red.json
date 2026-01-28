@@ -1,0 +1,37 @@
+{
+  "id": "brick_red_001",
+  "prompt": "красный кирпич с неровной поверхностью и затиркой",
+  "base": {
+    "color": [0.7, 0.25, 0.15],
+    "roughness": 0.85,
+    "transparency": 1.0
+  },
+  "gradients": [
+    {
+      "axis": "y",
+      "factor": 0.15,
+      "color_shift": [-0.1, -0.05, -0.02]
+    },
+    {
+      "axis": "x",
+      "factor": 0.08,
+      "color_shift": [0.05, 0.02, 0.01]
+    }
+  ],
+  "noise": {
+    "type": "perlin",
+    "scale": 15.0,
+    "octaves": 3,
+    "persistence": 0.45
+  },
+  "physics": {
+    "material": "stone",
+    "density": 1.9,
+    "break_pattern": "crumble"
+  },
+  "meta": {
+    "name": "Красный кирпич",
+    "tags": ["brick", "red", "building", "construction", "wall"],
+    "author": "isocubic"
+  }
+}
