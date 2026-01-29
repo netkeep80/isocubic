@@ -27,12 +27,14 @@ vi.mock('./ParamEditor', () => ({
       {currentCube && <span data-testid="cube-id">{currentCube.id}</span>}
       <button
         data-testid="update-cube-btn"
-        onClick={() =>
-          onCubeUpdate?.({
-            ...currentCube,
-            meta: { ...currentCube?.meta, name: 'Updated Cube' },
-          })
-        }
+        onClick={() => {
+          if (currentCube) {
+            onCubeUpdate?.({
+              ...currentCube,
+              meta: { ...currentCube.meta, name: 'Updated Cube' },
+            })
+          }
+        }}
       >
         Update
       </button>
@@ -53,12 +55,14 @@ vi.mock('./FFTParamEditor', () => ({
       {currentCube && <span data-testid="fft-cube-id">{currentCube.id}</span>}
       <button
         data-testid="update-fft-cube-btn"
-        onClick={() =>
-          onCubeUpdate?.({
-            ...currentCube,
-            meta: { ...currentCube?.meta, name: 'Updated FFT Cube' },
-          })
-        }
+        onClick={() => {
+          if (currentCube) {
+            onCubeUpdate?.({
+              ...currentCube,
+              meta: { ...currentCube.meta, name: 'Updated FFT Cube' },
+            })
+          }
+        }}
       >
         Update FFT
       </button>
@@ -79,12 +83,14 @@ vi.mock('./StackEditor', () => ({
       {currentStack && <span data-testid="stack-id">{currentStack.id}</span>}
       <button
         data-testid="update-stack-btn"
-        onClick={() =>
-          onStackUpdate?.({
-            ...currentStack,
-            meta: { ...currentStack?.meta, name: 'Updated Stack' },
-          })
-        }
+        onClick={() => {
+          if (currentStack) {
+            onStackUpdate?.({
+              ...currentStack,
+              meta: { ...currentStack.meta, name: 'Updated Stack' },
+            })
+          }
+        }}
       >
         Update Stack
       </button>
