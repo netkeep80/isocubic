@@ -88,46 +88,75 @@ export interface CollaborativeParamEditorProps {
 
 /**
  * Infers which field is being edited from a cube update action
+ * Uses 'in' operator to safely handle union types (SpectralCube | FFTCubeConfig)
  */
 function inferEditedField(action: CubeUpdateAction): { fieldName: string; section: string } | null {
   const { changes } = action.payload
 
-  if (changes.base) {
-    if ('color' in changes.base) return { fieldName: 'color', section: 'base' }
-    if ('roughness' in changes.base) return { fieldName: 'roughness', section: 'base' }
-    if ('transparency' in changes.base) return { fieldName: 'transparency', section: 'base' }
+  // Check for SpectralCube-specific properties using 'in' operator for type safety
+  if ('base' in changes && changes.base) {
+    const base = changes.base
+    if ('color' in base) return { fieldName: 'color', section: 'base' }
+    if ('roughness' in base) return { fieldName: 'roughness', section: 'base' }
+    if ('transparency' in base) return { fieldName: 'transparency', section: 'base' }
   }
 
-  if (changes.gradients) {
+  if ('gradients' in changes && changes.gradients) {
     return { fieldName: 'gradients', section: 'gradients' }
   }
 
-  if (changes.noise) {
-    if ('type' in changes.noise) return { fieldName: 'type', section: 'noise' }
-    if ('scale' in changes.noise) return { fieldName: 'scale', section: 'noise' }
-    if ('octaves' in changes.noise) return { fieldName: 'octaves', section: 'noise' }
-    if ('persistence' in changes.noise) return { fieldName: 'persistence', section: 'noise' }
-    if ('mask' in changes.noise) return { fieldName: 'mask', section: 'noise' }
+  if ('noise' in changes && changes.noise) {
+    const noise = changes.noise
+    if ('type' in noise) return { fieldName: 'type', section: 'noise' }
+    if ('scale' in noise) return { fieldName: 'scale', section: 'noise' }
+    if ('octaves' in noise) return { fieldName: 'octaves', section: 'noise' }
+    if ('persistence' in noise) return { fieldName: 'persistence', section: 'noise' }
+    if ('mask' in noise) return { fieldName: 'mask', section: 'noise' }
     return { fieldName: 'noise', section: 'noise' }
   }
 
-  if (changes.physics) {
-    if ('material' in changes.physics) return { fieldName: 'material', section: 'physics' }
-    if ('density' in changes.physics) return { fieldName: 'density', section: 'physics' }
-    if ('break_pattern' in changes.physics)
-      return { fieldName: 'break_pattern', section: 'physics' }
+  // physics exists on both SpectralCube and FFTCubeConfig, but with different types
+  if ('physics' in changes && changes.physics) {
+    const physics = changes.physics
+    if ('material' in physics) return { fieldName: 'material', section: 'physics' }
+    if ('density' in physics) return { fieldName: 'density', section: 'physics' }
+    if ('break_pattern' in physics) return { fieldName: 'break_pattern', section: 'physics' }
+    // FFTCubeConfig physics fields
+    if ('conductivity' in physics) return { fieldName: 'conductivity', section: 'physics' }
+    if ('resistance' in physics) return { fieldName: 'resistance', section: 'physics' }
     return { fieldName: 'physics', section: 'physics' }
   }
 
-  if (changes.boundary) {
-    if ('mode' in changes.boundary) return { fieldName: 'mode', section: 'boundary' }
-    if ('neighbor_influence' in changes.boundary)
+  // boundary exists on both types
+  if ('boundary' in changes && changes.boundary) {
+    const boundary = changes.boundary
+    if ('mode' in boundary) return { fieldName: 'mode', section: 'boundary' }
+    if ('neighbor_influence' in boundary)
       return { fieldName: 'neighbor_influence', section: 'boundary' }
     return { fieldName: 'boundary', section: 'boundary' }
   }
 
-  if (changes.meta) {
-    if ('name' in changes.meta) return { fieldName: 'name', section: 'meta' }
+  // meta exists on both types
+  if ('meta' in changes && changes.meta) {
+    const meta = changes.meta
+    if ('name' in meta) return { fieldName: 'name', section: 'meta' }
+  }
+
+  // FFTCubeConfig-specific properties
+  if ('channels' in changes && changes.channels) {
+    return { fieldName: 'channels', section: 'fft' }
+  }
+
+  if ('fft_size' in changes) {
+    return { fieldName: 'fft_size', section: 'fft' }
+  }
+
+  if ('energy_capacity' in changes) {
+    return { fieldName: 'energy_capacity', section: 'energy' }
+  }
+
+  if ('current_energy' in changes) {
+    return { fieldName: 'current_energy', section: 'energy' }
   }
 
   return null
