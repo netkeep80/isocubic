@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
-import { createElement, type ReactNode } from 'react'
+import React, { createElement, type ReactNode } from 'react'
 import { ComponentInfo, DevModeIndicator } from './ComponentInfo'
 import { DevModeProvider } from '../lib/devmode'
 import type { ComponentMeta } from '../types/component-meta'
@@ -98,7 +98,10 @@ const DevModeWrapper = ({
   children: ReactNode
   enabled?: boolean
 }) => {
-  return createElement(DevModeProvider, { initialSettings: { enabled } }, children)
+  return createElement(DevModeProvider, {
+    initialSettings: { enabled },
+    children,
+  } as React.ComponentProps<typeof DevModeProvider>)
 }
 
 describe('ComponentInfo', () => {

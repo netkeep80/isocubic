@@ -152,7 +152,8 @@ describe('createMetaTooltip', () => {
     const tooltip = createMetaTooltip(meta)
 
     // Tooltip should not have description (only summary)
-    expect((tooltip as Record<string, unknown>).description).toBeUndefined()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect((tooltip as any).description).toBeUndefined()
   })
 })
 

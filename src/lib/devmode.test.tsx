@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
-import { createElement, type ReactNode } from 'react'
+import React, { createElement, type ReactNode } from 'react'
 import {
   DevModeProvider,
   useDevMode,
@@ -38,7 +38,9 @@ Object.defineProperty(window, 'localStorage', {
 // Helper to create wrapper
 const createWrapper = (initialSettings?: Partial<DevModeSettings>) => {
   return function Wrapper({ children }: { children: ReactNode }) {
-    return createElement(DevModeProvider, { initialSettings }, children)
+    return createElement(DevModeProvider, { initialSettings, children } as React.ComponentProps<
+      typeof DevModeProvider
+    >)
   }
 }
 
