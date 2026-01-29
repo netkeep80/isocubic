@@ -1,5 +1,7 @@
 # GitHub Pages deployment workflow
 # Deploys the isocubic web application to GitHub Pages
+# Note: This workflow duplicates some CI checks intentionally to ensure
+# only validated code is deployed to production
 
 name: Deploy to GitHub Pages
 
@@ -42,7 +44,7 @@ jobs:
         run: npm run lint
 
       - name: Run type check
-        run: npx tsc --noEmit
+        run: npm run typecheck
 
       - name: Run tests
         run: npm run test -- --run
