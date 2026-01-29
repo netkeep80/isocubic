@@ -125,7 +125,9 @@
   background: transparent;
   color: #888;
   cursor: pointer;
-  transition: color 0.2s, background-color 0.2s;
+  transition:
+    color 0.2s,
+    background-color 0.2s;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
@@ -305,7 +307,9 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.875rem;
-  transition: opacity 0.2s, background-color 0.2s;
+  transition:
+    opacity 0.2s,
+    background-color 0.2s;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
@@ -494,7 +498,9 @@
   font-size: 0.75rem;
   background: transparent;
   color: #888;
-  transition: background-color 0.2s, color 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
@@ -669,7 +675,9 @@
   border-radius: 6px;
   overflow: hidden;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
@@ -728,16 +736,9 @@
 }
 
 .gallery__noise-indicator--worley {
-  background: radial-gradient(
-    circle at 30% 30%,
-    rgba(255, 255, 255, 0.3),
-    transparent 50%
-  ),
-  radial-gradient(
-    circle at 70% 70%,
-    rgba(255, 255, 255, 0.2),
-    transparent 50%
-  );
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3), transparent 50%),
+    radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.2), transparent 50%);
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
@@ -1022,7 +1023,9 @@
   color: #dc3545;
   font-size: 0.75rem;
   cursor: pointer;
-  transition: background-color 0.2s, color 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
@@ -1282,7 +1285,9 @@
   font-size: 1rem;
   line-height: 1;
   cursor: pointer;
-  transition: background-color 0.2s, color 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
@@ -1334,7 +1339,9 @@
   color: #888;
   font-size: 0.875rem;
   cursor: pointer;
-  transition: border-color 0.2s, color 0.2s;
+  transition:
+    border-color 0.2s,
+    color 0.2s;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
@@ -1464,8 +1471,13 @@
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 
 .prompt-generator__status-text {
@@ -1528,7 +1540,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s, transform 0.1s;
+  transition:
+    background-color 0.2s,
+    transform 0.1s;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
@@ -1560,7 +1574,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Example prompts */
@@ -1591,7 +1607,9 @@
   color: #888;
   font-size: 0.625rem;
   cursor: pointer;
-  transition: border-color 0.2s, color 0.2s;
+  transition:
+    border-color 0.2s,
+    color 0.2s;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
   white-space: nowrap;
@@ -1618,7 +1636,9 @@
   color: #fff;
   font-size: 0.875rem;
   cursor: pointer;
-  transition: background-color 0.2s, border-color 0.2s;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
@@ -1964,7 +1984,9 @@
   border-radius: 6px;
   font-size: 0.875rem;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
+  transition:
+    background-color 0.2s,
+    transform 0.1s;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
@@ -2161,7 +2183,9 @@
   color: #888;
   font-size: 1rem;
   cursor: pointer;
-  transition: border-color 0.2s, color 0.2s;
+  transition:
+    border-color 0.2s,
+    color 0.2s;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
@@ -2198,7 +2222,9 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
+  transition:
+    background-color 0.2s,
+    transform 0.1s;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
@@ -2463,7 +2489,9 @@
   color: #888;
   font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.2s, color 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
 }
 
 .session-panel__kick-btn:hover {
@@ -2646,7 +2674,9 @@
   font-size: 0.875rem;
   text-align: left;
   cursor: pointer;
-  transition: background-color 0.2s, border-color 0.2s;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s;
 }
 
 .cursor-list__button:hover:not(:disabled) {
@@ -2917,7 +2947,9 @@
   color: #ff9800;
   font-size: 0.75rem;
   cursor: pointer;
-  transition: background-color 0.2s, color 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
 }
 
 .action-history__undo-btn:hover {
@@ -2983,7 +3015,9 @@
   color: #646cff;
   font-size: 0.75rem;
   cursor: pointer;
-  transition: background-color 0.2s, color 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
 }
 
 .action-history__clear-btn:hover {
@@ -3067,7 +3101,9 @@
   color: #dc3545;
   font-size: 0.75rem;
   cursor: pointer;
-  transition: background-color 0.2s, color 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
@@ -3278,7 +3314,14 @@
 
 .fft-editor__progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #4caf50 0%, #8bc34a 50%, #cddc39 75%, #ff9800 90%, #f44336 100%);
+  background: linear-gradient(
+    90deg,
+    #4caf50 0%,
+    #8bc34a 50%,
+    #cddc39 75%,
+    #ff9800 90%,
+    #f44336 100%
+  );
   background-size: 200% 100%;
   border-radius: 6px;
   transition: width 0.3s ease;
@@ -3372,7 +3415,9 @@
 .fft-editor__stress-fill {
   height: 100%;
   border-radius: 8px;
-  transition: width 0.3s ease, background-color 0.3s ease;
+  transition:
+    width 0.3s ease,
+    background-color 0.3s ease;
 }
 
 .fft-editor__stress-threshold {
@@ -3441,8 +3486,13 @@
 }
 
 @keyframes pulse-critical {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 
 /* Warning and error messages */
@@ -3592,7 +3642,9 @@
   color: #e0e0e0;
   cursor: pointer;
   font-size: 0.85rem;
-  transition: background-color 0.2s, border-color 0.2s;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s;
 }
 
 .fft-channel-editor__presets-btn:hover {
@@ -3630,7 +3682,9 @@
   border-radius: 4px;
   cursor: pointer;
   text-align: left;
-  transition: background-color 0.2s, border-color 0.2s;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s;
 }
 
 .fft-channel-editor__preset-item:hover {
@@ -3684,7 +3738,9 @@
   border: 2px solid transparent;
   border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.2s, border-color 0.2s;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s;
 }
 
 .fft-channel-editor__tab:hover {
@@ -3834,7 +3890,7 @@
   margin-left: 8px;
 }
 
-.fft-channel-editor__field input[type="range"] {
+.fft-channel-editor__field input[type='range'] {
   width: 100%;
   height: 6px;
   background: #333;
@@ -3843,7 +3899,7 @@
   cursor: pointer;
 }
 
-.fft-channel-editor__field input[type="range"]::-webkit-slider-thumb {
+.fft-channel-editor__field input[type='range']::-webkit-slider-thumb {
   appearance: none;
   width: 16px;
   height: 16px;
@@ -3853,11 +3909,11 @@
   transition: transform 0.1s;
 }
 
-.fft-channel-editor__field input[type="range"]::-webkit-slider-thumb:hover {
+.fft-channel-editor__field input[type='range']::-webkit-slider-thumb:hover {
   transform: scale(1.1);
 }
 
-.fft-channel-editor__field input[type="range"]::-moz-range-thumb {
+.fft-channel-editor__field input[type='range']::-moz-range-thumb {
   width: 16px;
   height: 16px;
   background: #007bff;
@@ -3969,7 +4025,7 @@
   flex: 1;
 }
 
-.fft-channel-editor__field--freq input[type="number"] {
+.fft-channel-editor__field--freq input[type='number'] {
   width: 100%;
   padding: 6px 8px;
   background: #252538;
@@ -3980,7 +4036,7 @@
   text-align: center;
 }
 
-.fft-channel-editor__field--freq input[type="number"]:focus {
+.fft-channel-editor__field--freq input[type='number']:focus {
   outline: none;
   border-color: #007bff;
 }
@@ -4057,16 +4113,16 @@
     min-height: 44px;
   }
 
-  .fft-channel-editor__field input[type="range"] {
+  .fft-channel-editor__field input[type='range'] {
     height: 10px;
   }
 
-  .fft-channel-editor__field input[type="range"]::-webkit-slider-thumb {
+  .fft-channel-editor__field input[type='range']::-webkit-slider-thumb {
     width: 24px;
     height: 24px;
   }
 
-  .fft-channel-editor__field input[type="range"]::-moz-range-thumb {
+  .fft-channel-editor__field input[type='range']::-moz-range-thumb {
     width: 24px;
     height: 24px;
   }
@@ -4089,7 +4145,7 @@
   .fft-channel-editor__presets-btn,
   .fft-channel-editor__coefficient-remove,
   .fft-channel-editor__spectrum-bar,
-  .fft-channel-editor__field input[type="range"]::-webkit-slider-thumb {
+  .fft-channel-editor__field input[type='range']::-webkit-slider-thumb {
     transition: none;
   }
 }

@@ -1,3 +1,13 @@
+# CI/CD workflow implementing best practices for AI-driven development
+# Based on: https://github.com/link-assistant/hive-mind/blob/main/docs/BEST-PRACTICES.md
+#
+# Key improvements:
+# - Cross-platform testing (Ubuntu, macOS, Windows)
+# - Multiple Node.js versions (18, 20, 22)
+# - File size limits enforcement (max 1500 lines)
+# - Code coverage reporting to Codecov
+# - Format checking with Prettier
+
 name: CI
 
 on:
@@ -6,10 +16,17 @@ on:
   pull_request:
     branches: [main]
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+# Cancel in-progress runs for the same branch
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
+jobs:
+  # === LINT AND FORMAT CHECK ===
+  # Fast check that runs independently
+  lint:
+    name: Lint & Format
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -28,8 +45,128 @@ jobs:
       - name: Type check
         run: npx tsc --noEmit
 
+      - name: Check formatting
+        run: npx prettier --check "src/**/*.{ts,tsx,js,jsx,json,css}" "*.{ts,js,json}" || echo "::warning::Some files need formatting. Run 'npx prettier --write' to fix."
+
+  # === FILE SIZE CHECK ===
+  # Enforce maximum file size to keep code maintainable for both AI and humans
+  # Currently issues a warning for existing oversized files
+  # TODO: Refactor src/lib/tinyLLM.ts (1771 lines) to be under 1500 lines
+  file-size-check:
+    name: File Size Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check file sizes (max 1500 lines)
+        run: |
+          echo "Checking for files exceeding 1500 lines..."
+          oversized_files=""
+          oversized_count=0
+
+          # Find all TypeScript/JavaScript files and check line count
+          while IFS= read -r file; do
+            if [ -f "$file" ]; then
+              lines=$(wc -l < "$file")
+              if [ "$lines" -gt 1500 ]; then
+                oversized_files="$oversized_files  - $file ($lines lines)\n"
+                oversized_count=$((oversized_count + 1))
+              fi
+            fi
+          done < <(find src -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) 2>/dev/null)
+
+          if [ -n "$oversized_files" ]; then
+            echo "::warning::Files exceeding 1500 lines limit (should be refactored):"
+            echo -e "$oversized_files"
+            echo ""
+            echo "Large files should be split into smaller modules for better maintainability."
+            echo "This limit ensures code stays readable for both AI and human developers."
+            echo ""
+            echo "Note: This is currently a warning. Consider creating issues to refactor these files."
+          else
+            echo "✓ All source files are within the 1500 line limit."
+          fi
+
+  # === TEST MATRIX ===
+  # Cross-platform testing on multiple OS and Node.js versions
+  test:
+    name: Test (Node ${{ matrix.node-version }} on ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    needs: [lint]
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node-version: ['18', '20', '22']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run test -- --run
+
+  # === COVERAGE ===
+  # Generate and upload code coverage to Codecov
+  coverage:
+    name: Code Coverage
+    runs-on: ubuntu-latest
+    needs: [lint]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests with coverage
+        run: npm run test:coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/coverage-final.json
+          fail_ci_if_error: false
+          verbose: true
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  # === BUILD ===
+  # Ensure the project builds successfully
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [lint, test, file-size-check]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Build
         run: npm run build
 
-      - name: Test
-        run: npm run test -- --run
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 7
