@@ -11,7 +11,7 @@ import {
   formatSessionCode,
   parseSessionCode,
 } from './collaboration'
-import type { Participant, Session } from '../types/collaboration'
+import type { Participant, Session, CollaborativeAction } from '../types/collaboration'
 import { DEFAULT_SESSION_SETTINGS } from '../types/collaboration'
 
 // Mock localStorage
@@ -297,7 +297,8 @@ describe('CollaborationManager', () => {
       })
 
       expect(result.success).toBe(true)
-      expect(manager.getCube('test-cube')?.base.color).toEqual([0, 1, 0])
+      const updatedCube = manager.getCube('test-cube') as { base: { color: [number, number, number] } }
+      expect(updatedCube?.base.color).toEqual([0, 1, 0])
     })
 
     it('should fail to update non-existent cube', () => {
@@ -498,7 +499,8 @@ describe('CollaborationManager', () => {
 
       // External action should win due to later timestamp
       expect(conflictListener).toHaveBeenCalled()
-      expect(manager.getCube('test-cube')?.base.color).toEqual([0, 0, 1])
+      const resolvedCube = manager.getCube('test-cube') as { base: { color: [number, number, number] } }
+      expect(resolvedCube?.base.color).toEqual([0, 0, 1])
     })
   })
 
