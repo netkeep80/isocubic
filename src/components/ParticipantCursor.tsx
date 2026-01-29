@@ -4,21 +4,7 @@
  */
 
 import { useMemo } from 'react'
-import type { Participant } from '../types/collaboration'
-
-/**
- * Cursor position in 3D space
- */
-export interface CursorPosition {
-  /** X coordinate in world space */
-  x: number
-  /** Y coordinate in world space */
-  y: number
-  /** Z coordinate in world space */
-  z: number
-  /** Selected cube ID (if any) */
-  selectedCubeId?: string
-}
+import type { Participant, CursorPosition } from '../types/collaboration'
 
 /**
  * Props for single cursor display
@@ -60,7 +46,7 @@ function CursorDisplay({
   showCoordinates = false,
   animationDuration = 100,
 }: CursorDisplayProps) {
-  const cursor = participant.presence?.cursor
+  const cursor = participant.cursor
 
   const cursorStyle = useMemo(
     () => ({
@@ -140,7 +126,7 @@ export function ParticipantCursor({
         return false
       }
       // Exclude if no cursor data
-      if (!cursor && !participant.presence?.cursor) {
+      if (!cursor && !participant.cursor) {
         return false
       }
       // Exclude offline participants
@@ -209,7 +195,7 @@ export function CursorList({
       })
       .map(({ participant, cursor }) => ({
         participant,
-        cursor: cursor ?? participant.presence?.cursor ?? null,
+        cursor: cursor ?? participant.cursor ?? null,
       }))
   }, [participants, localParticipantId])
 

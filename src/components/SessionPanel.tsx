@@ -181,7 +181,7 @@ export function SessionPanel({
       return
     }
 
-    const settings: Partial<SessionSettings> = sessionName.trim()
+    const settings: Partial<SessionSettings> | undefined = sessionName.trim()
       ? { name: sessionName.trim() }
       : undefined
 

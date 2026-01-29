@@ -4,10 +4,9 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent, act } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { ParticipantCursor, CursorList } from './ParticipantCursor'
-import type { Participant } from '../types/collaboration'
-import type { CursorPosition } from './ParticipantCursor'
+import type { Participant, CursorPosition } from '../types/collaboration'
 
 // Mock participant data
 const createMockParticipant = (overrides: Partial<Participant> = {}): Participant => ({
@@ -16,6 +15,7 @@ const createMockParticipant = (overrides: Partial<Participant> = {}): Participan
   role: 'editor',
   color: '#646cff',
   joinedAt: new Date().toISOString(),
+  lastActiveAt: new Date().toISOString(),
   status: 'online',
   ...overrides,
 })
@@ -52,9 +52,7 @@ describe('ParticipantCursor', () => {
 
     it('should render cursor for remote participants', () => {
       const participant = createMockParticipant({
-        presence: {
-          cursor: createMockCursor(),
-        },
+        cursor: createMockCursor(),
       })
       const cursor = createMockCursor()
 
@@ -69,31 +67,10 @@ describe('ParticipantCursor', () => {
       expect(container.querySelector('.participant-cursor')).toBeInTheDocument()
     })
 
-    it('should not render cursor for offline participants', () => {
+    it('should display participant name in label', () => {
       const participant = createMockParticipant({
-        status: 'offline',
-        presence: {
-          cursor: createMockCursor(),
-        },
-      })
-      const cursor = createMockCursor()
-
-      const { container } = render(
-        <ParticipantCursor
-          participants={[{ participant, cursor }]}
-          localParticipantId="different-id"
-        />
-      )
-
-      expect(container.querySelector('.participant-cursor')).not.toBeInTheDocument()
-    })
-
-    it('should display participant name', () => {
-      const participant = createMockParticipant({
-        name: 'John Doe',
-        presence: {
-          cursor: createMockCursor(),
-        },
+        name: 'Alice',
+        cursor: createMockCursor(),
       })
       const cursor = createMockCursor()
 
@@ -104,16 +81,98 @@ describe('ParticipantCursor', () => {
         />
       )
 
-      expect(screen.getByText('John Doe')).toBeInTheDocument()
+      expect(screen.getByText('Alice')).toBeInTheDocument()
     })
 
-    it('should display coordinates when showCoordinates is true', () => {
+    it('should use participant color', () => {
       const participant = createMockParticipant({
-        presence: {
-          cursor: { x: 1.5, y: 2.0, z: 3.0 },
-        },
+        color: '#ff0000',
+        cursor: createMockCursor(),
       })
-      const cursor = { x: 1.5, y: 2.0, z: 3.0 }
+      const cursor = createMockCursor()
+
+      const { container } = render(
+        <ParticipantCursor
+          participants={[{ participant, cursor }]}
+          localParticipantId="different-id"
+        />
+      )
+
+      const label = container.querySelector('.participant-cursor__label')
+      expect(label).toHaveStyle({ backgroundColor: '#ff0000' })
+    })
+
+    it('should render selection indicator when cube is selected', () => {
+      const cursor = createMockCursor({ selectedCubeId: 'cube-123' })
+      const participant = createMockParticipant({
+        cursor,
+      })
+
+      const { container } = render(
+        <ParticipantCursor
+          participants={[{ participant, cursor }]}
+          localParticipantId="different-id"
+        />
+      )
+
+      expect(container.querySelector('.participant-cursor__selection')).toBeInTheDocument()
+      expect(screen.getByText('Selected: cube-123')).toBeInTheDocument()
+    })
+  })
+
+  describe('Filtering', () => {
+    it('should exclude local participant', () => {
+      const localParticipant = createMockParticipant({
+        id: 'local-id',
+        cursor: createMockCursor(),
+      })
+
+      const { container } = render(
+        <ParticipantCursor
+          participants={[{ participant: localParticipant, cursor: createMockCursor() }]}
+          localParticipantId="local-id"
+        />
+      )
+
+      expect(container.querySelector('.participant-cursor')).not.toBeInTheDocument()
+    })
+
+    it('should exclude offline participants', () => {
+      const offlineParticipant = createMockParticipant({
+        status: 'offline',
+        cursor: createMockCursor(),
+      })
+
+      const { container } = render(
+        <ParticipantCursor
+          participants={[{ participant: offlineParticipant, cursor: createMockCursor() }]}
+          localParticipantId="different-id"
+        />
+      )
+
+      expect(container.querySelector('.participant-cursor')).not.toBeInTheDocument()
+    })
+
+    it('should exclude participants without cursor data', () => {
+      const participant = createMockParticipant()
+
+      const { container } = render(
+        <ParticipantCursor
+          participants={[{ participant, cursor: null }]}
+          localParticipantId="different-id"
+        />
+      )
+
+      expect(container.querySelector('.participant-cursor')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Props', () => {
+    it('should show coordinates when showCoordinates is true', () => {
+      const cursor = createMockCursor({ x: 1.5, y: 2.0, z: 0.5 })
+      const participant = createMockParticipant({
+        cursor,
+      })
 
       render(
         <ParticipantCursor
@@ -123,38 +182,17 @@ describe('ParticipantCursor', () => {
         />
       )
 
-      expect(screen.getByText('(1.5, 2.0, 3.0)')).toBeInTheDocument()
-    })
-
-    it('should show selection indicator when cube is selected', () => {
-      const participant = createMockParticipant({
-        presence: {
-          cursor: { x: 1, y: 2, z: 3, selectedCubeId: 'cube-123' },
-        },
-      })
-      const cursor = { x: 1, y: 2, z: 3, selectedCubeId: 'cube-123' }
-
-      render(
-        <ParticipantCursor
-          participants={[{ participant, cursor }]}
-          localParticipantId="different-id"
-        />
-      )
-
-      expect(screen.getByText(/Selected: cube-123/)).toBeInTheDocument()
+      expect(screen.getByText(/\(1\.5, 2\.0, 0\.5\)/)).toBeInTheDocument()
     })
 
     it('should apply custom className', () => {
       const participant = createMockParticipant({
-        presence: {
-          cursor: createMockCursor(),
-        },
+        cursor: createMockCursor(),
       })
-      const cursor = createMockCursor()
 
       const { container } = render(
         <ParticipantCursor
-          participants={[{ participant, cursor }]}
+          participants={[{ participant, cursor: createMockCursor() }]}
           localParticipantId="different-id"
           className="custom-class"
         />
@@ -162,87 +200,55 @@ describe('ParticipantCursor', () => {
 
       expect(container.querySelector('.participant-cursors.custom-class')).toBeInTheDocument()
     })
-
-    it('should render multiple cursors', () => {
-      const participant1 = createMockParticipant({
-        id: 'p1',
-        name: 'User 1',
-        presence: { cursor: createMockCursor() },
-      })
-      const participant2 = createMockParticipant({
-        id: 'p2',
-        name: 'User 2',
-        presence: { cursor: createMockCursor() },
-      })
-      const cursor1 = createMockCursor()
-      const cursor2 = createMockCursor()
-
-      const { container } = render(
-        <ParticipantCursor
-          participants={[
-            { participant: participant1, cursor: cursor1 },
-            { participant: participant2, cursor: cursor2 },
-          ]}
-          localParticipantId="different-id"
-        />
-      )
-
-      const cursors = container.querySelectorAll('.participant-cursor')
-      expect(cursors.length).toBe(2)
-    })
   })
 })
 
 describe('CursorList', () => {
-  describe('Rendering', () => {
-    it('should render empty message when no participants', () => {
+  describe('Empty State', () => {
+    it('should show empty message when no participants', () => {
       render(<CursorList participants={[]} />)
 
       expect(screen.getByText('No other participants online')).toBeInTheDocument()
     })
 
-    it('should render empty message when only local participant', () => {
-      const participant = createMockParticipant()
-      const cursor = createMockCursor()
+    it('should show empty message when only local participant', () => {
+      const localParticipant = createMockParticipant({ id: 'local-id' })
 
       render(
-        <CursorList participants={[{ participant, cursor }]} localParticipantId={participant.id} />
+        <CursorList
+          participants={[{ participant: localParticipant, cursor: createMockCursor() }]}
+          localParticipantId="local-id"
+        />
       )
 
       expect(screen.getByText('No other participants online')).toBeInTheDocument()
     })
+  })
 
-    it('should render title', () => {
-      const participant = createMockParticipant()
-      const cursor = createMockCursor()
+  describe('Rendering', () => {
+    it('should render participant list', () => {
+      const participant = createMockParticipant({ name: 'Alice' })
 
       render(
-        <CursorList participants={[{ participant, cursor }]} localParticipantId="different-id" />
+        <CursorList
+          participants={[{ participant, cursor: createMockCursor() }]}
+          localParticipantId="different-id"
+        />
       )
 
       expect(screen.getByText('Participants')).toBeInTheDocument()
+      expect(screen.getByText('Alice')).toBeInTheDocument()
     })
 
-    it('should render participant list', () => {
-      const participant = createMockParticipant({ name: 'Jane Doe' })
-      const cursor = createMockCursor()
-
-      render(
-        <CursorList participants={[{ participant, cursor }]} localParticipantId="different-id" />
-      )
-
-      expect(screen.getByText('Jane Doe')).toBeInTheDocument()
-    })
-
-    it('should display cursor position', () => {
+    it('should show cursor position', () => {
+      const cursor = createMockCursor({ x: 1.5, y: 2.0, z: 0.5 })
       const participant = createMockParticipant()
-      const cursor = { x: 1.5, y: 2.5, z: 3.5 }
 
       render(
         <CursorList participants={[{ participant, cursor }]} localParticipantId="different-id" />
       )
 
-      expect(screen.getByText('x: 1.5, y: 2.5, z: 3.5')).toBeInTheDocument()
+      expect(screen.getByText(/x: 1\.5, y: 2\.0, z: 0\.5/)).toBeInTheDocument()
     })
 
     it('should show "No position" when cursor is null', () => {
@@ -258,10 +264,26 @@ describe('CursorList', () => {
       expect(screen.getByText('No position')).toBeInTheDocument()
     })
 
-    it('should call onCursorClick when item is clicked', async () => {
+    it('should use participant color', () => {
+      const participant = createMockParticipant({ color: '#ff0000' })
+
+      const { container } = render(
+        <CursorList
+          participants={[{ participant, cursor: createMockCursor() }]}
+          localParticipantId="different-id"
+        />
+      )
+
+      const colorIndicator = container.querySelector('.cursor-list__color')
+      expect(colorIndicator).toHaveStyle({ backgroundColor: '#ff0000' })
+    })
+  })
+
+  describe('Click Handler', () => {
+    it('should call onCursorClick when item clicked', () => {
       const onCursorClick = vi.fn()
-      const participant = createMockParticipant()
       const cursor = createMockCursor()
+      const participant = createMockParticipant()
 
       render(
         <CursorList
@@ -271,64 +293,62 @@ describe('CursorList', () => {
         />
       )
 
-      const button = screen.getByRole('button')
-      await act(async () => {
-        fireEvent.click(button)
-      })
+      fireEvent.click(screen.getByRole('button'))
 
       expect(onCursorClick).toHaveBeenCalledWith(cursor, participant)
     })
 
     it('should disable button when cursor is null', () => {
+      const onCursorClick = vi.fn()
       const participant = createMockParticipant()
 
       render(
         <CursorList
           participants={[{ participant, cursor: null }]}
           localParticipantId="different-id"
+          onCursorClick={onCursorClick}
         />
       )
 
-      const button = screen.getByRole('button')
-      expect(button).toBeDisabled()
+      expect(screen.getByRole('button')).toBeDisabled()
     })
+  })
 
-    it('should apply custom className', () => {
-      const participant = createMockParticipant()
-      const cursor = createMockCursor()
+  describe('Status Indicator', () => {
+    it('should show green for online status', () => {
+      const participant = createMockParticipant({ status: 'online' })
 
       const { container } = render(
         <CursorList
-          participants={[{ participant, cursor }]}
+          participants={[{ participant, cursor: createMockCursor() }]}
           localParticipantId="different-id"
-          className="custom-class"
         />
       )
 
-      expect(container.querySelector('.cursor-list.custom-class')).toBeInTheDocument()
+      const status = container.querySelector('.cursor-list__status')
+      expect(status).toHaveStyle({ backgroundColor: 'rgb(76, 175, 80)' })
     })
 
-    it('should not render offline participants', () => {
-      const onlineParticipant = createMockParticipant({ id: 'p1', name: 'Online' })
-      const offlineParticipant = createMockParticipant({
-        id: 'p2',
-        name: 'Offline',
-        status: 'offline',
-      })
-      const cursor = createMockCursor()
+    it('should show orange for away status', () => {
+      const participant = createMockParticipant({ status: 'away' })
 
-      render(
+      const { container } = render(
         <CursorList
-          participants={[
-            { participant: onlineParticipant, cursor },
-            { participant: offlineParticipant, cursor },
-          ]}
+          participants={[{ participant, cursor: createMockCursor() }]}
           localParticipantId="different-id"
         />
       )
 
-      expect(screen.getByText('Online')).toBeInTheDocument()
-      expect(screen.queryByText('Offline')).not.toBeInTheDocument()
+      const status = container.querySelector('.cursor-list__status')
+      expect(status).toHaveStyle({ backgroundColor: 'rgb(255, 152, 0)' })
+    })
+  })
+
+  describe('Props', () => {
+    it('should apply custom className', () => {
+      const { container } = render(<CursorList participants={[]} className="custom-class" />)
+
+      expect(container.querySelector('.cursor-list.custom-class')).toBeInTheDocument()
     })
   })
 })

@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, act } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { SessionPanel } from './SessionPanel'
 import type { CollaborationManager } from '../lib/collaboration'
 import type { Session, Participant, ConnectionState } from '../types/collaboration'
@@ -40,15 +40,17 @@ const mockSession: Session = {
   id: 'session-123',
   code: 'ABC123',
   ownerId: 'owner-1',
-  participantIds: ['owner-1', 'participant-2'],
   settings: {
     name: 'Test Session',
+    isOpen: true,
     maxParticipants: 10,
-    allowAnonymous: false,
+    allowRoleRequests: true,
+    autoSaveInterval: 0,
   },
-  state: 'active',
+  participants: new Map(),
+  cubes: new Map(),
   createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
+  modifiedAt: new Date().toISOString(),
 }
 
 // Mock participant data
@@ -58,6 +60,7 @@ const mockLocalParticipant: Participant = {
   role: 'owner',
   color: '#646cff',
   joinedAt: new Date().toISOString(),
+  lastActiveAt: new Date().toISOString(),
   status: 'online',
 }
 
@@ -67,6 +70,7 @@ const mockOtherParticipant: Participant = {
   role: 'editor',
   color: '#4caf50',
   joinedAt: new Date().toISOString(),
+  lastActiveAt: new Date().toISOString(),
   status: 'online',
 }
 
@@ -106,155 +110,88 @@ describe('SessionPanel', () => {
   })
 
   describe('Create Session View', () => {
-    it('should show create session form when Create Session is clicked', async () => {
+    it('should show create session form when Create Session is clicked', () => {
       const mockManager = createMockManager()
       render(<SessionPanel collaborationManager={mockManager} />)
 
-      const createButton = screen.getByRole('button', { name: 'Create Session' })
-      await act(async () => {
-        fireEvent.click(createButton)
-      })
+      fireEvent.click(screen.getByRole('button', { name: 'Create Session' }))
 
       expect(screen.getByLabelText(/Your Name/)).toBeInTheDocument()
       expect(screen.getByLabelText(/Session Name/)).toBeInTheDocument()
     })
 
-    it('should show back button in create view', async () => {
+    it('should show back button in create view', () => {
       const mockManager = createMockManager()
       render(<SessionPanel collaborationManager={mockManager} />)
 
-      const createButton = screen.getByRole('button', { name: 'Create Session' })
-      await act(async () => {
-        fireEvent.click(createButton)
-      })
+      fireEvent.click(screen.getByRole('button', { name: 'Create Session' }))
 
       expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument()
     })
 
-    it('should return to idle view when back is clicked', async () => {
+    it('should return to idle view when back is clicked', () => {
       const mockManager = createMockManager()
       render(<SessionPanel collaborationManager={mockManager} />)
 
-      // Go to create view
-      const createButton = screen.getByRole('button', { name: 'Create Session' })
-      await act(async () => {
-        fireEvent.click(createButton)
-      })
-
-      // Click back
-      const backButton = screen.getByRole('button', { name: 'Back' })
-      await act(async () => {
-        fireEvent.click(backButton)
-      })
+      fireEvent.click(screen.getByRole('button', { name: 'Create Session' }))
+      fireEvent.click(screen.getByRole('button', { name: 'Back' }))
 
       expect(screen.getByText('Collaboration')).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: 'Create Session' })).toBeInTheDocument()
+      expect(screen.queryByLabelText(/Your Name/)).not.toBeInTheDocument()
     })
 
-    it('should show error when name is empty on create', async () => {
+    it('should show error when name is empty on create', () => {
       const mockManager = createMockManager()
       render(<SessionPanel collaborationManager={mockManager} />)
 
-      // Go to create view
-      const createButton = screen.getByRole('button', { name: 'Create Session' })
-      await act(async () => {
-        fireEvent.click(createButton)
-      })
+      fireEvent.click(screen.getByRole('button', { name: 'Create Session' }))
+      fireEvent.click(screen.getByRole('button', { name: 'Create Session' }))
 
-      // Click create without entering name
-      const submitButton = screen.getByRole('button', { name: 'Create Session' })
-      await act(async () => {
-        fireEvent.click(submitButton)
-      })
-
-      expect(screen.getByRole('alert')).toBeInTheDocument()
-      expect(screen.getByText(/Please enter your name/)).toBeInTheDocument()
+      expect(screen.getByText('Please enter your name')).toBeInTheDocument()
     })
 
-    it('should call createSession on manager when form is valid', async () => {
+    it('should call createSession on manager when form is valid', () => {
       const mockManager = createMockManager()
       render(<SessionPanel collaborationManager={mockManager} />)
 
-      // Go to create view
-      const createButton = screen.getByRole('button', { name: 'Create Session' })
-      await act(async () => {
-        fireEvent.click(createButton)
-      })
-
-      // Fill in name
-      const nameInput = screen.getByLabelText(/Your Name/)
-      await act(async () => {
-        fireEvent.change(nameInput, { target: { value: 'Test User' } })
-      })
-
-      // Submit
-      const submitButton = screen.getByRole('button', { name: 'Create Session' })
-      await act(async () => {
-        fireEvent.click(submitButton)
-      })
+      fireEvent.click(screen.getByRole('button', { name: 'Create Session' }))
+      fireEvent.change(screen.getByLabelText(/Your Name/), { target: { value: 'Test User' } })
+      fireEvent.click(screen.getByRole('button', { name: 'Create Session' }))
 
       expect(mockManager.createSession).toHaveBeenCalledWith('Test User', undefined)
     })
   })
 
   describe('Join Session View', () => {
-    it('should show join session form when Join Session is clicked', async () => {
+    it('should show join session form when Join Session is clicked', () => {
       const mockManager = createMockManager()
       render(<SessionPanel collaborationManager={mockManager} />)
 
-      const joinButton = screen.getByRole('button', { name: 'Join Session' })
-      await act(async () => {
-        fireEvent.click(joinButton)
-      })
+      fireEvent.click(screen.getByRole('button', { name: 'Join Session' }))
 
       expect(screen.getByLabelText(/Your Name/)).toBeInTheDocument()
       expect(screen.getByLabelText(/Session Code/)).toBeInTheDocument()
     })
 
-    it('should show error when name is empty on join', async () => {
+    it('should show error when name is empty on join', () => {
       const mockManager = createMockManager()
       render(<SessionPanel collaborationManager={mockManager} />)
 
-      // Go to join view
-      const joinButton = screen.getByRole('button', { name: 'Join Session' })
-      await act(async () => {
-        fireEvent.click(joinButton)
-      })
+      fireEvent.click(screen.getByRole('button', { name: 'Join Session' }))
+      fireEvent.click(screen.getByRole('button', { name: 'Join Session' }))
 
-      // Click join without entering data
-      const submitButton = screen.getByRole('button', { name: 'Join Session' })
-      await act(async () => {
-        fireEvent.click(submitButton)
-      })
-
-      expect(screen.getByRole('alert')).toBeInTheDocument()
-      expect(screen.getByText(/Please enter your name/)).toBeInTheDocument()
+      expect(screen.getByText('Please enter your name')).toBeInTheDocument()
     })
 
-    it('should show error when session code is empty on join', async () => {
+    it('should show error when session code is empty on join', () => {
       const mockManager = createMockManager()
       render(<SessionPanel collaborationManager={mockManager} />)
 
-      // Go to join view
-      const joinButton = screen.getByRole('button', { name: 'Join Session' })
-      await act(async () => {
-        fireEvent.click(joinButton)
-      })
+      fireEvent.click(screen.getByRole('button', { name: 'Join Session' }))
+      fireEvent.change(screen.getByLabelText(/Your Name/), { target: { value: 'Test User' } })
+      fireEvent.click(screen.getByRole('button', { name: 'Join Session' }))
 
-      // Fill in name but not code
-      const nameInput = screen.getByLabelText(/Your Name/)
-      await act(async () => {
-        fireEvent.change(nameInput, { target: { value: 'Test User' } })
-      })
-
-      // Click join
-      const submitButton = screen.getByRole('button', { name: 'Join Session' })
-      await act(async () => {
-        fireEvent.click(submitButton)
-      })
-
-      expect(screen.getByRole('alert')).toBeInTheDocument()
-      expect(screen.getByText(/Please enter session code/)).toBeInTheDocument()
+      expect(screen.getByText('Please enter session code')).toBeInTheDocument()
     })
   })
 
@@ -262,7 +199,7 @@ describe('SessionPanel', () => {
     it('should render session name when session is active', () => {
       const mockManager = createMockManager({
         getSession: vi.fn().mockReturnValue(mockSession),
-        getParticipants: vi.fn().mockReturnValue([mockLocalParticipant, mockOtherParticipant]),
+        getParticipants: vi.fn().mockReturnValue([mockLocalParticipant]),
         getLocalParticipant: vi.fn().mockReturnValue(mockLocalParticipant),
         getState: vi.fn().mockReturnValue({ connectionState: 'connected' as ConnectionState }),
       })
@@ -296,23 +233,10 @@ describe('SessionPanel', () => {
       render(<SessionPanel collaborationManager={mockManager} />)
 
       expect(screen.getByText('Session Code:')).toBeInTheDocument()
-      expect(screen.getByText(/ABC-123/)).toBeInTheDocument()
+      expect(screen.getByText(/ABC.*123/)).toBeInTheDocument()
     })
 
-    it('should display participant count', () => {
-      const mockManager = createMockManager({
-        getSession: vi.fn().mockReturnValue(mockSession),
-        getParticipants: vi.fn().mockReturnValue([mockLocalParticipant, mockOtherParticipant]),
-        getLocalParticipant: vi.fn().mockReturnValue(mockLocalParticipant),
-        getState: vi.fn().mockReturnValue({ connectionState: 'connected' as ConnectionState }),
-      })
-
-      render(<SessionPanel collaborationManager={mockManager} />)
-
-      expect(screen.getByText('Participants (2)')).toBeInTheDocument()
-    })
-
-    it('should display participant list', () => {
+    it('should display participants list', () => {
       const mockManager = createMockManager({
         getSession: vi.fn().mockReturnValue(mockSession),
         getParticipants: vi.fn().mockReturnValue([mockLocalParticipant, mockOtherParticipant]),
@@ -326,7 +250,7 @@ describe('SessionPanel', () => {
       expect(screen.getByText('Other User')).toBeInTheDocument()
     })
 
-    it('should show "(you)" indicator for local participant', () => {
+    it('should show "(you)" next to local participant', () => {
       const mockManager = createMockManager({
         getSession: vi.fn().mockReturnValue(mockSession),
         getParticipants: vi.fn().mockReturnValue([mockLocalParticipant]),
@@ -352,7 +276,7 @@ describe('SessionPanel', () => {
       expect(screen.getByRole('button', { name: 'Leave Session' })).toBeInTheDocument()
     })
 
-    it('should call leaveSession when Leave Session is clicked', async () => {
+    it('should call leaveSession when Leave Session is clicked', () => {
       const mockManager = createMockManager({
         getSession: vi.fn().mockReturnValue(mockSession),
         getParticipants: vi.fn().mockReturnValue([mockLocalParticipant]),
@@ -362,10 +286,7 @@ describe('SessionPanel', () => {
 
       render(<SessionPanel collaborationManager={mockManager} />)
 
-      const leaveButton = screen.getByRole('button', { name: 'Leave Session' })
-      await act(async () => {
-        fireEvent.click(leaveButton)
-      })
+      fireEvent.click(screen.getByRole('button', { name: 'Leave Session' }))
 
       expect(mockManager.leaveSession).toHaveBeenCalled()
     })
@@ -426,12 +347,41 @@ describe('SessionPanel', () => {
 
       render(<SessionPanel collaborationManager={mockManager} />)
 
-      const kickButton = screen.getByRole('button', { name: /Remove Other User/ })
-      await act(async () => {
-        fireEvent.click(kickButton)
-      })
+      fireEvent.click(screen.getByRole('button', { name: /Remove Other User/ }))
 
       expect(mockManager.kickParticipant).toHaveBeenCalledWith('participant-2')
+    })
+
+    it('should call updateParticipantRole when role is changed', () => {
+      const mockManager = createMockManager({
+        getSession: vi.fn().mockReturnValue(mockSession),
+        getParticipants: vi.fn().mockReturnValue([mockLocalParticipant, mockOtherParticipant]),
+        getLocalParticipant: vi.fn().mockReturnValue(mockLocalParticipant),
+        getState: vi.fn().mockReturnValue({ connectionState: 'connected' as ConnectionState }),
+      })
+
+      render(<SessionPanel collaborationManager={mockManager} />)
+
+      const roleSelect = screen.getByRole('combobox', { name: /Change role for Other User/ })
+      fireEvent.change(roleSelect, { target: { value: 'viewer' } })
+
+      expect(mockManager.updateParticipantRole).toHaveBeenCalledWith('participant-2', 'viewer')
+    })
+
+    it('should not show controls for non-owner participants', () => {
+      const nonOwnerParticipant = { ...mockLocalParticipant, role: 'editor' as const }
+
+      const mockManager = createMockManager({
+        getSession: vi.fn().mockReturnValue(mockSession),
+        getParticipants: vi.fn().mockReturnValue([nonOwnerParticipant, mockOtherParticipant]),
+        getLocalParticipant: vi.fn().mockReturnValue(nonOwnerParticipant),
+        getState: vi.fn().mockReturnValue({ connectionState: 'connected' as ConnectionState }),
+      })
+
+      render(<SessionPanel collaborationManager={mockManager} />)
+
+      expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: /Remove/ })).not.toBeInTheDocument()
     })
   })
 

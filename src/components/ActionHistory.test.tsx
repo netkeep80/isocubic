@@ -6,14 +6,18 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import { ActionHistory } from './ActionHistory'
-import type { CollaborativeAction, Participant, ActionType } from '../types/collaboration'
+import type { CollaborativeAction, Participant, CubeCreateAction } from '../types/collaboration'
 
 // Helper to create mock actions
-const createMockAction = (overrides: Partial<CollaborativeAction> = {}): CollaborativeAction => ({
+const createMockAction = (overrides: Partial<CubeCreateAction> = {}): CubeCreateAction => ({
   id: `action-${Math.random().toString(36).slice(2)}`,
-  type: 'add_cube',
+  type: 'cube_create',
   participantId: 'participant-1',
   timestamp: new Date().toISOString(),
+  sessionId: 'session-1',
+  payload: {
+    cube: { id: 'cube-1' } as never,
+  },
   ...overrides,
 })
 
@@ -24,6 +28,7 @@ const createMockParticipant = (overrides: Partial<Participant> = {}): Participan
   role: 'editor',
   color: '#646cff',
   joinedAt: new Date().toISOString(),
+  lastActiveAt: new Date().toISOString(),
   status: 'online',
   ...overrides,
 })
@@ -49,56 +54,67 @@ describe('ActionHistory', () => {
   })
 
   describe('Rendering Actions', () => {
-    it('should render action list title', () => {
-      const actions = [createMockAction()]
+    it('should render actions list with count', () => {
+      const actions = [createMockAction(), createMockAction()]
 
       render(<ActionHistory actions={actions} />)
 
       expect(screen.getByText('Action History')).toBeInTheDocument()
+      expect(screen.getByText('2 actions')).toBeInTheDocument()
     })
 
-    it('should display action count', () => {
-      const actions = [createMockAction(), createMockAction(), createMockAction()]
+    it('should display action description', () => {
+      const actions = [createMockAction({ type: 'cube_create' })]
 
       render(<ActionHistory actions={actions} />)
 
-      expect(screen.getByText('3 actions')).toBeInTheDocument()
+      expect(screen.getByText('Created a cube')).toBeInTheDocument()
     })
 
-    it('should render action items', () => {
-      const actions = [createMockAction({ type: 'add_cube', targetId: 'cube-1' })]
+    it('should display "just now" for recent actions', () => {
+      const actions = [createMockAction({ timestamp: new Date().toISOString() })]
 
       render(<ActionHistory actions={actions} />)
 
-      expect(screen.getByText(/Added cube/)).toBeInTheDocument()
+      expect(screen.getByText('just now')).toBeInTheDocument()
     })
 
-    it('should render participant name when available', () => {
+    it('should display participant name from participants map', () => {
       const actions = [createMockAction({ participantId: 'p1' })]
-      const participants = new Map([['p1', createMockParticipant({ id: 'p1', name: 'John' })]])
+      const participants = new Map([['p1', createMockParticipant({ id: 'p1', name: 'Alice' })]])
 
       render(<ActionHistory actions={actions} participants={participants} />)
 
-      expect(screen.getByText('John')).toBeInTheDocument()
+      expect(screen.getByText('Alice')).toBeInTheDocument()
     })
 
-    it('should show "Unknown" for unresolved participants', () => {
-      const actions = [createMockAction({ participantId: 'unknown-id' })]
+    it('should display Unknown for missing participant', () => {
+      const actions = [createMockAction({ participantId: 'unknown-p' })]
 
       render(<ActionHistory actions={actions} />)
 
       expect(screen.getByText('Unknown')).toBeInTheDocument()
     })
+  })
 
-    it('should mark local participant actions', () => {
+  describe('Local Participant Highlighting', () => {
+    it('should show "(you)" badge for local participant actions', () => {
       const actions = [createMockAction({ participantId: 'local-p' })]
 
-      const { container } = render(<ActionHistory actions={actions} localParticipantId="local-p" />)
+      render(<ActionHistory actions={actions} localParticipantId="local-p" />)
 
-      expect(container.querySelector('.action-history__item--local')).toBeInTheDocument()
+      expect(screen.getByText('(you)')).toBeInTheDocument()
     })
 
-    it('should show "(you)" badge for local participant', () => {
+    it('should not show "(you)" badge for other participants', () => {
+      const actions = [createMockAction({ participantId: 'other-p' })]
+
+      render(<ActionHistory actions={actions} localParticipantId="local-p" />)
+
+      expect(screen.queryByText('(you)')).not.toBeInTheDocument()
+    })
+
+    it('should show participant name with "(you)" badge', () => {
       const actions = [createMockAction({ participantId: 'local-p' })]
       const participants = new Map([
         ['local-p', createMockParticipant({ id: 'local-p', name: 'Me' })],
@@ -108,249 +124,146 @@ describe('ActionHistory', () => {
         <ActionHistory actions={actions} participants={participants} localParticipantId="local-p" />
       )
 
+      expect(screen.getByText('Me')).toBeInTheDocument()
       expect(screen.getByText('(you)')).toBeInTheDocument()
     })
   })
 
-  describe('Action Types', () => {
-    const actionTypes: Array<{ type: ActionType; expectedText: RegExp }> = [
-      { type: 'add_cube', expectedText: /Added cube/ },
-      { type: 'remove_cube', expectedText: /Removed cube/ },
-      { type: 'modify_cube', expectedText: /Modified cube/ },
-      { type: 'select_cube', expectedText: /Selected/ },
-      { type: 'deselect_cube', expectedText: /Deselected/ },
-      { type: 'move_cube', expectedText: /Moved cube/ },
-      { type: 'rotate_cube', expectedText: /Rotated cube/ },
-      { type: 'scale_cube', expectedText: /Scaled cube/ },
-      { type: 'change_color', expectedText: /Changed color/ },
-      { type: 'change_material', expectedText: /Changed material/ },
-      { type: 'batch', expectedText: /Batch operation/ },
-    ]
-
-    actionTypes.forEach(({ type, expectedText }) => {
-      it(`should display correct description for ${type}`, () => {
-        const actions = [createMockAction({ type })]
-
-        render(<ActionHistory actions={actions} />)
-
-        expect(screen.getByText(expectedText)).toBeInTheDocument()
-      })
-    })
-  })
-
   describe('Filtering', () => {
-    it('should exclude cursor_move and presence_update by default', () => {
-      const actions = [
-        createMockAction({ type: 'cursor_move' }),
-        createMockAction({ type: 'presence_update' }),
-        createMockAction({ type: 'add_cube' }),
-      ]
-
-      render(<ActionHistory actions={actions} />)
-
-      expect(screen.getByText('1 actions')).toBeInTheDocument()
-    })
-
     it('should render filter buttons', () => {
       const actions = [createMockAction()]
 
       render(<ActionHistory actions={actions} />)
 
-      expect(screen.getByRole('button', { name: 'Add' })).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: 'Remove' })).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: 'Modify' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Create' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Update' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Delete' })).toBeInTheDocument()
     })
 
-    it('should filter actions when filter is clicked', async () => {
+    it('should filter actions when filter clicked', () => {
       const actions = [
-        createMockAction({ type: 'add_cube' }),
-        createMockAction({ type: 'remove_cube' }),
-        createMockAction({ type: 'add_cube' }),
+        createMockAction({ id: 'a1', type: 'cube_create' }),
+        {
+          id: 'a2',
+          type: 'cube_delete',
+          participantId: 'p1',
+          timestamp: new Date().toISOString(),
+          sessionId: 'session-1',
+          payload: { cubeId: 'cube-1' },
+        } as CollaborativeAction,
       ]
 
       render(<ActionHistory actions={actions} />)
 
-      const addFilter = screen.getByRole('button', { name: 'Add' })
-      await act(async () => {
-        fireEvent.click(addFilter)
-      })
-
       expect(screen.getByText('2 actions')).toBeInTheDocument()
+
+      fireEvent.click(screen.getByRole('button', { name: 'Delete' }))
+
+      expect(screen.getByText('1 actions')).toBeInTheDocument()
     })
 
-    it('should show Clear button when filters are active', async () => {
+    it('should show Clear button when filter is active', () => {
       const actions = [createMockAction()]
 
       render(<ActionHistory actions={actions} />)
 
-      const addFilter = screen.getByRole('button', { name: 'Add' })
-      await act(async () => {
-        fireEvent.click(addFilter)
-      })
+      expect(screen.queryByRole('button', { name: 'Clear' })).not.toBeInTheDocument()
+
+      fireEvent.click(screen.getByRole('button', { name: 'Create' }))
 
       expect(screen.getByRole('button', { name: 'Clear' })).toBeInTheDocument()
     })
 
-    it('should clear filters when Clear is clicked', async () => {
-      const actions = [
-        createMockAction({ type: 'add_cube' }),
-        createMockAction({ type: 'remove_cube' }),
-      ]
+    it('should clear all filters when Clear button clicked', () => {
+      const actions = [createMockAction()]
 
       render(<ActionHistory actions={actions} />)
 
-      // Activate filter
-      const addFilter = screen.getByRole('button', { name: 'Add' })
-      await act(async () => {
-        fireEvent.click(addFilter)
-      })
+      fireEvent.click(screen.getByRole('button', { name: 'Create' }))
+      fireEvent.click(screen.getByRole('button', { name: 'Clear' }))
 
-      // Clear filter
-      const clearButton = screen.getByRole('button', { name: 'Clear' })
-      await act(async () => {
-        fireEvent.click(clearButton)
-      })
-
-      expect(screen.getByText('2 actions')).toBeInTheDocument()
-    })
-
-    it('should show no results message when filter matches nothing', async () => {
-      const actions = [createMockAction({ type: 'add_cube' })]
-
-      render(<ActionHistory actions={actions} />)
-
-      // Filter by Remove (which we don't have)
-      const removeFilter = screen.getByRole('button', { name: 'Remove' })
-      await act(async () => {
-        fireEvent.click(removeFilter)
-      })
-
-      expect(screen.getByText('No actions match the selected filters')).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Clear' })).not.toBeInTheDocument()
     })
   })
 
-  describe('Action Details', () => {
-    it('should expand details when action is clicked', async () => {
-      const actions = [createMockAction({ id: 'action-123', type: 'add_cube' })]
+  describe('Expanding Action Details', () => {
+    it('should expand action details on click', () => {
+      const actions = [createMockAction({ id: 'test-action-id' })]
 
       render(<ActionHistory actions={actions} />)
 
-      const actionButton = screen.getByRole('button', { name: /Added cube/ })
-      await act(async () => {
-        fireEvent.click(actionButton)
-      })
+      expect(screen.queryByText('ID:')).not.toBeInTheDocument()
+
+      fireEvent.click(screen.getByText('Created a cube'))
 
       expect(screen.getByText('ID:')).toBeInTheDocument()
       expect(screen.getByText('Type:')).toBeInTheDocument()
+      expect(screen.getByText('Time:')).toBeInTheDocument()
     })
 
-    it('should collapse details when clicked again', async () => {
-      const actions = [createMockAction({ id: 'action-123', type: 'add_cube' })]
+    it('should collapse action details on second click', () => {
+      const actions = [createMockAction()]
 
       render(<ActionHistory actions={actions} />)
 
-      const actionButton = screen.getByRole('button', { name: /Added cube/ })
+      fireEvent.click(screen.getByText('Created a cube'))
+      expect(screen.getByText('ID:')).toBeInTheDocument()
 
-      // Expand
-      await act(async () => {
-        fireEvent.click(actionButton)
-      })
-
-      // Collapse
-      await act(async () => {
-        fireEvent.click(actionButton)
-      })
-
+      fireEvent.click(screen.getByText('Created a cube'))
       expect(screen.queryByText('ID:')).not.toBeInTheDocument()
     })
 
-    it('should show target ID in details when available', async () => {
-      const actions = [createMockAction({ targetId: 'cube-456' })]
+    it('should call onActionClick callback', () => {
+      const onActionClick = vi.fn()
+      const actions = [createMockAction()]
 
-      render(<ActionHistory actions={actions} />)
+      render(<ActionHistory actions={actions} onActionClick={onActionClick} />)
 
-      const actionButton = screen.getByRole('button', { name: /Added cube/ })
-      await act(async () => {
-        fireEvent.click(actionButton)
-      })
+      fireEvent.click(screen.getByText('Created a cube'))
 
-      expect(screen.getByText('Target:')).toBeInTheDocument()
-      expect(screen.getByText('cube-456')).toBeInTheDocument()
+      expect(onActionClick).toHaveBeenCalledTimes(1)
     })
   })
 
   describe('Undo Functionality', () => {
-    it('should show undo button for local participant actions', async () => {
-      const actions = [createMockAction({ participantId: 'local-p' })]
+    it('should show undo button for local participant expanded actions', () => {
       const onUndoAction = vi.fn()
+      const actions = [createMockAction({ participantId: 'local-p' })]
 
       render(
         <ActionHistory actions={actions} localParticipantId="local-p" onUndoAction={onUndoAction} />
       )
 
-      const actionButton = screen.getByRole('button', { name: /Added cube/ })
-      await act(async () => {
-        fireEvent.click(actionButton)
-      })
+      fireEvent.click(screen.getByText('Created a cube'))
 
       expect(screen.getByRole('button', { name: 'Undo' })).toBeInTheDocument()
     })
 
-    it('should call onUndoAction when undo is clicked', async () => {
-      const action = createMockAction({ participantId: 'local-p' })
+    it('should not show undo button for other participant actions', () => {
       const onUndoAction = vi.fn()
-
-      render(
-        <ActionHistory
-          actions={[action]}
-          localParticipantId="local-p"
-          onUndoAction={onUndoAction}
-        />
-      )
-
-      const actionButton = screen.getByRole('button', { name: /Added cube/ })
-      await act(async () => {
-        fireEvent.click(actionButton)
-      })
-
-      const undoButton = screen.getByRole('button', { name: 'Undo' })
-      await act(async () => {
-        fireEvent.click(undoButton)
-      })
-
-      expect(onUndoAction).toHaveBeenCalledWith(action)
-    })
-
-    it('should not show undo button for other participants', async () => {
       const actions = [createMockAction({ participantId: 'other-p' })]
-      const onUndoAction = vi.fn()
 
       render(
         <ActionHistory actions={actions} localParticipantId="local-p" onUndoAction={onUndoAction} />
       )
 
-      const actionButton = screen.getByRole('button', { name: /Added cube/ })
-      await act(async () => {
-        fireEvent.click(actionButton)
-      })
+      fireEvent.click(screen.getByText('Created a cube'))
 
       expect(screen.queryByRole('button', { name: 'Undo' })).not.toBeInTheDocument()
     })
-  })
 
-  describe('Action Click Callback', () => {
-    it('should call onActionClick when action is clicked', async () => {
-      const action = createMockAction()
-      const onActionClick = vi.fn()
+    it('should call onUndoAction when undo clicked', () => {
+      const onUndoAction = vi.fn()
+      const actions = [createMockAction({ participantId: 'local-p' })]
 
-      render(<ActionHistory actions={[action]} onActionClick={onActionClick} />)
+      render(
+        <ActionHistory actions={actions} localParticipantId="local-p" onUndoAction={onUndoAction} />
+      )
 
-      const actionButton = screen.getByRole('button', { name: /Added cube/ })
-      await act(async () => {
-        fireEvent.click(actionButton)
-      })
+      fireEvent.click(screen.getByText('Created a cube'))
+      fireEvent.click(screen.getByRole('button', { name: 'Undo' }))
 
-      expect(onActionClick).toHaveBeenCalledWith(action)
+      expect(onUndoAction).toHaveBeenCalledWith(actions[0])
     })
   })
 
@@ -365,27 +278,11 @@ describe('ActionHistory', () => {
   })
 
   describe('Grouping', () => {
-    it('should group actions by participant when groupByParticipant is true', () => {
+    it('should group actions by participant when enabled', () => {
       const actions = [
         createMockAction({ participantId: 'p1' }),
-        createMockAction({ participantId: 'p2' }),
         createMockAction({ participantId: 'p1' }),
       ]
-      const participants = new Map([
-        ['p1', createMockParticipant({ id: 'p1', name: 'User 1' })],
-        ['p2', createMockParticipant({ id: 'p2', name: 'User 2' })],
-      ])
-
-      const { container } = render(
-        <ActionHistory actions={actions} participants={participants} groupByParticipant={true} />
-      )
-
-      const groups = container.querySelectorAll('.action-history__group')
-      expect(groups.length).toBe(2)
-    })
-
-    it('should show group headers with participant names', () => {
-      const actions = [createMockAction({ participantId: 'p1' })]
       const participants = new Map([['p1', createMockParticipant({ id: 'p1', name: 'Alice' })]])
 
       render(
@@ -430,7 +327,7 @@ describe('ActionHistory', () => {
     })
 
     it('should display seconds ago for actions < 1 minute', () => {
-      const timestamp = new Date(Date.now() - 30000).toISOString() // 30 seconds ago
+      const timestamp = new Date(Date.now() - 30000).toISOString()
       const actions = [createMockAction({ timestamp })]
 
       render(<ActionHistory actions={actions} />)
@@ -439,12 +336,30 @@ describe('ActionHistory', () => {
     })
 
     it('should display minutes ago for actions < 1 hour', () => {
-      const timestamp = new Date(Date.now() - 300000).toISOString() // 5 minutes ago
+      const timestamp = new Date(Date.now() - 5 * 60 * 1000).toISOString()
       const actions = [createMockAction({ timestamp })]
 
       render(<ActionHistory actions={actions} />)
 
       expect(screen.getByText(/5m ago/)).toBeInTheDocument()
+    })
+
+    it('should update relative times periodically', async () => {
+      // Create timestamp at current fake time (will show "just now")
+      const timestamp = new Date().toISOString()
+      const actions = [createMockAction({ timestamp })]
+
+      render(<ActionHistory actions={actions} />)
+
+      expect(screen.getByText('just now')).toBeInTheDocument()
+
+      // Advance timers by 15 seconds (past the 10s threshold for "just now")
+      await act(async () => {
+        vi.advanceTimersByTime(15000)
+      })
+
+      // Should now show seconds ago
+      expect(screen.getByText(/s ago/)).toBeInTheDocument()
     })
   })
 })

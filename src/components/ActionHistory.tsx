@@ -42,19 +42,14 @@ export interface ActionHistoryProps {
  * Available action type filters
  */
 const ACTION_TYPE_LABELS: Record<ActionType, string> = {
-  add_cube: 'Add',
-  remove_cube: 'Remove',
-  modify_cube: 'Modify',
-  select_cube: 'Select',
-  deselect_cube: 'Deselect',
-  move_cube: 'Move',
-  rotate_cube: 'Rotate',
-  scale_cube: 'Scale',
-  change_color: 'Color',
-  change_material: 'Material',
-  batch: 'Batch',
+  cube_create: 'Create',
+  cube_update: 'Update',
+  cube_delete: 'Delete',
+  cube_select: 'Select',
   cursor_move: 'Cursor',
-  presence_update: 'Status',
+  participant_join: 'Join',
+  participant_leave: 'Leave',
+  session_settings_update: 'Settings',
 }
 
 /**
@@ -62,32 +57,22 @@ const ACTION_TYPE_LABELS: Record<ActionType, string> = {
  */
 function getActionIcon(type: ActionType): string {
   switch (type) {
-    case 'add_cube':
+    case 'cube_create':
       return '+'
-    case 'remove_cube':
-      return '-'
-    case 'modify_cube':
+    case 'cube_update':
       return '~'
-    case 'select_cube':
+    case 'cube_delete':
+      return '-'
+    case 'cube_select':
       return '[]'
-    case 'deselect_cube':
-      return '[ ]'
-    case 'move_cube':
-      return '\u2194' // ↔
-    case 'rotate_cube':
-      return '\u21BB' // ↻
-    case 'scale_cube':
-      return '\u2922' // ⤢
-    case 'change_color':
-      return '\u25CF' // ●
-    case 'change_material':
-      return '\u2726' // ✦
-    case 'batch':
-      return '#'
     case 'cursor_move':
       return '\u2197' // ↗
-    case 'presence_update':
-      return '\u25C9' // ◉
+    case 'participant_join':
+      return '\u2192' // →
+    case 'participant_leave':
+      return '\u2190' // ←
+    case 'session_settings_update':
+      return '\u2699' // ⚙
     default:
       return '?'
   }
@@ -98,32 +83,22 @@ function getActionIcon(type: ActionType): string {
  */
 function formatActionDescription(action: CollaborativeAction): string {
   switch (action.type) {
-    case 'add_cube':
-      return `Added cube${action.targetId ? ` "${action.targetId}"` : ''}`
-    case 'remove_cube':
-      return `Removed cube${action.targetId ? ` "${action.targetId}"` : ''}`
-    case 'modify_cube':
-      return `Modified cube${action.targetId ? ` "${action.targetId}"` : ''}`
-    case 'select_cube':
-      return `Selected${action.targetId ? ` "${action.targetId}"` : ' cube'}`
-    case 'deselect_cube':
-      return `Deselected${action.targetId ? ` "${action.targetId}"` : ' cube'}`
-    case 'move_cube':
-      return `Moved cube${action.targetId ? ` "${action.targetId}"` : ''}`
-    case 'rotate_cube':
-      return `Rotated cube${action.targetId ? ` "${action.targetId}"` : ''}`
-    case 'scale_cube':
-      return `Scaled cube${action.targetId ? ` "${action.targetId}"` : ''}`
-    case 'change_color':
-      return `Changed color${action.targetId ? ` of "${action.targetId}"` : ''}`
-    case 'change_material':
-      return `Changed material${action.targetId ? ` of "${action.targetId}"` : ''}`
-    case 'batch':
-      return 'Batch operation'
+    case 'cube_create':
+      return 'Created a cube'
+    case 'cube_update':
+      return `Updated cube${action.payload.cubeId ? ` "${action.payload.cubeId}"` : ''}`
+    case 'cube_delete':
+      return `Deleted cube${action.payload.cubeId ? ` "${action.payload.cubeId}"` : ''}`
+    case 'cube_select':
+      return action.payload.cubeId ? `Selected "${action.payload.cubeId}"` : 'Deselected cube'
     case 'cursor_move':
       return 'Moved cursor'
-    case 'presence_update':
-      return 'Updated status'
+    case 'participant_join':
+      return `${action.payload.participant?.name ?? 'Someone'} joined`
+    case 'participant_leave':
+      return 'Left session'
+    case 'session_settings_update':
+      return 'Updated settings'
     default:
       return 'Unknown action'
   }
@@ -192,11 +167,9 @@ export function ActionHistory({
       filtered = filtered.filter((action) => activeFilters.has(action.type))
     }
 
-    // Exclude cursor and presence updates by default (too noisy)
+    // Exclude cursor moves by default (too noisy)
     if (activeFilters.size === 0) {
-      filtered = filtered.filter(
-        (action) => action.type !== 'cursor_move' && action.type !== 'presence_update'
-      )
+      filtered = filtered.filter((action) => action.type !== 'cursor_move')
     }
 
     // Limit and reverse (newest first)
@@ -313,14 +286,6 @@ export function ActionHistory({
               <span className="action-history__detail-value">{action.type}</span>
             </div>
 
-            {/* Target */}
-            {action.targetId && (
-              <div className="action-history__detail-row">
-                <span className="action-history__detail-label">Target:</span>
-                <span className="action-history__detail-value">{action.targetId}</span>
-              </div>
-            )}
-
             {/* Timestamp */}
             <div className="action-history__detail-row">
               <span className="action-history__detail-label">Time:</span>
@@ -371,7 +336,7 @@ export function ActionHistory({
       {/* Filter chips */}
       <div className="action-history__filters">
         {Object.entries(ACTION_TYPE_LABELS)
-          .filter(([type]) => type !== 'cursor_move' && type !== 'presence_update')
+          .filter(([type]) => type !== 'cursor_move')
           .map(([type, label]) => (
             <button
               key={type}
