@@ -11,7 +11,8 @@
  * @module webgpu-compute
  */
 
-import { FFT3D, FFTResult, FFTSize } from './fft-wasm'
+import { FFT3D } from './fft-wasm'
+import type { FFTResult, FFTSize } from './fft-wasm'
 
 /**
  * WebGPU support status
@@ -106,7 +107,8 @@ export async function checkWebGPUSupport(): Promise<WebGPUSupport> {
       }
     }
 
-    const adapterInfo = await adapter.requestAdapterInfo()
+    // GPUAdapter.info is the modern API (adapter.requestAdapterInfo is deprecated)
+    const adapterInfo = adapter.info
 
     return {
       supported: true,
@@ -454,7 +456,8 @@ export class WebGPUCompute {
   private perlinPipeline: GPUComputePipeline | null = null
   private worleyPipeline: GPUComputePipeline | null = null
   private cracklePipeline: GPUComputePipeline | null = null
-  private fftPipeline: GPUComputePipeline | null = null
+  // Note: FFT currently uses optimized WASM/JS fallback from fft-wasm module
+  // WebGPU FFT pipeline can be added in future if performance benefits are identified
 
   // Fallback FFT instance
   private fallbackFFT: FFT3D | null = null
@@ -523,7 +526,9 @@ export class WebGPUCompute {
     this.perlinPipeline = createPipeline(perlinNoiseShader)
     this.worleyPipeline = createPipeline(worleyNoiseShader)
     this.cracklePipeline = createPipeline(crackleNoiseShader)
-    this.fftPipeline = createPipeline(fftComputeShader)
+    // FFT shader is prepared but not assigned to a pipeline
+    // since FFT currently uses optimized WASM/JS fallback
+    void fftComputeShader
   }
 
   /**
@@ -1012,7 +1017,6 @@ export class WebGPUCompute {
     this.perlinPipeline = null
     this.worleyPipeline = null
     this.cracklePipeline = null
-    this.fftPipeline = null
     this.initialized = false
     this.supported = false
   }

@@ -1,16 +1,13 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import {
   WebGPUCompute,
-  WebGPUSupport,
-  NoiseParams,
-  NoiseResult,
-  BenchmarkResult,
   checkWebGPUSupport,
   getWebGPUCompute,
   initWebGPUCompute,
   getPreferredComputeMethod,
   getWebGPUComputeVersion,
 } from './webgpu-compute'
+import type { WebGPUSupport, NoiseParams, NoiseResult, BenchmarkResult } from './webgpu-compute'
 
 describe('WebGPU Compute Module', () => {
   describe('getWebGPUComputeVersion', () => {
