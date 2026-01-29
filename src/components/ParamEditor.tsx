@@ -727,7 +727,11 @@ export function ParamEditor({ currentCube, onCubeUpdate, className = '' }: Param
                 ))}
               </select>
               <p className="param-editor__description">
-                {BOUNDARY_MODE_DESCRIPTIONS[localCube.boundary?.mode ?? CUBE_DEFAULTS.boundary.mode]}
+                {
+                  BOUNDARY_MODE_DESCRIPTIONS[
+                    localCube.boundary?.mode ?? CUBE_DEFAULTS.boundary.mode
+                  ]
+                }
               </p>
             </div>
 
@@ -736,7 +740,10 @@ export function ParamEditor({ currentCube, onCubeUpdate, className = '' }: Param
               <label htmlFor="boundary-neighbor-influence" className="param-editor__label">
                 Neighbor Influence
                 <span className="param-editor__value">
-                  {(localCube.boundary?.neighbor_influence ?? CUBE_DEFAULTS.boundary.neighbor_influence).toFixed(2)}
+                  {(
+                    localCube.boundary?.neighbor_influence ??
+                    CUBE_DEFAULTS.boundary.neighbor_influence
+                  ).toFixed(2)}
                 </span>
               </label>
               <input
@@ -746,7 +753,10 @@ export function ParamEditor({ currentCube, onCubeUpdate, className = '' }: Param
                 min="0"
                 max="1"
                 step="0.01"
-                value={localCube.boundary?.neighbor_influence ?? CUBE_DEFAULTS.boundary.neighbor_influence}
+                value={
+                  localCube.boundary?.neighbor_influence ??
+                  CUBE_DEFAULTS.boundary.neighbor_influence
+                }
                 onChange={(e) => updateBoundary({ neighbor_influence: parseFloat(e.target.value) })}
               />
               <div className="param-editor__slider-labels">

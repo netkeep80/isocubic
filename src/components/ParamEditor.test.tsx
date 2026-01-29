@@ -409,7 +409,9 @@ describe('ParamEditor', () => {
     it('displays neighbor influence description', () => {
       render(<ParamEditor currentCube={testCube} />)
       expect(
-        screen.getByText('How much neighboring cubes affect the color and gradient blending at edges.')
+        screen.getByText(
+          'How much neighboring cubes affect the color and gradient blending at edges.'
+        )
       ).toBeInTheDocument()
     })
 
