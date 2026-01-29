@@ -302,7 +302,7 @@ npm run test:coverage
 
 ## Лицензия
 
-MIT License — см. файл [LICENSE](LICENSE)
+Unlicense license — см. файл [LICENSE](LICENSE)
 
 ## Связь
 
