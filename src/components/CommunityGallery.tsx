@@ -103,7 +103,7 @@ export const COMMUNITY_GALLERY_META: ComponentMeta = {
       path: 'lib/community-gallery.ts',
       purpose: 'API service for community cubes',
     },
-    { name: 'community', type: 'types', path: 'types/community.ts', purpose: 'Type definitions' },
+    { name: 'community', type: 'lib', path: 'types/community.ts', purpose: 'Type definitions' },
   ],
   relatedFiles: [
     {
@@ -113,10 +113,10 @@ export const COMMUNITY_GALLERY_META: ComponentMeta = {
     },
     {
       path: 'lib/community-gallery.ts',
-      type: 'lib',
+      type: 'util',
       description: 'Community gallery service',
     },
-    { path: 'types/community.ts', type: 'types', description: 'Community types' },
+    { path: 'types/community.ts', type: 'type', description: 'Community types' },
   ],
   props: [
     {
@@ -247,12 +247,7 @@ function generateCubeGradient(cube: SpectralCube): string {
  * Community Gallery Component
  * Browse and interact with community-published cubes
  */
-export function CommunityGallery({
-  onCubeSelect,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onCubePreview,
-  className = '',
-}: CommunityGalleryProps) {
+export function CommunityGallery({ onCubeSelect, className = '' }: CommunityGalleryProps) {
   // State
   const [cubes, setCubes] = useState<PublishedCube[]>([])
   const [pagination, setPagination] = useState<PaginationMeta | null>(null)
