@@ -142,7 +142,8 @@ isocubic/
 │   │   ├── PromptGenerator.tsx # Генерация по промпту с расширенными режимами
 │   │   ├── Gallery.tsx        # Галерея примеров
 │   │   ├── CommunityGallery.tsx # Галерея сообщества
-│   │   └── ExportPanel.tsx    # Экспорт/импорт
+│   │   ├── ExportPanel.tsx    # Экспорт/импорт
+│   │   └── SharePanel.tsx     # Шаринг кубиков с QR-кодами
 │   ├── shaders/           # GLSL-шейдеры
 │   │   ├── parametric-cube.glsl  # Исходный GLSL код
 │   │   ├── parametric-cube.ts    # TypeScript модуль для Three.js
@@ -159,13 +160,15 @@ isocubic/
 │   │   ├── energyPhysics.ts   # Физика энергии для магических объектов
 │   │   ├── stack-presets.ts   # Готовые шаблоны стопок кубиков
 │   │   ├── collaboration.ts   # Модуль коллаборативного редактирования
-│   │   └── community-gallery.ts # Сервис галереи сообщества
+│   │   ├── community-gallery.ts # Сервис галереи сообщества
+│   │   └── share-links.ts     # Сервис share-ссылок и QR-кодов
 │   ├── types/             # TypeScript-типы
 │   │   ├── cube.ts
 │   │   ├── lod.ts             # Типы для LOD-системы
 │   │   ├── stack.ts           # Типы для системы стопок кубиков
 │   │   ├── collaboration.ts   # Типы для коллаборации и мультиплеера
-│   │   └── community.ts       # Типы для галереи сообщества
+│   │   ├── community.ts       # Типы для галереи сообщества
+│   │   └── share.ts           # Типы для share-ссылок
 │   └── App.tsx
 ├── wasm-fft/              # Rust WASM модуль для FFT
 │   ├── Cargo.toml             # Rust конфигурация
@@ -264,7 +267,7 @@ npm run test:coverage
 ```
 
 **Текущее покрытие:**
-- 1730+ тестов
+- 1850+ тестов
 - Unit-тесты для типов, валидации, хранилища, производительности, физики энергии
 - Тесты модуля коллаборации (сессии, участники, синхронизация, конфликты)
 - Тесты WebSocket клиента (подключение, сообщения, реконнект, fallback на polling)
@@ -274,6 +277,7 @@ npm run test:coverage
 - Тесты расширенной ИИ-модели (пакетная генерация, группы, fine-tuning)
 - Тесты системы аутентификации (AuthProvider, AuthForms, UserProfile, валидация)
 - Тесты галереи сообщества (CommunityGallery, поиск, фильтрация, сортировка, пагинация)
+- Тесты share-ссылок (SharePanel, QR-коды, защита паролем, аналитика)
 - E2E тесты для полных workflow редактирования
 
 ## Вклад в проект
