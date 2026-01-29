@@ -9,7 +9,7 @@ import type { CollaborativeAction, ActionType, Participant } from '../types/coll
 /**
  * Extended action with resolved participant info
  */
-export interface ResolvedAction extends CollaborativeAction {
+export type ResolvedAction = CollaborativeAction & {
   /** Resolved participant info (if available) */
   participant?: Participant
 }
