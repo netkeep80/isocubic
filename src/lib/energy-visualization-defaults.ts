@@ -8,7 +8,7 @@
  * ISSUE 28: Редактор визуализации энергии (Energy Visualization Editor)
  */
 
-import { ChannelMask, VisualizationMode } from '../shaders/energy-cube'
+import { ChannelMask, type VisualizationMode } from '../shaders/energy-cube'
 
 /**
  * Settings for visualization mode and channel display

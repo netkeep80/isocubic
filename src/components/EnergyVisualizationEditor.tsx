@@ -14,30 +14,24 @@ import { ChannelMask, type VisualizationMode } from '../shaders/energy-cube'
 import {
   DEFAULT_VISUALIZATION_SETTINGS,
   DEFAULT_ANIMATION_SETTINGS,
+  DEFAULT_EDITOR_SETTINGS,
+  type VisualizationSettings,
+  type AnimationSettings,
+  type EnergyVisualizationEditorSettings,
 } from '../lib/energy-visualization-defaults'
 
 // Re-export types and defaults for backward compatibility
-export type {
-  VisualizationSettings,
-  AnimationSettings,
-  EnergyVisualizationEditorSettings,
-} from '../lib/energy-visualization-defaults'
-export {
-  DEFAULT_VISUALIZATION_SETTINGS,
-  DEFAULT_ANIMATION_SETTINGS,
-  DEFAULT_EDITOR_SETTINGS,
-} from '../lib/energy-visualization-defaults'
+export type { VisualizationSettings, AnimationSettings, EnergyVisualizationEditorSettings }
+export { DEFAULT_VISUALIZATION_SETTINGS, DEFAULT_ANIMATION_SETTINGS, DEFAULT_EDITOR_SETTINGS }
 
 /**
  * Props for EnergyVisualizationEditor component
  */
 export interface EnergyVisualizationEditorProps {
   /** Current visualization settings */
-  settings: import('../lib/energy-visualization-defaults').EnergyVisualizationEditorSettings
+  settings: EnergyVisualizationEditorSettings
   /** Callback when settings are updated */
-  onSettingsChange?: (
-    settings: import('../lib/energy-visualization-defaults').EnergyVisualizationEditorSettings
-  ) => void
+  onSettingsChange?: (settings: EnergyVisualizationEditorSettings) => void
   /** Custom class name */
   className?: string
   /** Whether to show real-time preview info */
