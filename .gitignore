@@ -27,3 +27,6 @@ dist-ssr
 wasm-fft/target
 wasm-fft/pkg
 wasm-fft/Cargo.lock
+
+# Test coverage
+coverage/
