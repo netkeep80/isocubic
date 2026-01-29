@@ -10,7 +10,7 @@
  * - Ability to save custom presets to localStorage
  */
 
-import type { CubeStackConfig, StackLayer, StackTransition } from '../types/stack'
+import type { CubeStackConfig, StackTransition } from '../types/stack'
 import type { SpectralCube, Color3, MaterialType, NoiseType } from '../types/cube'
 import { createStackLayer, createCubeStack, DEFAULT_STACK_TRANSITION } from '../types/stack'
 
@@ -39,12 +39,7 @@ export interface StackPreset {
 /**
  * Categories for organizing presets
  */
-export type StackPresetCategory =
-  | 'natural'
-  | 'construction'
-  | 'magical'
-  | 'terrain'
-  | 'custom'
+export type StackPresetCategory = 'natural' | 'construction' | 'magical' | 'terrain' | 'custom'
 
 /**
  * Category metadata for display

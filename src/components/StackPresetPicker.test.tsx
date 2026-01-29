@@ -279,11 +279,7 @@ describe('StackPresetPicker', () => {
 
     it('calls onApplyPreset when apply button is clicked', () => {
       render(
-        <StackPresetPicker
-          isOpen={true}
-          onApplyPreset={mockOnApplyPreset}
-          onClose={mockOnClose}
-        />
+        <StackPresetPicker isOpen={true} onApplyPreset={mockOnApplyPreset} onClose={mockOnClose} />
       )
 
       // Select preset
@@ -300,11 +296,7 @@ describe('StackPresetPicker', () => {
 
     it('closes picker after applying preset', () => {
       render(
-        <StackPresetPicker
-          isOpen={true}
-          onApplyPreset={mockOnApplyPreset}
-          onClose={mockOnClose}
-        />
+        <StackPresetPicker isOpen={true} onApplyPreset={mockOnApplyPreset} onClose={mockOnClose} />
       )
 
       // Select and apply preset
@@ -317,11 +309,7 @@ describe('StackPresetPicker', () => {
 
     it('applies preset on double-click', () => {
       render(
-        <StackPresetPicker
-          isOpen={true}
-          onApplyPreset={mockOnApplyPreset}
-          onClose={mockOnClose}
-        />
+        <StackPresetPicker isOpen={true} onApplyPreset={mockOnApplyPreset} onClose={mockOnClose} />
       )
 
       const presetCard = screen.getByText('Stone Wall').closest('[role="button"]')
@@ -441,7 +429,9 @@ describe('StackPresetPicker', () => {
 
       // Delete it
       const presetCard = screen.getByText('To Be Deleted').closest('.stack-preset-picker__preset')
-      const deleteButton = within(presetCard as HTMLElement).getByRole('button', { name: /delete/i })
+      const deleteButton = within(presetCard as HTMLElement).getByRole('button', {
+        name: /delete/i,
+      })
       fireEvent.click(deleteButton)
 
       // Should be gone

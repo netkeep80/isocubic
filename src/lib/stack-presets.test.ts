@@ -20,7 +20,6 @@ import {
   applyPreset,
   exportPresetAsJSON,
   importPresetFromJSON,
-  type StackPreset,
   type StackPresetCategory,
 } from './stack-presets'
 import { createCubeStack, createStackLayer } from '../types/stack'

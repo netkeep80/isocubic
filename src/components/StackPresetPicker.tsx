@@ -102,8 +102,10 @@ export function StackPresetPicker({
     return presets
   }, [searchQuery, selectedCategory, refreshKey])
 
-  // Category counts
+  // Category counts - refreshKey dependency is intentional to trigger recalculation when presets change
   const categoryCounts = useMemo(() => {
+    // Note: refreshKey is used to force recalculation when user presets change
+    void refreshKey
     const allPresets = getAllStackPresets()
     const counts: Record<string, number> = { all: allPresets.length }
 
@@ -286,7 +288,9 @@ export function StackPresetPicker({
                 className="stack-preset-picker__preview"
                 style={{ background: generateStackGradient(preset) }}
               >
-                <div className="stack-preset-picker__layers-count">{preset.config.layers.length}</div>
+                <div className="stack-preset-picker__layers-count">
+                  {preset.config.layers.length}
+                </div>
               </div>
 
               {/* Info */}
