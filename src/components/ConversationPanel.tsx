@@ -29,12 +29,17 @@ import {
 } from 'react'
 import {
   type ConversationMessage,
+  type ConversationSession,
   type ConversationPanelSettings,
   type ConversationMessageContext,
   DEFAULT_CONVERSATION_SETTINGS,
   CONVERSATION_SUGGESTIONS,
 } from '../types/god-mode'
-import { createConversationAgent, type AgentResponse } from '../lib/conversation-agent'
+import {
+  createConversationAgent,
+  type AgentResponse,
+  type ConversationAgent,
+} from '../lib/conversation-agent'
 
 /**
  * Props for ConversationPanel
