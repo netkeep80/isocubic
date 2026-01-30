@@ -15,6 +15,17 @@
 
 import type { QueryLanguage } from './ai-query'
 
+// Re-export issue draft types for convenience
+export type {
+  IssueDraft,
+  IssueTemplate,
+  IssueType,
+  IssuePriority,
+  IssueScreenshot,
+  IssueAnnotation,
+  IssueDraftSettings,
+} from './issue-generator'
+
 /**
  * Available tabs in GOD MODE window
  */
@@ -85,7 +96,7 @@ export const GOD_MODE_TABS: GodModeTabInfo[] = [
     labelRu: 'Задачи',
     labelEn: 'Issues',
     icon: '📝',
-    available: false,
+    available: true,
     descriptionRu: 'Черновики GitHub Issues (TASK 56)',
     descriptionEn: 'GitHub Issue drafts (TASK 56)',
   },

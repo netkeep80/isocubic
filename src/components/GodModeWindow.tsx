@@ -52,6 +52,7 @@ import { DevModeQueryPanel } from './DevModeQueryPanel'
 import { ComponentContextPanel } from './ComponentContextPanel'
 import { ExtendedSearchPanel } from './ExtendedSearchPanel'
 import { ConversationPanel } from './ConversationPanel'
+import { IssueDraftPanel } from './IssueDraftPanel'
 
 /**
  * Props for GodModeWindow
@@ -678,17 +679,21 @@ export function GodModeWindow({
 
       case 'issues':
         return (
-          <div style={styles.placeholder}>
-            <div>
-              <div style={{ fontSize: '32px', marginBottom: '12px' }}>📝</div>
-              <div style={{ marginBottom: '8px' }}>
-                {language === 'ru' ? 'Черновики GitHub Issues' : 'GitHub Issue drafts'}
-              </div>
-              <div style={{ fontSize: '11px', color: '#9ca3af' }}>
-                {language === 'ru' ? 'Будет реализовано в TASK 56' : 'Coming in TASK 56'}
-              </div>
-            </div>
-          </div>
+          <IssueDraftPanel
+            conversationMessages={[]} // TODO: Get conversation messages from ConversationPanel
+            language={language}
+            showAdvancedOptions={true}
+            style={styles.embeddedPanel}
+            onDraftCreated={(draft) => {
+              console.log('Draft created:', draft)
+            }}
+            onDraftUpdated={(draft) => {
+              console.log('Draft updated:', draft)
+            }}
+            onDraftReady={(draft) => {
+              console.log('Draft ready for publishing:', draft)
+            }}
+          />
         )
 
       default:
