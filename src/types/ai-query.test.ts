@@ -14,7 +14,9 @@ import {
   createHistoryEntry,
   generateHistoryId,
   validateQueryRequest,
+  createDefaultContextInfo,
   DEFAULT_QUERY_PANEL_SETTINGS,
+  DEFAULT_CONTEXT_PANEL_SETTINGS,
   INTENT_PATTERNS,
   EXAMPLE_QUERIES,
   type AIQueryRequest,
@@ -22,6 +24,9 @@ import {
   type QueryHistoryEntry,
   type QueryIntent,
   type QueryLanguage,
+  type ComponentContextInfo,
+  type RelatedComponentInfo,
+  type ContextPanelSettings,
 } from './ai-query'
 import type { ComponentMeta } from './component-meta'
 
@@ -449,6 +454,134 @@ describe('AI Query Types', () => {
       const languages: QueryLanguage[] = ['ru', 'en']
 
       expect(languages).toHaveLength(2)
+    })
+  })
+
+  /**
+   * TASK 51: Component Context Assistant Types
+   */
+  describe('Component Context Assistant Types', () => {
+    describe('createDefaultContextInfo', () => {
+      it('should create default context info with given componentId', () => {
+        const context = createDefaultContextInfo('test-component')
+
+        expect(context.componentId).toBe('test-component')
+        expect(context.description).toBe('')
+        expect(context.keyFeatures).toEqual([])
+        expect(context.usageTips).toEqual([])
+        expect(context.relatedComponents).toEqual([])
+        expect(context.patterns).toEqual([])
+        expect(context.confidence).toBe(0)
+        expect(context.language).toBe('ru')
+        expect(context.generatedAt).toBeDefined()
+      })
+
+      it('should use specified language', () => {
+        const context = createDefaultContextInfo('test', 'en')
+
+        expect(context.language).toBe('en')
+      })
+
+      it('should set generatedAt to current timestamp', () => {
+        const before = new Date().toISOString()
+        const context = createDefaultContextInfo('test')
+        const after = new Date().toISOString()
+
+        expect(context.generatedAt >= before).toBe(true)
+        expect(context.generatedAt <= after).toBe(true)
+      })
+    })
+
+    describe('DEFAULT_CONTEXT_PANEL_SETTINGS', () => {
+      it('should have sensible defaults', () => {
+        expect(DEFAULT_CONTEXT_PANEL_SETTINGS.autoUpdate).toBe(true)
+        expect(DEFAULT_CONTEXT_PANEL_SETTINGS.showRelated).toBe(true)
+        expect(DEFAULT_CONTEXT_PANEL_SETTINGS.showTips).toBe(true)
+        expect(DEFAULT_CONTEXT_PANEL_SETTINGS.showPatterns).toBe(true)
+        expect(DEFAULT_CONTEXT_PANEL_SETTINGS.maxRelatedComponents).toBe(5)
+        expect(DEFAULT_CONTEXT_PANEL_SETTINGS.position).toBe('top-left')
+        expect(DEFAULT_CONTEXT_PANEL_SETTINGS.preferredLanguage).toBe('ru')
+      })
+    })
+
+    describe('ComponentContextInfo interface', () => {
+      it('should allow creating valid context info', () => {
+        const contextInfo: ComponentContextInfo = {
+          componentId: 'gallery',
+          description: 'Gallery component for browsing cubes',
+          keyFeatures: ['Search', 'Filter', 'Select'],
+          usageTips: ['Click to select', 'Use search to filter'],
+          relatedComponents: [
+            {
+              id: 'preview',
+              name: 'CubePreview',
+              relationship: 'dependency',
+              reason: 'Used for rendering cubes',
+            },
+          ],
+          patterns: ['import { Gallery } from "./Gallery"'],
+          confidence: 0.85,
+          language: 'en',
+          generatedAt: new Date().toISOString(),
+        }
+
+        expect(contextInfo.componentId).toBe('gallery')
+        expect(contextInfo.keyFeatures).toHaveLength(3)
+        expect(contextInfo.relatedComponents).toHaveLength(1)
+        expect(contextInfo.confidence).toBe(0.85)
+      })
+    })
+
+    describe('RelatedComponentInfo interface', () => {
+      it('should allow all valid relationship types', () => {
+        const relationships: RelatedComponentInfo['relationship'][] = [
+          'dependency',
+          'dependent',
+          'sibling',
+          'similar',
+          'works-with',
+        ]
+
+        expect(relationships).toHaveLength(5)
+
+        const relatedInfo: RelatedComponentInfo = {
+          id: 'test',
+          name: 'Test',
+          relationship: 'dependency',
+          reason: 'Test reason',
+        }
+
+        expect(relatedInfo.relationship).toBe('dependency')
+      })
+    })
+
+    describe('ContextPanelSettings interface', () => {
+      it('should allow creating valid settings', () => {
+        const settings: ContextPanelSettings = {
+          autoUpdate: false,
+          showRelated: true,
+          showTips: false,
+          showPatterns: true,
+          maxRelatedComponents: 3,
+          position: 'bottom-right',
+          preferredLanguage: 'en',
+        }
+
+        expect(settings.autoUpdate).toBe(false)
+        expect(settings.position).toBe('bottom-right')
+        expect(settings.preferredLanguage).toBe('en')
+      })
+
+      it('should allow all valid position values', () => {
+        const positions: ContextPanelSettings['position'][] = [
+          'top-left',
+          'top-right',
+          'bottom-left',
+          'bottom-right',
+        ]
+
+        expect(positions).toHaveLength(4)
+      })
     })
   })
 })
