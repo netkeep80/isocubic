@@ -380,3 +380,100 @@ export function validateQueryRequest(request: Partial<AIQueryRequest>): request 
     request.query && typeof request.query === 'string' && request.query.trim().length > 0
   )
 }
+
+/**
+ * Component Context Assistant Types
+ *
+ * TASK 51: Component Context Assistant (Phase 8 - AI + Metadata)
+ */
+
+/**
+ * Context information for a selected component
+ */
+export interface ComponentContextInfo {
+  /** Component ID */
+  componentId: string
+  /** AI-generated description of the component */
+  description: string
+  /** Key features highlighted */
+  keyFeatures: string[]
+  /** Usage tips specific to this component */
+  usageTips: string[]
+  /** Related components that work well with this one */
+  relatedComponents: RelatedComponentInfo[]
+  /** Common patterns or best practices */
+  patterns: string[]
+  /** Confidence score for the context information */
+  confidence: number
+  /** Language of the context */
+  language: QueryLanguage
+  /** Timestamp when context was generated */
+  generatedAt: string
+}
+
+/**
+ * Related component information for context panel
+ */
+export interface RelatedComponentInfo {
+  /** Component ID */
+  id: string
+  /** Component name */
+  name: string
+  /** Relationship type */
+  relationship: 'dependency' | 'dependent' | 'sibling' | 'similar' | 'works-with'
+  /** Brief description of the relationship */
+  reason: string
+}
+
+/**
+ * Context panel display settings
+ */
+export interface ContextPanelSettings {
+  /** Whether to auto-update on component selection */
+  autoUpdate: boolean
+  /** Whether to show related components */
+  showRelated: boolean
+  /** Whether to show usage tips */
+  showTips: boolean
+  /** Whether to show patterns */
+  showPatterns: boolean
+  /** Maximum related components to display */
+  maxRelatedComponents: number
+  /** Panel position */
+  position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
+  /** Preferred display language */
+  preferredLanguage: QueryLanguage
+}
+
+/**
+ * Default context panel settings
+ */
+export const DEFAULT_CONTEXT_PANEL_SETTINGS: ContextPanelSettings = {
+  autoUpdate: true,
+  showRelated: true,
+  showTips: true,
+  showPatterns: true,
+  maxRelatedComponents: 5,
+  position: 'top-left',
+  preferredLanguage: 'ru',
+}
+
+/**
+ * Creates default context info for a component
+ */
+export function createDefaultContextInfo(
+  componentId: string,
+  language: QueryLanguage = 'ru'
+): ComponentContextInfo {
+  return {
+    componentId,
+    description: '',
+    keyFeatures: [],
+    usageTips: [],
+    relatedComponents: [],
+    patterns: [],
+    confidence: 0,
+    language,
+    generatedAt: new Date().toISOString(),
+  }
+}

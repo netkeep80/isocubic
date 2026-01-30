@@ -144,7 +144,8 @@ isocubic/
 │   │   ├── CommunityGallery.tsx # Галерея сообщества
 │   │   ├── ExportPanel.tsx    # Экспорт/импорт
 │   │   ├── SharePanel.tsx     # Шаринг кубиков с QR-кодами
-│   │   └── DevModeQueryPanel.tsx # AI-запросы в режиме разработки
+│   │   ├── DevModeQueryPanel.tsx # AI-запросы в режиме разработки
+│   │   └── ComponentContextPanel.tsx # AI-контекст для компонентов в DevMode
 │   ├── shaders/           # GLSL-шейдеры
 │   │   ├── parametric-cube.glsl  # Исходный GLSL код
 │   │   ├── parametric-cube.ts    # TypeScript модуль для Three.js
@@ -273,7 +274,7 @@ npm run test:coverage
 ```
 
 **Текущее покрытие:**
-- 2246+ тестов
+- 2295+ тестов
 - Unit-тесты для типов, валидации, хранилища, производительности, физики энергии
 - Тесты модуля коллаборации (сессии, участники, синхронизация, конфликты)
 - Тесты WebSocket клиента (подключение, сообщения, реконнект, fallback на polling)
@@ -285,6 +286,7 @@ npm run test:coverage
 - Тесты галереи сообщества (CommunityGallery, поиск, фильтрация, сортировка, пагинация)
 - Тесты share-ссылок (SharePanel, QR-коды, защита паролем, аналитика)
 - Тесты социальных функций (комментарии, подписки, уведомления, избранное)
+- Тесты AI-контекста для компонентов (ComponentContextPanel)
 - E2E тесты для полных workflow редактирования
 
 ## Вклад в проект
