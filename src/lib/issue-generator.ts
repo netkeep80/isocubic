@@ -514,7 +514,7 @@ export class IssueGenerator {
       if (
         searchText.includes(component.name.toLowerCase()) ||
         searchText.includes(component.id.toLowerCase()) ||
-        component.keywords.some((keyword) => searchText.includes(keyword.toLowerCase()))
+        component.tags.some((tag: string) => searchText.includes(tag.toLowerCase()))
       ) {
         components.push(component)
       }
@@ -523,7 +523,7 @@ export class IssueGenerator {
     // Also check message context for component IDs
     for (const message of messages) {
       if (message.context?.componentId) {
-        const component = allComponents.find((c) => c.id === message.context.componentId)
+        const component = allComponents.find((c) => c.id === message.context?.componentId)
         if (component && !components.some((c) => c.id === component.id)) {
           components.push(component)
         }
