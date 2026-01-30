@@ -383,8 +383,7 @@ export function GodModeWindow({
   const language: QueryLanguage = config.preferredLanguage || 'ru'
 
   // Window actions - defined before useEffect that uses them
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const openWindow = useCallback(() => {
+  const _openWindow = useCallback(() => {
     setWindowState((prev) => ({
       ...prev,
       state: 'open',
@@ -392,6 +391,7 @@ export function GodModeWindow({
     }))
     onOpen?.()
   }, [onOpen])
+  void _openWindow // Marked as used for API completeness
 
   const closeWindow = useCallback(() => {
     setWindowState((prev) => ({
@@ -549,7 +549,8 @@ export function GodModeWindow({
 
   // Handle resize move
   useEffect(() => {
-    if (!resizeState.isResizing || !resizeState.edge) return
+    const currentEdge = resizeState.edge
+    if (!resizeState.isResizing || !currentEdge) return
 
     const handleMouseMove = (e: globalThis.MouseEvent) => {
       const deltaX = e.clientX - resizeState.startX
@@ -561,17 +562,17 @@ export function GodModeWindow({
       let newY = resizeState.startWindowY
 
       // Handle horizontal resize
-      if (resizeState.edge.includes('e')) {
+      if (currentEdge.includes('e')) {
         newWidth = resizeState.startWidth + deltaX
-      } else if (resizeState.edge.includes('w')) {
+      } else if (currentEdge.includes('w')) {
         newWidth = resizeState.startWidth - deltaX
         newX = resizeState.startWindowX + deltaX
       }
 
       // Handle vertical resize
-      if (resizeState.edge.includes('s')) {
+      if (currentEdge.includes('s')) {
         newHeight = resizeState.startHeight + deltaY
-      } else if (resizeState.edge.includes('n')) {
+      } else if (currentEdge.includes('n')) {
         newHeight = resizeState.startHeight - deltaY
         newY = resizeState.startWindowY + deltaY
       }
@@ -583,10 +584,10 @@ export function GodModeWindow({
       })
 
       // Adjust position if resizing from left or top
-      if (resizeState.edge.includes('w') && constrainedSize.width !== newWidth) {
+      if (currentEdge.includes('w') && constrainedSize.width !== newWidth) {
         newX = resizeState.startWindowX + (resizeState.startWidth - constrainedSize.width)
       }
-      if (resizeState.edge.includes('n') && constrainedSize.height !== newHeight) {
+      if (currentEdge.includes('n') && constrainedSize.height !== newHeight) {
         newY = resizeState.startWindowY + (resizeState.startHeight - constrainedSize.height)
       }
 
