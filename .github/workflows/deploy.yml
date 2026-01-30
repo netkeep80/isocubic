@@ -9,6 +9,9 @@ on:
   # Trigger on push to main branch
   push:
     branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
   # Allow manual deployment
   workflow_dispatch:
 
