@@ -1,16 +1,23 @@
 import { ExtendedSearchEngine, DEFAULT_SEARCH_OPTIONS } from '../src/lib/extended-search'
-import { componentMetaRegistry, registerComponentMeta, type ComponentMeta } from '../src/types/component-meta'
+import {
+  componentMetaRegistry,
+  registerComponentMeta,
+  type ComponentMeta,
+} from '../src/types/component-meta'
 
 const mockComponent: ComponentMeta = {
   id: 'cube-preview',
   name: 'CubePreview',
   version: '2.1.0',
   summary: 'Interactive 3D preview component for parametric cubes',
-  description: 'CubePreview provides real-time 3D rendering of parametric cubes with rotation and zoom controls.',
+  description:
+    'CubePreview provides real-time 3D rendering of parametric cubes with rotation and zoom controls.',
   phase: 1,
   filePath: 'components/CubePreview.tsx',
   history: [],
-  features: [{ id: 'rotation', name: 'Rotation', description: 'Interactive cube rotation', enabled: true }],
+  features: [
+    { id: 'rotation', name: 'Rotation', description: 'Interactive cube rotation', enabled: true },
+  ],
   dependencies: [],
   relatedFiles: [],
   tags: ['3d', 'preview', 'cube', 'webgl', 'render'],
@@ -37,7 +44,9 @@ if (results1.length > 0) {
 
 // Test 2: Search with default options
 console.log('\n--- Test 2: Search with default searchFields ---')
-const results2 = engine.search('3d webgl', undefined, { searchFields: DEFAULT_SEARCH_OPTIONS.searchFields })
+const results2 = engine.search('3d webgl', undefined, {
+  searchFields: DEFAULT_SEARCH_OPTIONS.searchFields,
+})
 console.log('Results length:', results2.length)
 if (results2.length > 0) {
   console.log('matchedFields:', results2[0].matchedFields)
