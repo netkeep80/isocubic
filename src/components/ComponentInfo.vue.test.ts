@@ -34,9 +34,17 @@ const { mockDevModeEnabled, mockSettings } = vi.hoisted(() => {
   return { mockDevModeEnabled, mockSettings }
 })
 
+const mockDevModeStore = {
+  hoveredComponentId: null as string | null,
+  setHoveredComponent: vi.fn((id: string | null) => {
+    mockDevModeStore.hoveredComponentId = id
+  }),
+}
+
 vi.mock('../lib/devmode', () => ({
   useIsDevModeEnabled: vi.fn(() => mockDevModeEnabled),
   useDevModeSettings: vi.fn(() => ({ value: mockSettings })),
+  useDevModeStore: vi.fn(() => mockDevModeStore),
 }))
 
 // Test metadata

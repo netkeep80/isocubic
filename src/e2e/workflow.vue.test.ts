@@ -35,6 +35,7 @@ vi.mock('../components/Gallery.vue', () => ({
     props: ['currentCube'],
     emits: ['cube-select'],
   },
+  GALLERY_META: { id: 'gallery', name: 'Gallery', version: '1.0.0', summary: '', description: '', phase: 1, taskId: '', filePath: '', history: [], features: [], dependencies: [], relatedFiles: [], props: [], tags: [], status: 'stable', lastUpdated: '' },
 }))
 
 vi.mock('../components/ExportPanel.vue', () => ({
@@ -50,6 +51,7 @@ vi.mock('../components/ExportPanel.vue', () => ({
     props: ['currentCube'],
     emits: ['cube-load', 'cube-change'],
   },
+  EXPORT_PANEL_META: { id: 'export-panel', name: 'ExportPanel', version: '1.0.0', summary: '', description: '', phase: 1, taskId: '', filePath: '', history: [], features: [], dependencies: [], relatedFiles: [], props: [], tags: [], status: 'stable', lastUpdated: '' },
 }))
 
 vi.mock('../components/CubePreview.vue', () => ({
@@ -58,6 +60,7 @@ vi.mock('../components/CubePreview.vue', () => ({
     template: '<div class="cube-preview-mock" data-testid="cube-preview">Preview</div>',
     props: ['config'],
   },
+  CUBE_PREVIEW_META: { id: 'cube-preview', name: 'CubePreview', version: '1.0.0', summary: '', description: '', phase: 1, taskId: '', filePath: '', history: [], features: [], dependencies: [], relatedFiles: [], props: [], tags: [], status: 'stable', lastUpdated: '' },
 }))
 
 vi.mock('../components/UnifiedEditor.vue', () => ({
@@ -67,6 +70,7 @@ vi.mock('../components/UnifiedEditor.vue', () => ({
     props: ['cube'],
     emits: ['update:cube'],
   },
+  UNIFIED_EDITOR_META: { id: 'unified-editor', name: 'UnifiedEditor', version: '1.0.0', summary: '', description: '', phase: 1, taskId: '', filePath: '', history: [], features: [], dependencies: [], relatedFiles: [], props: [], tags: [], status: 'stable', lastUpdated: '' },
 }))
 
 vi.mock('../components/ActionHistory.vue', () => ({
@@ -83,6 +87,7 @@ vi.mock('../components/PromptGenerator.vue', () => ({
     template: '<div class="prompt-generator-mock">PromptGenerator</div>',
     emits: ['cube-generated', 'cubes-generated'],
   },
+  PROMPT_GENERATOR_META: { id: 'prompt-generator', name: 'PromptGenerator', version: '1.0.0', summary: '', description: '', phase: 1, taskId: '', filePath: '', history: [], features: [], dependencies: [], relatedFiles: [], props: [], tags: [], status: 'stable', lastUpdated: '' },
 }))
 
 vi.mock('../components/GodModeWindow.vue', () => ({
@@ -124,6 +129,7 @@ vi.mock('../composables/useCubeEditor', () => ({
 
 vi.mock('../lib/devmode', () => ({
   useDevModeKeyboard: vi.fn(),
+  useHoveredComponentId: vi.fn(() => ({ value: null })),
   useDevModeStore: () => ({
     isDevMode: false,
     toggleDevMode: vi.fn(),
