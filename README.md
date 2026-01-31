@@ -171,6 +171,10 @@ isocubic/
 │   │   ├── IssueDraftPanel.vue  # Генератор черновиков issues (Vue SFC, TASK 66)
 │   │   ├── GitHubAuthButton.vue # Авторизация GitHub (Vue SFC, TASK 66)
 │   │   └── AnnotationCanvas.vue # Аннотирование скриншотов (Vue SFC, TASK 66)
+│   ├── composables/       # Vue composables (TASK 67)
+│   │   ├── useDeviceType.ts    # Определение типа устройства (desktop/tablet/mobile)
+│   │   ├── useCubeEditor.ts    # Централизованное управление состоянием куба
+│   │   └── useLODStatistics.ts # Статистика LOD-системы
 │   ├── shaders/           # GLSL-шейдеры
 │   │   ├── parametric-cube.glsl  # Исходный GLSL код
 │   │   ├── parametric-cube.ts    # TypeScript модуль для Three.js
@@ -209,7 +213,7 @@ isocubic/
 │   │   ├── ai-query.ts        # Типы для AI-запросов в DevMode
 │   │   ├── god-mode.ts        # Типы для GOD MODE (Phase 9)
 │   │   └── issue-generator.ts # Типы для генератора issues (Phase 9)
-│   └── App.vue
+│   └── App.vue            # Корневой компонент с адаптивным layout (TASK 67)
 ├── wasm-fft/              # Rust WASM модуль для FFT
 │   ├── Cargo.toml             # Rust конфигурация
 │   ├── src/lib.rs             # Реализация 3D FFT
