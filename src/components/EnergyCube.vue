@@ -12,7 +12,7 @@
 -->
 <script setup lang="ts">
 import { computed, shallowRef, watch } from 'vue'
-import { useRenderLoop } from '@tresjs/core'
+import { useLoop } from '@tresjs/core'
 import * as THREE from 'three'
 import {
   vertexShader,
@@ -135,9 +135,9 @@ watch(
 )
 
 // Animation frame for time updates and rotation
-const { onLoop } = useRenderLoop()
+const { onBeforeRender } = useLoop()
 
-onLoop(({ delta }) => {
+onBeforeRender(({ delta }) => {
   // Update time uniform for animation
   if (props.animate && materialRef.value) {
     materialRef.value.uniforms.uTime.value += delta * props.animationSpeed
