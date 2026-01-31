@@ -162,14 +162,15 @@ isocubic/
 │   │   ├── SessionPanel.vue     # Панель сессий коллаборации (Vue SFC, TASK 65)
 │   │   ├── CollaborativeParamEditor.vue # Совместное редактирование (Vue SFC, TASK 65)
 │   │   ├── ParticipantCursor.vue # Курсоры участников (Vue SFC, TASK 65)
-│   │   ├── DevModeQueryPanel.tsx # AI-запросы в режиме разработки
-│   │   ├── ComponentContextPanel.tsx # AI-контекст для компонентов в DevMode
-│   │   ├── ExtendedSearchPanel.tsx # Расширенный AI-поиск компонентов
-│   │   ├── GodModeWindow.tsx    # Единое окно GOD MODE (Phase 9)
-│   │   ├── ConversationPanel.tsx # AI-диалог для GOD MODE (Phase 9)
-│   │   ├── IssueDraftPanel.tsx  # Генератор черновиков issues (Phase 9)
-│   │   ├── GitHubAuthButton.tsx # Авторизация GitHub (Phase 9)
-│   │   └── AnnotationCanvas.tsx # Аннотирование скриншотов (Phase 9)
+│   │   ├── DevModeQueryPanel.vue # AI-запросы в режиме разработки (Vue SFC, TASK 66)
+│   │   ├── ComponentContextPanel.vue # AI-контекст для компонентов в DevMode (Vue SFC, TASK 66)
+│   │   ├── ExtendedSearchPanel.vue # Расширенный AI-поиск компонентов (Vue SFC, TASK 66)
+│   │   ├── ComponentInfo.vue    # DevMode индикатор компонентов (Vue SFC, TASK 66)
+│   │   ├── GodModeWindow.vue    # Единое окно GOD MODE (Vue SFC, TASK 66)
+│   │   ├── ConversationPanel.vue # AI-диалог для GOD MODE (Vue SFC, TASK 66)
+│   │   ├── IssueDraftPanel.vue  # Генератор черновиков issues (Vue SFC, TASK 66)
+│   │   ├── GitHubAuthButton.vue # Авторизация GitHub (Vue SFC, TASK 66)
+│   │   └── AnnotationCanvas.vue # Аннотирование скриншотов (Vue SFC, TASK 66)
 │   ├── shaders/           # GLSL-шейдеры
 │   │   ├── parametric-cube.glsl  # Исходный GLSL код
 │   │   ├── parametric-cube.ts    # TypeScript модуль для Three.js
