@@ -18,6 +18,7 @@ import ActionHistory from './components/ActionHistory.vue'
 import PromptGenerator from './components/PromptGenerator.vue'
 import GodModeWindow from './components/GodModeWindow.vue'
 import ComponentInfo from './components/ComponentInfo.vue'
+import DevModeIndicator from './components/DevModeIndicator.vue'
 import './App.css'
 
 // Device type detection
@@ -240,6 +241,7 @@ const APP_META = {
 
     <GodModeWindow />
     <ComponentInfo :meta="APP_META" />
+    <DevModeIndicator />
   </div>
 
   <!-- Tablet Layout -->
@@ -281,6 +283,7 @@ const APP_META = {
     </main>
 
     <GodModeWindow />
+    <DevModeIndicator />
   </div>
 
   <!-- Mobile Layout -->
@@ -353,5 +356,7 @@ const APP_META = {
     <div class="app__swipe-indicator">
       <span>Swipe to navigate</span>
     </div>
+
+    <DevModeIndicator />
   </div>
 </template>
