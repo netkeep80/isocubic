@@ -1,18 +1,8 @@
-/**
- * StackPresetPicker Component
- * Provides a gallery UI for selecting and managing stack presets
- *
- * ISSUE 30: Шаблоны стопок (Stack Presets)
- *
- * Features:
- * - Gallery of preset thumbnails
- * - Search by name/tags
- * - Category filtering
- * - Apply preset to editor
- * - Save current stack as preset
- */
+/** * StackPresetPicker Component * Provides a gallery UI for selecting and managing stack presets *
+* ISSUE 30: Шаблоны стопок (Stack Presets) * * Features: * - Gallery of preset thumbnails * - Search
+by name/tags * - Category filtering * - Apply preset to editor * - Save current stack as preset */
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick, watch } from 'vue'
+import { ref, computed, nextTick, watch } from 'vue'
 import type { CubeStackConfig } from '../types/stack'
 import type { Color3 } from '../types/cube'
 import {
@@ -117,7 +107,7 @@ const categoryCounts = computed(() => {
 // Selected preset details
 const selectedPreset = computed(() => {
   return selectedPresetId.value
-    ? filteredPresets.value.find((p) => p.id === selectedPresetId.value) ?? null
+    ? (filteredPresets.value.find((p) => p.id === selectedPresetId.value) ?? null)
     : null
 })
 
@@ -154,7 +144,12 @@ function handleSaveAsPreset() {
     .map((t) => t.trim())
     .filter((t) => t.length > 0)
 
-  saveStackAsPreset(props.currentStack, savePresetName.value.trim(), savePresetDescription.value.trim(), tags)
+  saveStackAsPreset(
+    props.currentStack,
+    savePresetName.value.trim(),
+    savePresetDescription.value.trim(),
+    tags
+  )
 
   // Reset form and refresh
   savePresetName.value = ''
@@ -268,7 +263,7 @@ watch(showSaveDialog, async (newVal) => {
         All ({{ categoryCounts.all }})
       </button>
       <button
-        v-for="category in (Object.keys(STACK_PRESET_CATEGORIES) as StackPresetCategory[])"
+        v-for="category in Object.keys(STACK_PRESET_CATEGORIES) as StackPresetCategory[]"
         :key="category"
         type="button"
         :class="`stack-preset-picker__category ${selectedCategory === category ? 'stack-preset-picker__category--active' : ''}`"
@@ -353,11 +348,7 @@ watch(showSaveDialog, async (newVal) => {
         <span>Category: {{ STACK_PRESET_CATEGORIES[selectedPreset.category].name }}</span>
       </div>
       <div class="stack-preset-picker__tags">
-        <span
-          v-for="tag in selectedPreset.tags"
-          :key="tag"
-          class="stack-preset-picker__tag"
-        >
+        <span v-for="tag in selectedPreset.tags" :key="tag" class="stack-preset-picker__tag">
           {{ tag }}
         </span>
       </div>
