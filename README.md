@@ -140,10 +140,15 @@ isocubic/
 │   │   ├── LODCubeGrid.vue      # Сетка кубов с автоматическим LOD управлением (TresJS, TASK 62)
 │   │   ├── MagicCubeDemo.vue    # Демо магического куба с энергетической физикой (TresJS, TASK 62)
 │   │   ├── LODStatisticsDisplay.vue # Статистика LOD-системы (Vue SFC, TASK 62)
-│   │   ├── StackEditor.tsx      # Редактор стопок кубиков (ожидает миграцию — TASK 63)
-│   │   ├── StackPresetPicker.tsx # Выбор шаблонов стопок
-│   │   ├── ParamEditor.tsx      # Редактор параметров (TODO)
-│   │   ├── PromptGenerator.tsx  # Генерация по промпту с расширенными режимами
+│   │   ├── UnifiedEditor.vue    # Основной редактор с табами и lazy loading (Vue SFC, TASK 63)
+│   │   ├── ParamEditor.vue      # Редактор параметров куба (Vue SFC, TASK 63)
+│   │   ├── FFTParamEditor.vue   # Редактор FFT параметров (Vue SFC, TASK 63)
+│   │   ├── FFTChannelEditor.vue # Редактор FFT каналов (Vue SFC, TASK 63)
+│   │   ├── EnergyVisualizationEditor.vue # Редактор энергетической визуализации (Vue SFC, TASK 63)
+│   │   ├── LODConfigEditor.vue  # Редактор LOD конфигурации (Vue SFC, TASK 63)
+│   │   ├── StackEditor.vue      # Редактор стопок кубиков (Vue SFC, TASK 63)
+│   │   ├── StackPresetPicker.vue # Выбор шаблонов стопок (Vue SFC, TASK 63)
+│   │   ├── PromptGenerator.vue  # Генерация по промпту с расширенными режимами (Vue SFC, TASK 63)
 │   │   ├── Gallery.tsx          # Галерея примеров
 │   │   ├── CommunityGallery.tsx # Галерея сообщества
 │   │   ├── ExportPanel.tsx      # Экспорт/импорт
@@ -297,8 +302,9 @@ npm run test:coverage
 ```
 
 **Текущее покрытие:**
-- 1926+ тестов (framework-agnostic и Vue.js тесты; React-компонентные тесты будут мигрированы в TASK 68)
+- 1960+ тестов (framework-agnostic и Vue.js тесты; React-компонентные тесты будут мигрированы в TASK 68)
 - Тесты 3D-компонентов Vue.js (ParametricCube, EnergyCube, CubePreview, CubeGrid, CubeStack, LODCubeGrid, LODStatisticsDisplay, MagicCubeDemo — TASK 62)
+- Тесты UI-компонентов редактора Vue.js (UnifiedEditor, ParamEditor, FFTParamEditor, FFTChannelEditor, EnergyVisualizationEditor, LODConfigEditor, StackEditor, StackPresetPicker, PromptGenerator — TASK 63)
 - Unit-тесты для типов, валидации, хранилища, производительности, физики энергии
 - Тесты модуля коллаборации (сессии, участники, синхронизация, конфликты)
 - Тесты WebSocket клиента (подключение, сообщения, реконнект, fallback на polling)

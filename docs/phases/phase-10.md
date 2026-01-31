@@ -158,15 +158,15 @@
 Перевести все компоненты редактирования параметров на Vue.js Single File Components.
 
 **Компоненты для миграции**:
-- [ ] `UnifiedEditor.tsx` → `UnifiedEditor.vue` — основной редактор
-- [ ] `ParamEditor.tsx` → `ParamEditor.vue` — редактор параметров куба
-- [ ] `FFTParamEditor.tsx` → `FFTParamEditor.vue` — редактор FFT параметров
-- [ ] `FFTChannelEditor.tsx` → `FFTChannelEditor.vue` — редактор FFT каналов
-- [ ] `EnergyVisualizationEditor.tsx` → `EnergyVisualizationEditor.vue` — редактор энергетической визуализации
-- [ ] `LODConfigEditor.tsx` → `LODConfigEditor.vue` — редактор LOD конфигурации
-- [ ] `StackEditor.tsx` → `StackEditor.vue` — редактор стопок
-- [ ] `StackPresetPicker.tsx` → `StackPresetPicker.vue` — выбор шаблонов стопок
-- [ ] `PromptGenerator.tsx` → `PromptGenerator.vue` — генератор по промпту
+- [x] `UnifiedEditor.tsx` → `UnifiedEditor.vue` — основной редактор
+- [x] `ParamEditor.tsx` → `ParamEditor.vue` — редактор параметров куба
+- [x] `FFTParamEditor.tsx` → `FFTParamEditor.vue` — редактор FFT параметров
+- [x] `FFTChannelEditor.tsx` → `FFTChannelEditor.vue` — редактор FFT каналов
+- [x] `EnergyVisualizationEditor.tsx` → `EnergyVisualizationEditor.vue` — редактор энергетической визуализации
+- [x] `LODConfigEditor.tsx` → `LODConfigEditor.vue` — редактор LOD конфигурации
+- [x] `StackEditor.tsx` → `StackEditor.vue` — редактор стопок
+- [x] `StackPresetPicker.tsx` → `StackPresetPicker.vue` — выбор шаблонов стопок
+- [x] `PromptGenerator.tsx` → `PromptGenerator.vue` — генератор по промпту
 
 **Ключевые изменения**:
 - `onChange` callbacks → `v-model` (двустороннее связывание) или `emit('update:...')`
