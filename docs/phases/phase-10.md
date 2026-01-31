@@ -296,21 +296,21 @@
 Создать корневой компонент приложения с адаптивным layout (desktop/tablet/mobile) и интеграцией всех подсистем.
 
 **Задачи**:
-- [ ] Создать `App.vue` с адаптивным layout (desktop, tablet, mobile)
-- [ ] Реализовать `useDeviceType()` как Vue composable
-- [ ] Реализовать touch swipe навигацию для мобильных как composable
-- [ ] Создать `src/composables/useDeviceType.ts`
-- [ ] Создать `src/composables/useCubeEditor.ts` (централизованное управление состоянием куба)
-- [ ] Интегрировать Pinia stores (auth, collaboration, god-mode)
-- [ ] Подключить все компоненты в App.vue
-- [ ] Обновить `src/main.ts` с инициализацией Pinia и router (если потребуется)
-- [ ] Обновить `src/App.css` если требуется (CSS framework-agnostic)
+- [x] Создать `App.vue` с адаптивным layout (desktop, tablet, mobile)
+- [x] Реализовать `useDeviceType()` как Vue composable
+- [x] Реализовать touch swipe навигацию для мобильных как composable
+- [x] Создать `src/composables/useDeviceType.ts`
+- [x] Создать `src/composables/useCubeEditor.ts` (централизованное управление состоянием куба)
+- [x] Интегрировать Pinia stores (auth, collaboration, god-mode)
+- [x] Подключить все компоненты в App.vue
+- [x] Обновить `src/main.ts` с инициализацией Pinia и router (если потребуется)
+- [x] Обновить `src/App.css` если требуется (CSS framework-agnostic)
 
 **Критерии приёмки**:
-- Приложение загружается и работает на desktop, tablet и mobile
-- Навигация между вкладками на мобильных работает
-- Все подсистемы интегрированы и функционируют
-- DevMode / GOD MODE доступны
+- [x] Приложение загружается и работает на desktop, tablet и mobile
+- [x] Навигация между вкладками на мобильных работает
+- [x] Все подсистемы интегрированы и функционируют
+- [x] DevMode / GOD MODE доступны
 
 **Метки**: `migration`, `vue`, `app`, `layout`
 
