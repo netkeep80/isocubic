@@ -166,17 +166,22 @@ describe('useIsDevModeEnabled composable', () => {
     setActivePinia(createPinia())
   })
 
-  it('should return false by default', () => {
+  it('should return a ComputedRef that is false by default', () => {
     const isEnabled = useIsDevModeEnabled()
-    expect(isEnabled).toBe(false)
+    expect(isEnabled.value).toBe(false)
   })
 
-  it('should return true after toggling', () => {
+  it('should reactively update when toggling', () => {
     const store = useDevModeStore()
-    store.toggleDevMode()
-
     const isEnabled = useIsDevModeEnabled()
-    expect(isEnabled).toBe(true)
+
+    expect(isEnabled.value).toBe(false)
+
+    store.toggleDevMode()
+    expect(isEnabled.value).toBe(true)
+
+    store.toggleDevMode()
+    expect(isEnabled.value).toBe(false)
   })
 })
 
@@ -187,26 +192,29 @@ describe('useDevModeSettings composable', () => {
     setActivePinia(createPinia())
   })
 
-  it('should return default settings', () => {
+  it('should return a ComputedRef with default settings', () => {
     const settings = useDevModeSettings()
 
-    expect(settings.enabled).toBe(false)
-    expect(settings.verbosity).toBe('normal')
-    expect(settings.showOutline).toBe(true)
-    expect(settings.showHoverInfo).toBe(true)
-    expect(settings.panelPosition).toBe('top-right')
+    expect(settings.value.enabled).toBe(false)
+    expect(settings.value.verbosity).toBe('normal')
+    expect(settings.value.showOutline).toBe(true)
+    expect(settings.value.showHoverInfo).toBe(true)
+    expect(settings.value.panelPosition).toBe('top-right')
   })
 
-  it('should return current settings after modification', () => {
+  it('should reactively update after modification', () => {
     const store = useDevModeStore()
+    const settings = useDevModeSettings()
+
+    expect(settings.value.showOutline).toBe(true)
+
     store.updateSettings({
       showOutline: false,
       panelPosition: 'bottom-left',
     })
 
-    const settings = useDevModeSettings()
-    expect(settings.showOutline).toBe(false)
-    expect(settings.panelPosition).toBe('bottom-left')
+    expect(settings.value.showOutline).toBe(false)
+    expect(settings.value.panelPosition).toBe('bottom-left')
   })
 })
 

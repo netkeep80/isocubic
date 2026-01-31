@@ -35,16 +35,8 @@ const { mockDevModeEnabled, mockSettings } = vi.hoisted(() => {
 })
 
 vi.mock('../lib/devmode', () => ({
-  useIsDevModeEnabled: vi.fn(() => mockDevModeEnabled.value),
-  useDevMode: vi.fn(() => ({
-    settings: mockSettings,
-    toggleDevMode: vi.fn(),
-    updateSettings: vi.fn(),
-    updateCategory: vi.fn(),
-    resetSettings: vi.fn(),
-    isEnabled: mockDevModeEnabled.value,
-  })),
-  useDevModeSettings: vi.fn(() => mockSettings),
+  useIsDevModeEnabled: vi.fn(() => mockDevModeEnabled),
+  useDevModeSettings: vi.fn(() => ({ value: mockSettings })),
 }))
 
 // Test metadata

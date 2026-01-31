@@ -1,21 +1,23 @@
 /**
- * Developer Mode Store (Pinia)
+ * VueDevMode Store (Pinia)
  *
- * Provides a Pinia store for enabling Developer Mode throughout the application.
- * When Developer Mode is enabled, components display their metadata and development
- * information via tooltips and overlays.
+ * Provides a Pinia store for enabling VueDevMode (unified Developer Mode) throughout
+ * the application. When VueDevMode is enabled, components display their metadata and
+ * development information via tooltips and overlays, and the VueDevMode window
+ * (formerly GOD MODE) becomes available.
  *
  * TASK 40: Developer Mode System (Phase 6 - Developer Experience)
  * TASK 61: Migrated from React Context to Pinia store (Phase 10 - Vue.js 3.0 Migration)
+ * Issue #173: Unified devmode/god-mode under VueDevMode name, fixed reactivity
  *
  * Features:
- * - Toggle Developer Mode on/off via UI or keyboard shortcut (Ctrl+Shift+D)
+ * - Toggle VueDevMode on/off via UI or keyboard shortcut (Ctrl+Shift+D)
  * - Persist preference in localStorage
  * - Configure verbosity level (minimal, normal, verbose)
  * - Enable/disable specific metadata categories
  */
 
-import { ref, watch, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, type ComputedRef } from 'vue'
 import { defineStore } from 'pinia'
 
 /**
@@ -229,29 +231,37 @@ export function useDevModeKeyboard() {
 export function useDevMode(): DevModeContextValue {
   const store = useDevModeStore()
   return {
-    settings: store.settings,
+    get settings() {
+      return store.settings
+    },
     toggleDevMode: store.toggleDevMode,
     updateSettings: store.updateSettings,
     updateCategory: store.updateCategory,
     resetSettings: store.resetSettings,
-    isEnabled: store.settings.enabled,
+    get isEnabled() {
+      return store.settings.enabled
+    },
   }
 }
 
 /**
  * Composable to check if DevMode is enabled
+ *
+ * Returns a ComputedRef<boolean> that reactively tracks the enabled state.
  */
-export function useIsDevModeEnabled(): boolean {
+export function useIsDevModeEnabled(): ComputedRef<boolean> {
   const store = useDevModeStore()
-  return store.settings.enabled
+  return computed(() => store.settings.enabled)
 }
 
 /**
  * Composable to get DevMode settings
+ *
+ * Returns a ComputedRef<DevModeSettings> that reactively tracks all settings.
  */
-export function useDevModeSettings(): DevModeSettings {
+export function useDevModeSettings(): ComputedRef<DevModeSettings> {
   const store = useDevModeStore()
-  return store.settings
+  return computed(() => store.settings)
 }
 
 export default useDevModeStore

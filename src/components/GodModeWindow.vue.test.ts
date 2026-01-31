@@ -183,9 +183,9 @@ describe('GodModeWindow Vue Component', () => {
       expect(wrapper.find('[data-testid="god-mode-window"]').exists()).toBe(false)
     })
 
-    it('should render GOD MODE title in header', () => {
+    it('should render VueDevMode title in header', () => {
       const wrapper = mountWindow()
-      expect(wrapper.text()).toContain('GOD MODE')
+      expect(wrapper.text()).toContain('VueDevMode')
     })
   })
 
