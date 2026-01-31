@@ -19,14 +19,23 @@ import { createDefaultCube, type SpectralCube } from '../types/cube'
 
 // Mock TresJS dependencies
 vi.mock('@tresjs/core', () => ({
-  useRenderLoop: () => ({ onLoop: vi.fn() }),
+  useLoop: () => ({ onBeforeRender: vi.fn(), onRender: vi.fn() }),
 }))
 
 // Mock ParametricCube to render a simple stub with data attributes
 vi.mock('./ParametricCube.vue', () => ({
   default: {
     name: 'ParametricCube',
-    props: ['config', 'position', 'gridPosition', 'scale', 'lodLevel', 'animate', 'rotationSpeed', 'lodSettings'],
+    props: [
+      'config',
+      'position',
+      'gridPosition',
+      'scale',
+      'lodLevel',
+      'animate',
+      'rotationSpeed',
+      'lodSettings',
+    ],
     template: `<div
       data-testid="parametric-cube-mock"
       :data-config-id="config?.id"
@@ -58,8 +67,18 @@ function createMockStackConfig(): CubeStackConfig {
   }
 
   const layers: StackLayer[] = [
-    { id: 'layer-1', cubeConfig: { ...baseCube, id: 'layer-1-cube' }, height: 1, position: 'bottom' },
-    { id: 'layer-2', cubeConfig: { ...baseCube, id: 'layer-2-cube' }, height: 0.5, position: 'middle' },
+    {
+      id: 'layer-1',
+      cubeConfig: { ...baseCube, id: 'layer-1-cube' },
+      height: 1,
+      position: 'bottom',
+    },
+    {
+      id: 'layer-2',
+      cubeConfig: { ...baseCube, id: 'layer-2-cube' },
+      height: 0.5,
+      position: 'middle',
+    },
     { id: 'layer-3', cubeConfig: { ...baseCube, id: 'layer-3-cube' }, height: 1, position: 'top' },
   ]
 

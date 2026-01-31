@@ -11,7 +11,7 @@ import type { SpectralCube } from '../types/cube'
 
 // Mock TresJS dependencies
 vi.mock('@tresjs/core', () => ({
-  useRenderLoop: () => ({ onLoop: vi.fn() }),
+  useLoop: () => ({ onBeforeRender: vi.fn(), onRender: vi.fn() }),
 }))
 
 // Mock ParametricCube to render a simple stub with data attributes
@@ -344,8 +344,14 @@ describe('CubeGrid Vue Component — Boundary Stitching', () => {
 
     const gridPositions = cubes.map((cube) => cube.attributes('data-grid-position'))
     const expectedPositions = [
-      '0,0,0', '0,0,1', '0,1,0', '0,1,1',
-      '1,0,0', '1,0,1', '1,1,0', '1,1,1',
+      '0,0,0',
+      '0,0,1',
+      '0,1,0',
+      '0,1,1',
+      '1,0,0',
+      '1,0,1',
+      '1,1,0',
+      '1,1,1',
     ]
     expectedPositions.forEach((pos) => {
       expect(gridPositions).toContain(pos)

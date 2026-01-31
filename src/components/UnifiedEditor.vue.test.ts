@@ -7,7 +7,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount, shallowMount, flushPromises } from '@vue/test-utils'
-import { defineComponent, h, Suspense } from 'vue'
+import { defineComponent, h } from 'vue'
 import UnifiedEditor from './UnifiedEditor.vue'
 import type { SpectralCube, FFTCubeConfig } from '../types/cube'
 import type { CubeStackConfig } from '../types/stack'
@@ -26,17 +26,21 @@ const MockParamEditor = defineComponent({
       h('div', { class: 'mock-param-editor', 'data-testid': 'param-editor' }, [
         h('span', 'ParamEditor'),
         props.currentCube ? h('span', { 'data-testid': 'cube-id' }, props.currentCube.id) : null,
-        h('button', {
-          'data-testid': 'update-cube-btn',
-          onClick: () => {
-            if (props.currentCube && props.onCubeUpdate) {
-              props.onCubeUpdate({
-                ...props.currentCube,
-                meta: { ...props.currentCube.meta, name: 'Updated Cube' },
-              })
-            }
+        h(
+          'button',
+          {
+            'data-testid': 'update-cube-btn',
+            onClick: () => {
+              if (props.currentCube && props.onCubeUpdate) {
+                props.onCubeUpdate({
+                  ...props.currentCube,
+                  meta: { ...props.currentCube.meta, name: 'Updated Cube' },
+                })
+              }
+            },
           },
-        }, 'Update'),
+          'Update'
+        ),
       ])
   },
 })
@@ -49,7 +53,9 @@ const MockFFTParamEditor = defineComponent({
     return () =>
       h('div', { class: 'mock-fft-param-editor', 'data-testid': 'fft-param-editor' }, [
         h('span', 'FFTParamEditor'),
-        props.currentCube ? h('span', { 'data-testid': 'fft-cube-id' }, props.currentCube.id) : null,
+        props.currentCube
+          ? h('span', { 'data-testid': 'fft-cube-id' }, props.currentCube.id)
+          : null,
       ])
   },
 })
@@ -75,14 +81,18 @@ const MockLODConfigEditor = defineComponent({
     return () =>
       h('div', { class: 'mock-lod-editor', 'data-testid': 'lod-config-editor' }, [
         h('span', 'LODConfigEditor'),
-        h('button', {
-          'data-testid': 'update-lod-btn',
-          onClick: () => {
-            if (props.config && props.onConfigChange) {
-              props.onConfigChange({ ...props.config, enabled: !props.config.enabled })
-            }
+        h(
+          'button',
+          {
+            'data-testid': 'update-lod-btn',
+            onClick: () => {
+              if (props.config && props.onConfigChange) {
+                props.onConfigChange({ ...props.config, enabled: !props.config.enabled })
+              }
+            },
           },
-        }, 'Update LOD'),
+          'Update LOD'
+        ),
       ])
   },
 })
@@ -107,7 +117,9 @@ const MockFFTChannelEditor = defineComponent({
     return () =>
       h('div', { class: 'mock-fft-channel-editor', 'data-testid': 'fft-channel-editor' }, [
         h('span', 'FFTChannelEditor'),
-        props.currentCube ? h('span', { 'data-testid': 'channel-cube-id' }, props.currentCube.id) : null,
+        props.currentCube
+          ? h('span', { 'data-testid': 'channel-cube-id' }, props.currentCube.id)
+          : null,
       ])
   },
 })
@@ -209,6 +221,26 @@ describe('UnifiedEditor Vue Component', () => {
     })
   }
 
+  // Shallow mount helper for tests that trigger reactive state changes via keyboard
+  // shortcuts. Using shallowMount avoids infinite Vue patch cycles caused by
+  // Suspense + deeply nested conditional rendering in the template.
+  function shallowMountEditor(props: Record<string, unknown> = {}) {
+    return shallowMount(UnifiedEditor, {
+      props,
+      global: {
+        stubs: {
+          ParamEditor: MockParamEditor,
+          FFTParamEditor: MockFFTParamEditor,
+          StackEditor: MockStackEditor,
+          LODConfigEditor: MockLODConfigEditor,
+          EnergyVisualizationEditor: MockEnergyVisualizationEditor,
+          FFTChannelEditor: MockFFTChannelEditor,
+          Suspense: true,
+        },
+      },
+    })
+  }
+
   describe('Rendering', () => {
     it('renders the unified editor title', async () => {
       const wrapper = mountEditor()
@@ -253,23 +285,23 @@ describe('UnifiedEditor Vue Component', () => {
     it('starts in spectral mode by default', async () => {
       const wrapper = mountEditor({ currentCube: testCube })
       await flushPromises()
-      const spectralBtn = wrapper.findAll('.unified-editor__mode-btn').find((btn) =>
-        btn.text().includes('Spectral')
-      )
+      const spectralBtn = wrapper
+        .findAll('.unified-editor__mode-btn')
+        .find((btn) => btn.text().includes('Spectral'))
       expect(spectralBtn!.attributes('aria-pressed')).toBe('true')
     })
 
     it('can switch to FFT mode', async () => {
       const wrapper = mountEditor({
-          currentCube: testCube,
-          currentFFTCube: testFFTCube,
-          onModeChange: mockOnModeChange,
-        })
+        currentCube: testCube,
+        currentFFTCube: testFFTCube,
+        onModeChange: mockOnModeChange,
+      })
       await flushPromises()
 
-      const fftBtn = wrapper.findAll('.unified-editor__mode-btn').find((btn) =>
-        btn.text().includes('FFT')
-      )
+      const fftBtn = wrapper
+        .findAll('.unified-editor__mode-btn')
+        .find((btn) => btn.text().includes('FFT'))
       await fftBtn!.trigger('click')
 
       expect(mockOnModeChange).toHaveBeenCalledWith('fft')
@@ -278,15 +310,15 @@ describe('UnifiedEditor Vue Component', () => {
 
     it('can switch to Stack mode', async () => {
       const wrapper = mountEditor({
-          currentCube: testCube,
-          currentStack: testStack,
-          onModeChange: mockOnModeChange,
-        })
+        currentCube: testCube,
+        currentStack: testStack,
+        onModeChange: mockOnModeChange,
+      })
       await flushPromises()
 
-      const stackBtn = wrapper.findAll('.unified-editor__mode-btn').find((btn) =>
-        btn.text().includes('Stack')
-      )
+      const stackBtn = wrapper
+        .findAll('.unified-editor__mode-btn')
+        .find((btn) => btn.text().includes('Stack'))
       await stackBtn!.trigger('click')
 
       expect(mockOnModeChange).toHaveBeenCalledWith('stack')
@@ -296,9 +328,9 @@ describe('UnifiedEditor Vue Component', () => {
       const wrapper = mountEditor({ initialMode: 'fft', currentFFTCube: testFFTCube })
       await flushPromises()
 
-      const fftBtn = wrapper.findAll('.unified-editor__mode-btn').find((btn) =>
-        btn.text().includes('FFT')
-      )
+      const fftBtn = wrapper
+        .findAll('.unified-editor__mode-btn')
+        .find((btn) => btn.text().includes('FFT'))
       expect(fftBtn!.attributes('aria-pressed')).toBe('true')
     })
   })
@@ -330,10 +362,10 @@ describe('UnifiedEditor Vue Component', () => {
   describe('FFT mode', () => {
     it('shows FFTParamEditor for FFT cube', async () => {
       const wrapper = mountEditor({
-          initialMode: 'fft',
-          currentFFTCube: testFFTCube,
-          onFFTCubeUpdate: mockOnFFTCubeUpdate,
-        })
+        initialMode: 'fft',
+        currentFFTCube: testFFTCube,
+        onFFTCubeUpdate: mockOnFFTCubeUpdate,
+      })
       await flushPromises()
 
       expect(wrapper.find('[data-testid="fft-param-editor"]').exists()).toBe(true)
@@ -362,10 +394,10 @@ describe('UnifiedEditor Vue Component', () => {
   describe('Stack mode', () => {
     it('shows StackEditor for stack', async () => {
       const wrapper = mountEditor({
-          initialMode: 'stack',
-          currentStack: testStack,
-          onStackUpdate: mockOnStackUpdate,
-        })
+        initialMode: 'stack',
+        currentStack: testStack,
+        onStackUpdate: mockOnStackUpdate,
+      })
       await flushPromises()
 
       expect(wrapper.find('[data-testid="stack-editor"]').exists()).toBe(true)
@@ -406,7 +438,9 @@ describe('UnifiedEditor Vue Component', () => {
       const wrapper = mountEditor({ currentCube: testCube })
       await flushPromises()
 
-      const appearanceTab = wrapper.findAll('[role="tab"]').find((t) => t.text().includes('Appearance'))
+      const appearanceTab = wrapper
+        .findAll('[role="tab"]')
+        .find((t) => t.text().includes('Appearance'))
       await appearanceTab!.trigger('click')
       await flushPromises()
 
@@ -462,9 +496,9 @@ describe('UnifiedEditor Vue Component', () => {
       const wrapper = mountEditor({ currentCube: testCube, onCubeUpdate: mockOnCubeUpdate })
       await flushPromises()
 
-      const resetBtn = wrapper.findAll('.unified-editor__quick-action-btn').find((btn) =>
-        btn.text().includes('Reset')
-      )
+      const resetBtn = wrapper
+        .findAll('.unified-editor__quick-action-btn')
+        .find((btn) => btn.text().includes('Reset'))
       await resetBtn!.trigger('click')
 
       expect(mockOnCubeUpdate).toHaveBeenCalled()
@@ -476,9 +510,9 @@ describe('UnifiedEditor Vue Component', () => {
       const wrapper = mountEditor({ currentCube: testCube, onCubeUpdate: mockOnCubeUpdate })
       await flushPromises()
 
-      const duplicateBtn = wrapper.findAll('.unified-editor__quick-action-btn').find((btn) =>
-        btn.text().includes('Duplicate')
-      )
+      const duplicateBtn = wrapper
+        .findAll('.unified-editor__quick-action-btn')
+        .find((btn) => btn.text().includes('Duplicate'))
       await duplicateBtn!.trigger('click')
 
       expect(mockOnCubeUpdate).toHaveBeenCalled()
@@ -491,9 +525,9 @@ describe('UnifiedEditor Vue Component', () => {
       const wrapper = mountEditor({ currentCube: testCube, onCubeUpdate: mockOnCubeUpdate })
       await flushPromises()
 
-      const randomizeBtn = wrapper.findAll('.unified-editor__quick-action-btn').find((btn) =>
-        btn.text().includes('Randomize')
-      )
+      const randomizeBtn = wrapper
+        .findAll('.unified-editor__quick-action-btn')
+        .find((btn) => btn.text().includes('Randomize'))
       await randomizeBtn!.trigger('click')
 
       expect(mockOnCubeUpdate).toHaveBeenCalled()
@@ -505,9 +539,9 @@ describe('UnifiedEditor Vue Component', () => {
       const wrapper = mountEditor({ currentCube: testCube })
       await flushPromises()
 
-      const copyBtn = wrapper.findAll('.unified-editor__quick-action-btn').find((btn) =>
-        btn.text().includes('Copy')
-      )
+      const copyBtn = wrapper
+        .findAll('.unified-editor__quick-action-btn')
+        .find((btn) => btn.text().includes('Copy'))
       await copyBtn!.trigger('click')
 
       expect(navigator.clipboard.writeText).toHaveBeenCalled()
@@ -517,9 +551,9 @@ describe('UnifiedEditor Vue Component', () => {
       const wrapper = mountEditor()
       await flushPromises()
 
-      const resetBtn = wrapper.findAll('.unified-editor__quick-action-btn').find((btn) =>
-        btn.text().includes('Reset')
-      )
+      const resetBtn = wrapper
+        .findAll('.unified-editor__quick-action-btn')
+        .find((btn) => btn.text().includes('Reset'))
       expect((resetBtn!.element as HTMLButtonElement).disabled).toBe(true)
     })
   })
@@ -543,7 +577,11 @@ describe('UnifiedEditor Vue Component', () => {
     })
 
     it('switches tabs via select on mobile', async () => {
-      const wrapper = mountEditor({ currentCube: testCube, isMobile: true, lodConfig: DEFAULT_LOD_CONFIG })
+      const wrapper = mountEditor({
+        currentCube: testCube,
+        isMobile: true,
+        lodConfig: DEFAULT_LOD_CONFIG,
+      })
       await flushPromises()
 
       await wrapper.find('.unified-editor__tab-select').setValue('lod')
@@ -572,20 +610,28 @@ describe('UnifiedEditor Vue Component', () => {
 
   describe('Keyboard shortcuts', () => {
     it('resets on Ctrl+R', async () => {
-      const wrapper = mountEditor({ currentCube: testCube, onCubeUpdate: mockOnCubeUpdate })
+      const wrapper = shallowMountEditor({
+        currentCube: testCube,
+        onCubeUpdate: mockOnCubeUpdate,
+      })
       await flushPromises()
 
       window.dispatchEvent(new KeyboardEvent('keydown', { key: 'r', ctrlKey: true }))
+      await flushPromises()
 
       expect(mockOnCubeUpdate).toHaveBeenCalled()
       wrapper.unmount()
     })
 
     it('duplicates on Ctrl+D', async () => {
-      const wrapper = mountEditor({ currentCube: testCube, onCubeUpdate: mockOnCubeUpdate })
+      const wrapper = shallowMountEditor({
+        currentCube: testCube,
+        onCubeUpdate: mockOnCubeUpdate,
+      })
       await flushPromises()
 
       window.dispatchEvent(new KeyboardEvent('keydown', { key: 'd', ctrlKey: true }))
+      await flushPromises()
 
       expect(mockOnCubeUpdate).toHaveBeenCalled()
       const cube = mockOnCubeUpdate.mock.calls[0][0]
@@ -594,10 +640,16 @@ describe('UnifiedEditor Vue Component', () => {
     })
 
     it('randomizes on Ctrl+Shift+R', async () => {
-      const wrapper = mountEditor({ currentCube: testCube, onCubeUpdate: mockOnCubeUpdate })
+      const wrapper = shallowMountEditor({
+        currentCube: testCube,
+        onCubeUpdate: mockOnCubeUpdate,
+      })
       await flushPromises()
 
-      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'r', ctrlKey: true, shiftKey: true }))
+      window.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'r', ctrlKey: true, shiftKey: true })
+      )
+      await flushPromises()
 
       expect(mockOnCubeUpdate).toHaveBeenCalled()
       const cube = mockOnCubeUpdate.mock.calls[0][0]
@@ -610,10 +662,11 @@ describe('UnifiedEditor Vue Component', () => {
         toString: () => '',
       } as Selection)
 
-      const wrapper = mountEditor({ currentCube: testCube })
+      const wrapper = shallowMountEditor({ currentCube: testCube })
       await flushPromises()
 
       window.dispatchEvent(new KeyboardEvent('keydown', { key: 'c', ctrlKey: true }))
+      await flushPromises()
 
       expect(navigator.clipboard.writeText).toHaveBeenCalled()
       wrapper.unmount()
@@ -624,10 +677,10 @@ describe('UnifiedEditor Vue Component', () => {
   describe('LOD tab', () => {
     it('shows LODConfigEditor in LOD tab', async () => {
       const wrapper = mountEditor({
-          currentCube: testCube,
-          lodConfig: DEFAULT_LOD_CONFIG,
-          onLODConfigChange: mockOnLODConfigChange,
-        })
+        currentCube: testCube,
+        lodConfig: DEFAULT_LOD_CONFIG,
+        onLODConfigChange: mockOnLODConfigChange,
+      })
       await flushPromises()
 
       const lodTab = wrapper.findAll('[role="tab"]').find((t) => t.text().includes('LOD'))
@@ -639,10 +692,10 @@ describe('UnifiedEditor Vue Component', () => {
 
     it('passes LOD config to LODConfigEditor', async () => {
       const wrapper = mountEditor({
-          currentCube: testCube,
-          lodConfig: DEFAULT_LOD_CONFIG,
-          onLODConfigChange: mockOnLODConfigChange,
-        })
+        currentCube: testCube,
+        lodConfig: DEFAULT_LOD_CONFIG,
+        onLODConfigChange: mockOnLODConfigChange,
+      })
       await flushPromises()
 
       const lodTab = wrapper.findAll('[role="tab"]').find((t) => t.text().includes('LOD'))
@@ -687,9 +740,9 @@ describe('UnifiedEditor Vue Component', () => {
       const wrapper = mountEditor({ currentCube: testCube })
       await flushPromises()
 
-      const spectralBtn = wrapper.findAll('.unified-editor__mode-btn').find((btn) =>
-        btn.text().includes('Spectral')
-      )
+      const spectralBtn = wrapper
+        .findAll('.unified-editor__mode-btn')
+        .find((btn) => btn.text().includes('Spectral'))
       expect(spectralBtn!.attributes('aria-pressed')).toBe('true')
     })
   })

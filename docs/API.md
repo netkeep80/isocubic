@@ -10,9 +10,13 @@ This document provides API reference for the main components and modules in isoc
    - [Gallery](#gallery)
    - [ExportPanel](#exportpanel)
    - [App](#app)
-2. [Types](#types)
+2. [Composables](#composables)
+   - [useDeviceType](#usedevicetype)
+   - [useCubeEditor](#usecubeeditor)
+   - [useLODStatistics](#uselodstatistics)
+3. [Types](#types)
    - [SpectralCube](#spectralcube)
-3. [Library Modules](#library-modules)
+4. [Library Modules](#library-modules)
    - [validation.ts](#validationts)
    - [storage.ts](#storagets)
    - [performance.ts](#performancets)
@@ -21,23 +25,32 @@ This document provides API reference for the main components and modules in isoc
 
 ## Components
 
+All components are Vue 3.0 Single File Components (`.vue`) using `<script setup lang="ts">` with Composition API.
+
 ### Gallery
 
 A component for displaying and selecting cube presets with filtering and search capabilities.
 
 #### Import
 
-```tsx
-import { Gallery } from './components/Gallery'
+```vue
+<script setup lang="ts">
+import Gallery from './components/Gallery.vue'
+</script>
 ```
 
 #### Props
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `onCubeSelect` | `(cube: SpectralCube) => void` | `undefined` | Callback when a cube is selected from the gallery |
 | `currentCube` | `SpectralCube \| null` | `undefined` | Current cube for saving to gallery |
-| `className` | `string` | `''` | Custom CSS class name |
+| `class` | `string` | `''` | Custom CSS class name |
+
+#### Events
+
+| Event | Payload | Description |
+|-------|---------|-------------|
+| `cube-select` | `SpectralCube` | Emitted when a cube is selected from the gallery |
 
 #### Features
 
@@ -49,18 +62,22 @@ import { Gallery } from './components/Gallery'
 
 #### Example
 
-```tsx
-function MyComponent() {
-  const [currentCube, setCurrentCube] = useState<SpectralCube | null>(null)
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import Gallery from './components/Gallery.vue'
+import type { SpectralCube } from './types/cube'
 
-  return (
-    <Gallery
-      onCubeSelect={(cube) => setCurrentCube(cube)}
-      currentCube={currentCube}
-      className="my-gallery"
-    />
-  )
-}
+const currentCube = ref<SpectralCube | null>(null)
+</script>
+
+<template>
+  <Gallery
+    @cube-select="(cube) => currentCube = cube"
+    :current-cube="currentCube"
+    class="my-gallery"
+  />
+</template>
 ```
 
 ---
@@ -71,8 +88,10 @@ A component for managing cube configuration export/import and undo/redo function
 
 #### Import
 
-```tsx
-import { ExportPanel } from './components/ExportPanel'
+```vue
+<script setup lang="ts">
+import ExportPanel from './components/ExportPanel.vue'
+</script>
 ```
 
 #### Props
@@ -80,9 +99,14 @@ import { ExportPanel } from './components/ExportPanel'
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `currentCube` | `SpectralCube \| null` | - | Current cube configuration |
-| `onCubeLoad` | `(cube: SpectralCube) => void` | `undefined` | Callback when a cube is loaded/imported |
-| `onCubeChange` | `(cube: SpectralCube) => void` | `undefined` | Callback when cube changes via undo/redo |
-| `className` | `string` | `''` | Custom CSS class name |
+| `class` | `string` | `''` | Custom CSS class name |
+
+#### Events
+
+| Event | Payload | Description |
+|-------|---------|-------------|
+| `cube-load` | `SpectralCube` | Emitted when a cube is loaded/imported |
+| `cube-change` | `SpectralCube` | Emitted when cube changes via undo/redo |
 
 #### Features
 
@@ -94,18 +118,22 @@ import { ExportPanel } from './components/ExportPanel'
 
 #### Example
 
-```tsx
-function MyComponent() {
-  const [cube, setCube] = useState<SpectralCube | null>(null)
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import ExportPanel from './components/ExportPanel.vue'
+import type { SpectralCube } from './types/cube'
 
-  return (
-    <ExportPanel
-      currentCube={cube}
-      onCubeLoad={(loadedCube) => setCube(loadedCube)}
-      onCubeChange={(changedCube) => setCube(changedCube)}
-    />
-  )
-}
+const cube = ref<SpectralCube | null>(null)
+</script>
+
+<template>
+  <ExportPanel
+    :current-cube="cube"
+    @cube-load="(loadedCube) => cube = loadedCube"
+    @cube-change="(changedCube) => cube = changedCube"
+  />
+</template>
 ```
 
 ---
@@ -124,6 +152,42 @@ The main application component with responsive layouts.
 
 ---
 
+## Composables
+
+Vue 3.0 composables (located in `src/composables/`).
+
+### useDeviceType
+
+Reactive device type detection based on window width breakpoints.
+
+```typescript
+import { useDeviceType } from './composables/useDeviceType'
+
+const { deviceType, isMobile, isTablet, isDesktop } = useDeviceType()
+```
+
+### useCubeEditor
+
+Centralized cube editing state with undo/redo history and autosave.
+
+```typescript
+import { useCubeEditor } from './composables/useCubeEditor'
+
+const { currentCube, updateCube, undo, redo, canUndo, canRedo } = useCubeEditor()
+```
+
+### useLODStatistics
+
+LOD system statistics management.
+
+```typescript
+import { useLODStatistics } from './composables/useLODStatistics'
+
+const { stats, setStats } = useLODStatistics()
+```
+
+---
+
 ## Types
 
 ### SpectralCube
@@ -132,7 +196,7 @@ The main type representing a parametric cube configuration.
 
 #### Import
 
-```tsx
+```typescript
 import type { SpectralCube } from './types/cube'
 import { createDefaultCube, CUBE_DEFAULTS } from './types/cube'
 ```
@@ -480,14 +544,15 @@ if (monitor.isBelowThreshold(30)) {
 
 ## Testing
 
-All components and modules are fully tested. Run tests with:
+All components and modules are fully tested with Vitest and @vue/test-utils. Run tests with:
 
 ```bash
 npm test
 ```
 
 Current test coverage:
-- **176 tests** passing
-- Unit tests for types, validation, storage, performance
-- Integration tests for Gallery, ExportPanel components
+- **3014+ tests** passing across 81 test files
+- Unit tests for types, validation, storage, performance, physics
+- Vue component tests with @vue/test-utils
+- Integration tests for Gallery, ExportPanel, StackEditor
 - E2E tests for complete editing workflows

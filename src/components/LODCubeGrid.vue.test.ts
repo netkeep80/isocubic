@@ -14,10 +14,9 @@ import { DEFAULT_LOD_CONFIG } from '../types/lod'
 // Mock TresJS dependencies to avoid ESM import issues in test environment
 vi.mock('@tresjs/core', () => ({
   TresCanvas: {},
-  useRenderLoop: () => ({ onLoop: () => {} }),
+  useLoop: () => ({ onBeforeRender: () => {}, onRender: () => {} }),
   useTresContext: () => ({ camera: { value: null } }),
 }))
-import type { SpectralCube } from '../types/cube'
 
 describe('LODCubeGrid Vue Component — LOD System Integration', () => {
   it('should create LOD system with default config', () => {

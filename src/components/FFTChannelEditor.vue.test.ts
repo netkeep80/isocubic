@@ -5,7 +5,7 @@
  * @vitest-environment jsdom
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { shallowMount } from '@vue/test-utils'
 import FFTChannelEditor from './FFTChannelEditor.vue'
 import { FFT_CHANNEL_PRESETS } from '../lib/fft-presets'
@@ -259,7 +259,9 @@ describe('FFTChannelEditor Vue Component', () => {
         props: { currentCube: testCube },
       })
 
-      const dcAmplitudeSlider = wrapper.find('.fft-channel-editor__dc-amplitude input[type="range"]')
+      const dcAmplitudeSlider = wrapper.find(
+        '.fft-channel-editor__dc-amplitude input[type="range"]'
+      )
       await dcAmplitudeSlider.setValue('1.5')
 
       expect(wrapper.emitted('update:cube')).toBeTruthy()

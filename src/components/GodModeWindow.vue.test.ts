@@ -7,7 +7,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { shallowMount, VueWrapper } from '@vue/test-utils'
+import { shallowMount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import GodModeWindow from './GodModeWindow.vue'
 import { GOD_MODE_STORAGE_KEY, GOD_MODE_TABS, DEFAULT_WINDOW_STATE } from '../types/god-mode'
@@ -277,7 +277,14 @@ describe('GodModeWindow Vue Component', () => {
           state: 'minimized',
           activeTab: 'query',
           position: { x: 20, y: 80 },
-          size: { width: 500, height: 600, minWidth: 380, minHeight: 400, maxWidth: 900, maxHeight: 900 },
+          size: {
+            width: 500,
+            height: 600,
+            minWidth: 380,
+            minHeight: 400,
+            maxWidth: 900,
+            maxHeight: 900,
+          },
           isPinned: false,
         })
       )
@@ -374,7 +381,14 @@ describe('GodModeWindow Vue Component', () => {
           state: 'open',
           activeTab: 'search',
           position: { x: 100, y: 150 },
-          size: { width: 600, height: 700, minWidth: 380, minHeight: 400, maxWidth: 900, maxHeight: 900 },
+          size: {
+            width: 600,
+            height: 700,
+            minWidth: 380,
+            minHeight: 400,
+            maxWidth: 900,
+            maxHeight: 900,
+          },
           isPinned: true,
         })
       )

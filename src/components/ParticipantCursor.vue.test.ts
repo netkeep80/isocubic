@@ -6,8 +6,8 @@
  * @vitest-environment jsdom
  */
 
-import { describe, it, expect, vi } from 'vitest'
-import { mount, shallowMount } from '@vue/test-utils'
+import { describe, it, expect } from 'vitest'
+import { mount } from '@vue/test-utils'
 import ParticipantCursor from './ParticipantCursor.vue'
 import { CursorList } from './ParticipantCursor.vue'
 import type { Participant, CursorPosition } from '../types/collaboration'
@@ -369,7 +369,13 @@ describe('ParticipantCursor Vue Component - Cursor Filtering Logic', () => {
   it('should filter out local participant', () => {
     const participants = [
       {
-        participant: { id: 'local', name: 'Me', color: '#ff0000', status: 'online', cursor: null } as unknown as Participant,
+        participant: {
+          id: 'local',
+          name: 'Me',
+          color: '#ff0000',
+          status: 'online',
+          cursor: null,
+        } as unknown as Participant,
         cursor: null,
       },
       {

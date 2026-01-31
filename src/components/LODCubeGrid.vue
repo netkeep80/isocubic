@@ -15,7 +15,7 @@
 -->
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useRenderLoop, useTresContext } from '@tresjs/core'
+import { useLoop, useTresContext } from '@tresjs/core'
 import * as THREE from 'three'
 import ParametricCube from './ParametricCube.vue'
 import type { SpectralCube } from '../types/cube'
@@ -155,9 +155,9 @@ const lodDebugColors: Record<LODLevel, string> = {
 const { camera } = useTresContext()
 
 // Frame update for LOD calculations
-const { onLoop } = useRenderLoop()
+const { onBeforeRender } = useLoop()
 
-onLoop(({ elapsed }) => {
+onBeforeRender(({ elapsed }) => {
   // Update LOD levels at specified interval
   if (elapsed - lastUpdateTime.value >= props.updateInterval) {
     const cam = camera.value

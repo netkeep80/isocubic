@@ -135,7 +135,7 @@ describe('MagicCubeDemo Vue Component — Energy Physics', () => {
     const sourceEnergy = crystal.current_energy ?? 0
     const transferAmount = sourceEnergy * 0.2
 
-    const { source, target, result } = applyEnergyTransfer(crystal, core, transferAmount, {
+    const { source, result } = applyEnergyTransfer(crystal, core, transferAmount, {
       efficiency: 0.9,
     })
 

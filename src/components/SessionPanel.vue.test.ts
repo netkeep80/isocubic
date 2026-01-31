@@ -7,7 +7,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { mount, shallowMount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import SessionPanel from './SessionPanel.vue'
 import type { CollaborationManager } from '../lib/collaboration'
 import type { Session, Participant, ConnectionState } from '../types/collaboration'

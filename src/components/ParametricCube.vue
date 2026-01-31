@@ -6,7 +6,7 @@
 -->
 <script setup lang="ts">
 import { computed, shallowRef } from 'vue'
-import { useRenderLoop } from '@tresjs/core'
+import { useLoop } from '@tresjs/core'
 import * as THREE from 'three'
 import { vertexShader, fragmentShader } from '../shaders/parametric-cube'
 import { createUniforms } from '../lib/shader-utils'
@@ -66,9 +66,9 @@ const shaderMaterial = computed(() => {
 })
 
 // Animation frame for rotation
-const { onLoop } = useRenderLoop()
+const { onBeforeRender } = useLoop()
 
-onLoop(({ delta }) => {
+onBeforeRender(({ delta }) => {
   if (props.animate && meshRef.value) {
     meshRef.value.rotation.y += props.rotationSpeed * delta
   }

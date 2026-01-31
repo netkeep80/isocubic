@@ -1,6 +1,6 @@
 # @isocubic/god-mode
 
-GOD MODE — unified floating DevMode window with AI conversation, GitHub issue generation, screen capture & annotations for React applications.
+GOD MODE — unified floating DevMode window with AI conversation, GitHub issue generation, screen capture & annotations for Vue.js 3.0 applications.
 
 ## Features
 
@@ -22,32 +22,39 @@ npm install @isocubic/god-mode
 
 ## Quick Start
 
-```tsx
+```vue
+<script setup lang="ts">
 import { GodModeProvider, useGodMode } from '@isocubic/god-mode'
+</script>
 
-function App() {
-  return (
-    <GodModeProvider
-      config={{
-        github: { owner: 'my-org', repo: 'my-repo' },
-        preferredLanguage: 'en',
-        storageKeyPrefix: 'my_app',
-        tabs: ['conversation', 'issues'],
-      }}
-    >
-      <MyApp />
-    </GodModeProvider>
-  )
-}
+<template>
+  <GodModeProvider
+    :config="{
+      github: { owner: 'my-org', repo: 'my-repo' },
+      preferredLanguage: 'en',
+      storageKeyPrefix: 'my_app',
+      tabs: ['conversation', 'issues'],
+    }"
+  >
+    <MyApp />
+  </GodModeProvider>
+</template>
+```
 
-function ToggleButton() {
-  const { toggleWindow, isVisible } = useGodMode()
-  return (
-    <button onClick={toggleWindow}>
-      {isVisible ? 'Close' : 'Open'} GOD MODE
-    </button>
-  )
-}
+Toggle button example:
+
+```vue
+<script setup lang="ts">
+import { useGodMode } from '@isocubic/god-mode'
+
+const { toggleWindow, isVisible } = useGodMode()
+</script>
+
+<template>
+  <button @click="toggleWindow">
+    {{ isVisible ? 'Close' : 'Open' }} GOD MODE
+  </button>
+</template>
 ```
 
 ## Configuration
@@ -69,7 +76,7 @@ function ToggleButton() {
 
 To connect your application's component metadata with GOD MODE:
 
-```tsx
+```typescript
 import type { ComponentRegistry } from '@isocubic/god-mode'
 
 const myRegistry: ComponentRegistry = {
@@ -86,8 +93,8 @@ const myRegistry: ComponentRegistry = {
 
 ### Components
 
-- `GodModeProvider` — React Context Provider for state management
-- `useGodMode()` — Hook to access GOD MODE state and actions
+- `GodModeProvider` — Vue provide/inject provider for state management
+- `useGodMode()` — Composable to access GOD MODE state and actions
 
 ### Types
 

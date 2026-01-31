@@ -7,7 +7,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { shallowMount, flushPromises, VueWrapper } from '@vue/test-utils'
+import { shallowMount, flushPromises } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import ConversationPanel from './ConversationPanel.vue'
 import { CONVERSATION_SUGGESTIONS } from '../types/god-mode'
@@ -15,7 +15,12 @@ import { CONVERSATION_SUGGESTIONS } from '../types/god-mode'
 // Mock conversation-agent module
 const mockProcessMessage = vi.fn().mockResolvedValue({
   success: true,
-  message: { id: 'resp_1', role: 'assistant', content: 'Test response', timestamp: new Date().toISOString() },
+  message: {
+    id: 'resp_1',
+    role: 'assistant',
+    content: 'Test response',
+    timestamp: new Date().toISOString(),
+  },
   suggestions: [],
 })
 const mockGetSession = vi.fn().mockReturnValue({

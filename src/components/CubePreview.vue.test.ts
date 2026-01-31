@@ -9,7 +9,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { shallowMount } from '@vue/test-utils'
 import type { SpectralCube } from '../types/cube'
 import { createDefaultCube } from '../types/cube'
-import type { ComponentMeta } from '../types/component-meta'
 
 // Mock TresJS dependencies to avoid ESM import issues in test environment
 vi.mock('@tresjs/core', () => ({
@@ -18,7 +17,7 @@ vi.mock('@tresjs/core', () => ({
     template: '<div data-testid="canvas-mock"><slot /></div>',
     props: ['camera', 'antialias', 'alpha', 'powerPreference', 'dpr'],
   },
-  useRenderLoop: () => ({ onLoop: vi.fn() }),
+  useLoop: () => ({ onBeforeRender: vi.fn(), onRender: vi.fn() }),
   useTresContext: () => ({ camera: { value: null } }),
 }))
 

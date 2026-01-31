@@ -10,7 +10,6 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { shallowMount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import GitHubAuthButton from './GitHubAuthButton.vue'
-import { GITHUB_TOKEN_STORAGE_KEY, GITHUB_AUTH_METHOD_KEY } from '../lib/github-api'
 
 // Mock fetch globally
 const mockFetch = vi.fn()
@@ -219,7 +218,12 @@ describe('GitHubAuthButton Vue Component', () => {
     it('should show sign out button when authenticated', async () => {
       mockGetAuthState.mockResolvedValue({
         authenticated: true,
-        user: { login: 'testuser', name: 'Test User', avatarUrl: 'https://example.com/avatar', htmlUrl: 'https://github.com/testuser' },
+        user: {
+          login: 'testuser',
+          name: 'Test User',
+          avatarUrl: 'https://example.com/avatar',
+          htmlUrl: 'https://github.com/testuser',
+        },
       })
 
       const wrapper = mountButton()

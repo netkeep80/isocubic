@@ -7,7 +7,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { shallowMount, flushPromises } from '@vue/test-utils'
+import { shallowMount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import DevModeQueryPanel from './DevModeQueryPanel.vue'
 import { registerComponentMeta, componentMetaRegistry } from '../types/component-meta'
