@@ -338,7 +338,7 @@ describe('ParametricCube Vue Component — Component Mounting', () => {
       global: globalStubs,
     })
     const html = wrapper.html().toLowerCase()
-    expect(html).toContain('tres-mesh')
+    expect(html).toContain('tresmesh')
   })
 
   it('should use TresBoxGeometry as geometry (verified via component definition)', async () => {

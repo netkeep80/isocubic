@@ -271,20 +271,15 @@ onUnmounted(() => {
   >
     <TresCanvas
       v-if="dimensions.width > 0 && dimensions.height > 0"
-      :camera="{
-        position: [2, 2, 2],
-        fov: 50,
-        near: 0.1,
-        far: 100,
-      }"
+      :clear-color="props.backgroundColor"
       :antialias="true"
       :alpha="false"
       power-preference="high-performance"
       :dpr="[1, 2]"
       :style="{ width: '100%', height: '100%' }"
     >
-      <!-- Background color -->
-      <TresColor attach="background" :args="[props.backgroundColor]" />
+      <!-- Camera -->
+      <TresPerspectiveCamera :position="[2, 2, 2]" :fov="50" :near="0.1" :far="100" />
 
       <!-- Ambient light for base illumination -->
       <TresAmbientLight :intensity="0.4" />
