@@ -17,7 +17,6 @@ vi.mock('@tresjs/core', () => ({
   useRenderLoop: () => ({ onLoop: () => {} }),
   useTresContext: () => ({ camera: { value: null } }),
 }))
-import type { SpectralCube } from '../types/cube'
 
 describe('LODCubeGrid Vue Component — LOD System Integration', () => {
   it('should create LOD system with default config', () => {

@@ -9,14 +9,12 @@ import { describe, it, expect } from 'vitest'
 import {
   vertexShader,
   fragmentShader,
-  defaultUniforms,
   createEnergyUniforms,
   createSimpleEnergyConfig,
   createMagicCrystalConfig,
   createUnstableCoreConfig,
   visualizationModeToInt,
   ChannelMask,
-  type EnergyCubeConfig,
 } from '../shaders/energy-cube'
 
 describe('EnergyCube Vue Component — Shader Module', () => {

@@ -9,7 +9,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { shallowMount } from '@vue/test-utils'
 import type { SpectralCube } from '../types/cube'
 import { createDefaultCube } from '../types/cube'
-import type { ComponentMeta } from '../types/component-meta'
 
 // Mock TresJS dependencies to avoid ESM import issues in test environment
 vi.mock('@tresjs/core', () => ({

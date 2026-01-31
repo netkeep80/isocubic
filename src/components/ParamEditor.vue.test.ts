@@ -9,7 +9,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { shallowMount } from '@vue/test-utils'
 import ParamEditor from './ParamEditor.vue'
 import type { SpectralCube } from '../types/cube'
-import { createDefaultCube, CUBE_DEFAULTS } from '../types/cube'
+import { createDefaultCube } from '../types/cube'
 
 // Mock LODConfigEditor child component
 vi.mock('./LODConfigEditor.vue', () => ({

@@ -32,4 +32,11 @@ export default defineConfig([
       'vue/multi-word-component-names': 'off',
     },
   },
+  {
+    // Allow 'any' type in test files
+    files: ['**/*.test.ts', '**/*.test.tsx', '**/*.test.vue', '**/*.spec.ts'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+    },
+  },
 ])

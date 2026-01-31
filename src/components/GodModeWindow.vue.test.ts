@@ -7,7 +7,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { shallowMount, VueWrapper } from '@vue/test-utils'
+import { shallowMount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import GodModeWindow from './GodModeWindow.vue'
 import { GOD_MODE_STORAGE_KEY, GOD_MODE_TABS, DEFAULT_WINDOW_STATE } from '../types/god-mode'

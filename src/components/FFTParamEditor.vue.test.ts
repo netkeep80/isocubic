@@ -5,7 +5,7 @@
  * @vitest-environment jsdom
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { shallowMount } from '@vue/test-utils'
 import FFTParamEditor from './FFTParamEditor.vue'
 import type { FFTCubeConfig } from '../types/cube'
@@ -42,10 +42,8 @@ describe('FFTParamEditor Vue Component — FFT Configuration', () => {
 })
 
 describe('FFTParamEditor Vue Component', () => {
-  let mockOnCubeUpdate: ReturnType<typeof vi.fn>
-
   beforeEach(() => {
-    mockOnCubeUpdate = vi.fn()
+    // Setup code here if needed
   })
 
   describe('Empty state', () => {

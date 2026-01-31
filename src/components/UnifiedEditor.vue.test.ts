@@ -6,8 +6,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { mount, shallowMount, flushPromises } from '@vue/test-utils'
-import { defineComponent, h, Suspense } from 'vue'
+import { mount, flushPromises } from '@vue/test-utils'
+import { defineComponent, h } from 'vue'
 import UnifiedEditor from './UnifiedEditor.vue'
 import type { SpectralCube, FFTCubeConfig } from '../types/cube'
 import type { CubeStackConfig } from '../types/stack'

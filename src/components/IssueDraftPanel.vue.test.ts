@@ -8,7 +8,6 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { shallowMount } from '@vue/test-utils'
-import { nextTick } from 'vue'
 import IssueDraftPanel from './IssueDraftPanel.vue'
 
 // Mock child components
