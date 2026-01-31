@@ -22,12 +22,12 @@ function toggle() {
     type="button"
     class="devmode-indicator"
     :class="{ 'devmode-indicator--active': isEnabled }"
-    :aria-label="isEnabled ? 'Disable Developer Mode' : 'Enable Developer Mode'"
-    title="Toggle Developer Mode (Ctrl+Shift+D)"
+    :aria-label="isEnabled ? 'Disable VueDevMode' : 'Enable VueDevMode'"
+    title="Toggle VueDevMode (Ctrl+Shift+D)"
     @click="toggle"
   >
     <span class="devmode-indicator__icon">{{ isEnabled ? '🔧' : '👁️' }}</span>
-    <span class="devmode-indicator__label">DevMode {{ isEnabled ? 'ON' : 'OFF' }}</span>
+    <span class="devmode-indicator__label">VueDevMode {{ isEnabled ? 'ON' : 'OFF' }}</span>
   </button>
 </template>
 

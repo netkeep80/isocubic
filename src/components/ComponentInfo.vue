@@ -24,7 +24,7 @@ import type {
   ComponentHistoryEntry,
   ComponentFeature,
 } from '../types/component-meta'
-import { useDevMode, useIsDevModeEnabled, useDevModeSettings } from '../lib/devmode'
+import { useIsDevModeEnabled, useDevModeSettings } from '../lib/devmode'
 
 // --- Props ---
 interface ComponentInfoProps {
@@ -305,14 +305,14 @@ function toggleSection(title: string, defaultExpanded: boolean) {
 // --- Computed ---
 
 const actualPosition = computed(() =>
-  props.position === 'auto' ? settings.panelPosition : props.position
+  props.position === 'auto' ? settings.value.panelPosition : props.position
 )
 
 const showPanel = computed(
-  () => props.alwaysShow || (settings.showHoverInfo && (isHovered.value || isPinned.value))
+  () => props.alwaysShow || (settings.value.showHoverInfo && (isHovered.value || isPinned.value))
 )
 
-const showOutline = computed(() => settings.showOutline)
+const showOutline = computed(() => settings.value.showOutline)
 
 const wrapperStyle = computed<CSSProperties>(() => ({
   ...(showOutline.value ? styles.wrapperOutline : styles.wrapper),
@@ -331,9 +331,8 @@ const badgeStyle = computed<CSSProperties>(() => ({
 }))
 
 // --- InfoPanel computed ---
-const { settings: devModeSettings } = useDevMode()
-const categories = computed(() => devModeSettings.categories)
-const verbosity = computed(() => devModeSettings.verbosity)
+const categories = computed(() => settings.value.categories)
+const verbosity = computed(() => settings.value.verbosity)
 
 const historyEntries = computed(() =>
   props.meta.history.slice(0, verbosity.value === 'verbose' ? undefined : 3)

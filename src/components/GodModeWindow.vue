@@ -716,7 +716,7 @@ onUnmounted(() => {
         <div :style="styles.header" data-testid="god-mode-header" @mousedown="handleDragStart">
           <div :style="styles.headerTitle">
             <span :style="styles.headerIcon">&#9889;</span>
-            <span>GOD MODE</span>
+            <span>VueDevMode</span>
           </div>
           <div :style="styles.headerButtons">
             <!-- Pin button -->
