@@ -203,44 +203,49 @@ const APP_META = {
 <template>
   <!-- Desktop Layout -->
   <div v-if="isDesktop" class="app app--desktop">
-    <header class="app__header">
-      <h1>isocubic</h1>
-      <p>Web editor for parametric cubes</p>
-    </header>
+    <ComponentInfo :meta="APP_META">
+      <header class="app__header">
+        <h1>isocubic</h1>
+        <p>Web editor for parametric cubes</p>
+      </header>
 
-    <main class="app__main">
-      <!-- Gallery sidebar -->
-      <section class="app__section app__section--sidebar">
-        <Gallery :current-cube="currentCube" @cube-select="selectCube" />
-      </section>
+      <main class="app__main">
+        <!-- Gallery sidebar -->
+        <section class="app__section app__section--sidebar">
+          <Gallery :current-cube="currentCube" @cube-select="selectCube" />
+        </section>
 
-      <!-- Main content: preview + editor -->
-      <section class="app__section app__section--main">
-        <div class="app__current-cube">
-          <h3 class="app__section-title">Preview</h3>
-          <div class="app__3d-preview app__3d-preview--desktop">
-            <CubePreview :config="currentCube" data-testid="cube-preview" />
+        <!-- Main content: preview + editor -->
+        <section class="app__section app__section--main">
+          <div class="app__current-cube">
+            <h3 class="app__section-title">Preview</h3>
+            <div class="app__3d-preview app__3d-preview--desktop">
+              <CubePreview :config="currentCube" data-testid="cube-preview" />
+            </div>
           </div>
-        </div>
 
-        <PromptGenerator
-          @cube-generated="selectCube"
-          @cubes-generated="(cubes) => cubes.length > 0 && selectCube(cubes[0])"
-        />
+          <PromptGenerator
+            @cube-generated="selectCube"
+            @cubes-generated="(cubes) => cubes.length > 0 && selectCube(cubes[0])"
+          />
 
-        <UnifiedEditor :cube="currentCube" @update:cube="updateCube" />
-      </section>
+          <UnifiedEditor :cube="currentCube" @update:cube="updateCube" />
+        </section>
 
-      <!-- Tools sidebar -->
-      <section class="app__section app__section--sidebar">
-        <ExportPanel :current-cube="currentCube" @cube-load="loadCube" @cube-change="updateCube" />
+        <!-- Tools sidebar -->
+        <section class="app__section app__section--sidebar">
+          <ExportPanel
+            :current-cube="currentCube"
+            @cube-load="loadCube"
+            @cube-change="updateCube"
+          />
 
-        <ActionHistory :actions="[]" />
-      </section>
-    </main>
+          <ActionHistory :actions="[]" />
+        </section>
+      </main>
+    </ComponentInfo>
 
     <GodModeWindow />
-    <ComponentInfo :meta="APP_META" />
     <DevModeIndicator />
   </div>
 

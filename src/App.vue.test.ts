@@ -71,8 +71,8 @@ vi.mock('./components/GodModeWindow.vue', () => ({
 vi.mock('./components/ComponentInfo.vue', () => ({
   default: {
     name: 'ComponentInfo',
-    template: '<div class="component-info-mock">ComponentInfo</div>',
-    props: ['meta'],
+    template: '<div class="component-info-mock"><slot /></div>',
+    props: ['meta', 'style', 'className', 'position', 'alwaysShow'],
   },
 }))
 
@@ -126,6 +126,11 @@ function createWrapper() {
       plugins: [createPinia()],
       stubs: {
         teleport: true,
+        ComponentInfo: {
+          name: 'ComponentInfo',
+          template: '<div class="component-info-mock"><slot /></div>',
+          props: ['meta'],
+        },
       },
     },
   })
