@@ -2,7 +2,7 @@
  * LOD Statistics Composable
  * Vue.js 3.0 composable for managing LOD system statistics state
  *
- * Migrated from React hook (src/hooks/useLODStatistics.ts) as part of Phase 10 (TASK 67)
+ * Vue.js 3.0 composable (migrated from React hook as part of Phase 10, TASK 67)
  *
  * ISSUE 17: LOD-система для дальних кубиков
  */
