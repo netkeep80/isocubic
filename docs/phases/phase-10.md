@@ -253,21 +253,21 @@
 Перевести компоненты GOD MODE на Vue.js 3.0, используя локальный код из `packages/god-mode/`. Не использовать внешний npm-пакет `@isocubic/god-mode`.
 
 **Компоненты для миграции**:
-- [ ] `GodModeWindow.tsx` → `GodModeWindow.vue` — основное плавающее окно с вкладками
-- [ ] `ConversationPanel.tsx` → `ConversationPanel.vue` — AI-диалог
-- [ ] `IssueDraftPanel.tsx` → `IssueDraftPanel.vue` — генератор черновиков issues
-- [ ] `GitHubAuthButton.tsx` → `GitHubAuthButton.vue` — авторизация GitHub
-- [ ] `AnnotationCanvas.tsx` → `AnnotationCanvas.vue` — аннотирование скриншотов
-- [ ] `DevModeQueryPanel.tsx` → `DevModeQueryPanel.vue` — AI-запросы
-- [ ] `ComponentContextPanel.tsx` → `ComponentContextPanel.vue` — контекст компонентов
-- [ ] `ExtendedSearchPanel.tsx` → `ExtendedSearchPanel.vue` — расширенный поиск
-- [ ] `ComponentInfo.tsx` → `ComponentInfo.vue` — DevMode индикатор
+- [x] `GodModeWindow.tsx` → `GodModeWindow.vue` — основное плавающее окно с вкладками
+- [x] `ConversationPanel.tsx` → `ConversationPanel.vue` — AI-диалог
+- [x] `IssueDraftPanel.tsx` → `IssueDraftPanel.vue` — генератор черновиков issues
+- [x] `GitHubAuthButton.tsx` → `GitHubAuthButton.vue` — авторизация GitHub
+- [x] `AnnotationCanvas.tsx` → `AnnotationCanvas.vue` — аннотирование скриншотов
+- [x] `DevModeQueryPanel.tsx` → `DevModeQueryPanel.vue` — AI-запросы
+- [x] `ComponentContextPanel.tsx` → `ComponentContextPanel.vue` — контекст компонентов
+- [x] `ExtendedSearchPanel.tsx` → `ExtendedSearchPanel.vue` — расширенный поиск
+- [x] `ComponentInfo.tsx` → `ComponentInfo.vue` — DevMode индикатор
 
 **Изменения в god-mode пакете**:
-- [ ] `packages/god-mode/src/components/GodModeProvider.tsx` → переписать на Vue provide/inject
-- [ ] `useGodMode()` React hook → `useGodMode()` Vue composable
-- [ ] Убрать peer dependency на React, добавить Vue
-- [ ] Обновить `packages/god-mode/examples/basic-usage.tsx` → `basic-usage.vue`
+- [x] `packages/god-mode/src/components/GodModeProvider.tsx` → переписать на Vue provide/inject
+- [x] `useGodMode()` React hook → `useGodMode()` Vue composable
+- [x] Убрать peer dependency на React, добавить Vue
+- [x] Обновить `packages/god-mode/examples/basic-usage.tsx` → `basic-usage.vue`
 
 **Ключевые изменения**:
 - GodModeProvider (React Context) → Vue `provide()` / `inject()` или Pinia store

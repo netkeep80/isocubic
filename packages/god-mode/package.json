@@ -1,7 +1,7 @@
 {
   "name": "@isocubic/god-mode",
   "version": "0.1.0",
-  "description": "GOD MODE — unified floating DevMode window with AI conversation, GitHub issue generation, screen capture & annotations for React apps",
+  "description": "GOD MODE — unified floating DevMode window with AI conversation, GitHub issue generation, screen capture & annotations for Vue.js 3.0 apps",
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
@@ -13,7 +13,8 @@
     "README.md"
   ],
   "keywords": [
-    "react",
+    "vue",
+    "vue3",
     "devtools",
     "god-mode",
     "ai",
@@ -31,14 +32,10 @@
     "directory": "packages/god-mode"
   },
   "peerDependencies": {
-    "react": ">=18.0.0",
-    "react-dom": ">=18.0.0"
+    "vue": ">=3.5.0"
   },
   "devDependencies": {
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "@types/react": "^19.2.5",
-    "@types/react-dom": "^19.2.3",
+    "vue": "^3.5.0",
     "typescript": "~5.9.3"
   }
 }
