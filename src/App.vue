@@ -217,7 +217,9 @@ const APP_META = {
       <section class="app__section app__section--main">
         <div class="app__current-cube">
           <h3 class="app__section-title">Preview</h3>
-          <CubePreview :config="currentCube" data-testid="cube-preview" />
+          <div class="app__3d-preview app__3d-preview--desktop">
+            <CubePreview :config="currentCube" data-testid="cube-preview" />
+          </div>
         </div>
 
         <PromptGenerator
@@ -250,7 +252,9 @@ const APP_META = {
     <main class="app__main app__main--tablet">
       <!-- Preview on top -->
       <div class="app__preview-section">
-        <CubePreview :config="currentCube" data-testid="cube-preview" />
+        <div class="app__3d-preview app__3d-preview--tablet">
+          <CubePreview :config="currentCube" data-testid="cube-preview" />
+        </div>
       </div>
 
       <!-- Panels below -->
@@ -313,7 +317,9 @@ const APP_META = {
         class="app__mobile-panel app__mobile-panel--preview"
       >
         <div class="app__current-cube app__current-cube--mobile">
-          <CubePreview :config="currentCube" data-testid="cube-preview" />
+          <div class="app__3d-preview app__3d-preview--mobile">
+            <CubePreview :config="currentCube" data-testid="cube-preview" />
+          </div>
           <div class="app__cube-info">
             <p>
               <strong>{{
