@@ -1,0 +1,27 @@
+{
+  "$schema": "../../metanet.schema.json",
+  "name": "god-mode",
+  "description": "Standalone package for GOD MODE AI-assisted development panel",
+  "languages": ["typescript", "vue"],
+  "files": {
+    "package.json": {
+      "description": "NPM package manifest for god-mode"
+    },
+    "tsconfig.json": {
+      "description": "TypeScript configuration for god-mode package"
+    },
+    "README.md": {
+      "description": "GOD MODE package documentation"
+    }
+  },
+  "directories": {
+    "src": {
+      "description": "Package source code",
+      "metanet": "src/metanet.json"
+    },
+    "examples": {
+      "description": "Usage examples",
+      "metanet": "examples/metanet.json"
+    }
+  }
+}

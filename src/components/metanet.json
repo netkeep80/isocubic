@@ -1,0 +1,12 @@
+{
+  "$schema": "../../metanet.schema.json",
+  "name": "components",
+  "description": "Vue UI components for the isocubic application: editors, previews, panels, and tools",
+  "tags": ["vue", "ui", "components"],
+  "directories": {
+    "windows": {
+      "description": "Window-wrapped components for the window manager system",
+      "metanet": "windows/metanet.json"
+    }
+  }
+}

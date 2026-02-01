@@ -1,0 +1,5 @@
+{
+  "$schema": "../../metanet.schema.json",
+  "name": "splash",
+  "description": "PWA splash screen images for various device sizes"
+}

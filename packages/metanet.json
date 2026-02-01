@@ -1,0 +1,11 @@
+{
+  "$schema": "../metanet.schema.json",
+  "name": "packages",
+  "description": "Standalone packages extracted from the isocubic project",
+  "directories": {
+    "god-mode": {
+      "description": "GOD MODE: AI-assisted development floating DevTools package",
+      "metanet": "god-mode/metanet.json"
+    }
+  }
+}

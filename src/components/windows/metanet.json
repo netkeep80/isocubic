@@ -1,0 +1,11 @@
+{
+  "$schema": "../../../metanet.schema.json",
+  "name": "windows",
+  "description": "Window-wrapped components for the DraggableWindow-based window management system",
+  "tags": ["windows", "ui", "layout"],
+  "files": {
+    "test-utils.ts": {
+      "description": "Shared test utilities for window component tests"
+    }
+  }
+}

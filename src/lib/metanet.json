@@ -1,0 +1,6 @@
+{
+  "$schema": "../../metanet.schema.json",
+  "name": "lib",
+  "description": "TypeScript library modules: core logic, AI integration, collaboration, utilities",
+  "tags": ["library", "core", "utilities"]
+}

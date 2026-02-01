@@ -1,0 +1,20 @@
+{
+  "$schema": "../metanet.schema.json",
+  "name": "wasm-fft",
+  "description": "Rust WebAssembly module for high-performance FFT computations",
+  "languages": ["rust"],
+  "files": {
+    "Cargo.toml": {
+      "description": "Rust package manifest with wasm-bindgen and rustfft dependencies"
+    },
+    "README.md": {
+      "description": "Documentation for the WASM FFT module"
+    }
+  },
+  "directories": {
+    "src": {
+      "description": "Rust source code",
+      "metanet": "src/metanet.json"
+    }
+  }
+}

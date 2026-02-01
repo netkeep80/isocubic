@@ -1,0 +1,5 @@
+{
+  "$schema": "../metanet.schema.json",
+  "name": "examples",
+  "description": "Example cube configuration presets demonstrating various parametric cube styles"
+}
