@@ -22,9 +22,9 @@ describe('PromptGeneratorWindow', () => {
 
   it('emits cubeGenerated event when PromptGenerator emits it', async () => {
     const wrapper = mount(PromptGeneratorWindow)
-    
+
     await wrapper.findComponent({ name: 'PromptGenerator' }).vm.$emit('cubeGenerated', mockCube)
-    
+
     expect(wrapper.emitted('cubeGenerated')).toBeTruthy()
     expect(wrapper.emitted('cubeGenerated')?.[0]).toEqual([mockCube])
   })
@@ -32,9 +32,9 @@ describe('PromptGeneratorWindow', () => {
   it('emits cubesGenerated event when PromptGenerator emits it', async () => {
     const wrapper = mount(PromptGeneratorWindow)
     const mockCubes = [mockCube, { ...mockCube, id: 'test-cube-2' }]
-    
+
     await wrapper.findComponent({ name: 'PromptGenerator' }).vm.$emit('cubesGenerated', mockCubes)
-    
+
     expect(wrapper.emitted('cubesGenerated')).toBeTruthy()
     expect(wrapper.emitted('cubesGenerated')?.[0]).toEqual([mockCubes])
   })

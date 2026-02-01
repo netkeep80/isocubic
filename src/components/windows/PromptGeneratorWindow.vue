@@ -24,8 +24,8 @@ function handleCubesGenerated(cubes: CubeConfig[]) {
 
 <template>
   <ComponentInfo :meta="PROMPT_GENERATOR_META">
-    <PromptGenerator 
-      @cube-generated="handleCubeGenerated" 
+    <PromptGenerator
+      @cube-generated="handleCubeGenerated"
       @cubes-generated="handleCubesGenerated"
     />
   </ComponentInfo>

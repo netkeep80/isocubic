@@ -17,7 +17,7 @@ describe('SharePanelWindow', () => {
 
   it('renders SharePanel component with cube prop', () => {
     const wrapper = mount(SharePanelWindow, {
-      props: { cube: mockCube }
+      props: { cube: mockCube },
     })
 
     expect(wrapper.findComponent({ name: 'SharePanel' }).exists()).toBe(true)
@@ -25,7 +25,7 @@ describe('SharePanelWindow', () => {
 
   it('passes cube prop to SharePanel', () => {
     const wrapper = mount(SharePanelWindow, {
-      props: { cube: mockCube }
+      props: { cube: mockCube },
     })
 
     const shareComponent = wrapper.findComponent({ name: 'SharePanel' })
@@ -34,7 +34,7 @@ describe('SharePanelWindow', () => {
 
   it('works with null cube', () => {
     const wrapper = mount(SharePanelWindow, {
-      props: { cube: null }
+      props: { cube: null },
     })
 
     expect(wrapper.findComponent({ name: 'SharePanel' }).exists()).toBe(true)

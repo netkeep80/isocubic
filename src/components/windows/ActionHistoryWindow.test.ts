@@ -15,20 +15,20 @@ describe('ActionHistoryWindow', () => {
       type: 'create',
       timestamp: Date.now(),
       description: 'Created test cube',
-      data: { cubeId: 'test-cube' }
+      data: { cubeId: 'test-cube' },
     },
     {
       id: 'action-2',
       type: 'modify',
       timestamp: Date.now() + 1000,
       description: 'Modified cube color',
-      data: { cubeId: 'test-cube', changes: { color: [1, 0, 0] } }
-    }
+      data: { cubeId: 'test-cube', changes: { color: [1, 0, 0] } },
+    },
   ]
 
   it('renders ActionHistory component with actions prop', () => {
     const wrapper = mount(ActionHistoryWindow, {
-      props: { actions: mockActions }
+      props: { actions: mockActions },
     })
 
     expect(wrapper.findComponent({ name: 'ActionHistory' }).exists()).toBe(true)
@@ -36,7 +36,7 @@ describe('ActionHistoryWindow', () => {
 
   it('passes actions prop to ActionHistory', () => {
     const wrapper = mount(ActionHistoryWindow, {
-      props: { actions: mockActions }
+      props: { actions: mockActions },
     })
 
     const historyComponent = wrapper.findComponent({ name: 'ActionHistory' })
@@ -45,7 +45,7 @@ describe('ActionHistoryWindow', () => {
 
   it('works with empty actions array', () => {
     const wrapper = mount(ActionHistoryWindow, {
-      props: { actions: [] }
+      props: { actions: [] },
     })
 
     expect(wrapper.findComponent({ name: 'ActionHistory' }).exists()).toBe(true)

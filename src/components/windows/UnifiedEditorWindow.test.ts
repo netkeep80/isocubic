@@ -3,7 +3,7 @@
  * Phase 11, TASK 74: Window wrapper components
  */
 
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import UnifiedEditorWindow from './UnifiedEditorWindow.vue'
 import type { CubeConfig } from '../../types/cube'
@@ -17,7 +17,7 @@ describe('UnifiedEditorWindow', () => {
 
   it('renders UnifiedEditor component with cube prop', () => {
     const wrapper = mount(UnifiedEditorWindow, {
-      props: { cube: mockCube }
+      props: { cube: mockCube },
     })
 
     expect(wrapper.findComponent({ name: 'UnifiedEditor' }).exists()).toBe(true)
@@ -25,7 +25,7 @@ describe('UnifiedEditorWindow', () => {
 
   it('passes cube prop to UnifiedEditor', () => {
     const wrapper = mount(UnifiedEditorWindow, {
-      props: { cube: mockCube }
+      props: { cube: mockCube },
     })
 
     const editorComponent = wrapper.findComponent({ name: 'UnifiedEditor' })
@@ -35,16 +35,16 @@ describe('UnifiedEditorWindow', () => {
   it('emits update:cube event when UnifiedEditor emits it', async () => {
     const wrapper = mount(UnifiedEditorWindow)
     const updatedCube = { ...mockCube, meta: { name: 'Updated Cube' } }
-    
+
     await wrapper.findComponent({ name: 'UnifiedEditor' }).vm.$emit('update:cube', updatedCube)
-    
+
     expect(wrapper.emitted('update:cube')).toBeTruthy()
     expect(wrapper.emitted('update:cube')?.[0]).toEqual([updatedCube])
   })
 
   it('works with null cube', () => {
     const wrapper = mount(UnifiedEditorWindow, {
-      props: { cube: null }
+      props: { cube: null },
     })
 
     expect(wrapper.findComponent({ name: 'UnifiedEditor' }).exists()).toBe(true)

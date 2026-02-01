@@ -26,7 +26,7 @@ describe('GalleryWindow', () => {
 
   it('renders Gallery component with props', () => {
     const wrapper = mount(GalleryWindow, {
-      props: { currentCube: mockCube }
+      props: { currentCube: mockCube },
     })
 
     expect(wrapper.findComponent({ name: 'Gallery' }).exists()).toBe(true)
@@ -34,7 +34,7 @@ describe('GalleryWindow', () => {
 
   it('passes currentCube prop to Gallery', () => {
     const wrapper = mount(GalleryWindow, {
-      props: { currentCube: mockCube }
+      props: { currentCube: mockCube },
     })
 
     const galleryComponent = wrapper.findComponent({ name: 'Gallery' })
@@ -43,16 +43,16 @@ describe('GalleryWindow', () => {
 
   it('emits cubeSelect event when Gallery emits it', async () => {
     const wrapper = mount(GalleryWindow)
-    
+
     await wrapper.findComponent({ name: 'Gallery' }).vm.$emit('cubeSelect', mockCube)
-    
+
     expect(wrapper.emitted('cubeSelect')).toBeTruthy()
     expect(wrapper.emitted('cubeSelect')?.[0]).toEqual([mockCube])
   })
 
   it('works without currentCube', () => {
     const wrapper = mount(GalleryWindow)
-    
+
     expect(wrapper.findComponent({ name: 'Gallery' }).exists()).toBe(true)
     expect(wrapper.findComponent({ name: 'Gallery' }).props('currentCube')).toBeNull()
   })

@@ -17,7 +17,7 @@ describe('CubePreviewWindow', () => {
 
   it('renders CubePreview component with config prop', () => {
     const wrapper = mount(CubePreviewWindow, {
-      props: { config: mockCube }
+      props: { config: mockCube },
     })
 
     expect(wrapper.findComponent({ name: 'CubePreview' }).exists()).toBe(true)
@@ -25,7 +25,7 @@ describe('CubePreviewWindow', () => {
 
   it('passes config prop to CubePreview', () => {
     const wrapper = mount(CubePreviewWindow, {
-      props: { config: mockCube }
+      props: { config: mockCube },
     })
 
     const previewComponent = wrapper.findComponent({ name: 'CubePreview' })
@@ -34,7 +34,7 @@ describe('CubePreviewWindow', () => {
 
   it('renders with null config', () => {
     const wrapper = mount(CubePreviewWindow, {
-      props: { config: null }
+      props: { config: null },
     })
 
     expect(wrapper.findComponent({ name: 'CubePreview' }).exists()).toBe(true)
@@ -43,7 +43,7 @@ describe('CubePreviewWindow', () => {
 
   it('has proper styling wrapper', () => {
     const wrapper = mount(CubePreviewWindow, {
-      props: { config: mockCube }
+      props: { config: mockCube },
     })
 
     const container = wrapper.find('.cube-preview-window')

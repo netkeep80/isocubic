@@ -22,9 +22,9 @@ describe('CommunityGalleryWindow', () => {
 
   it('emits cubeSelect event when CommunityGallery emits it', async () => {
     const wrapper = mount(CommunityGalleryWindow)
-    
+
     await wrapper.findComponent({ name: 'CommunityGallery' }).vm.$emit('cubeSelect', mockCube)
-    
+
     expect(wrapper.emitted('cubeSelect')).toBeTruthy()
     expect(wrapper.emitted('cubeSelect')?.[0]).toEqual([mockCube])
   })
