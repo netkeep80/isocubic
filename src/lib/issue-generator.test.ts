@@ -13,6 +13,7 @@ import {
   createIssueGenerator,
   getDefaultIssueGenerator,
   resetDefaultIssueGenerator,
+  detectEnvironment,
 } from '../lib/issue-generator'
 import type { ConversationMessage } from '../types/god-mode'
 import { validateIssueDraft } from '../types/issue-generator'
@@ -473,6 +474,32 @@ describe('IssueGenerator', () => {
         generator.createFromTemplate('unknown_template')
       }).toThrow('Template not found: unknown_template')
     })
+
+    it('should auto-fill placeholder default values when no explicit values provided', () => {
+      const draft = generator.createFromTemplate('bug_report')
+
+      // The body should not contain raw {os} placeholder since it has defaultValue 'Windows'
+      // (or auto-detected OS value)
+      expect(draft.body).not.toContain('{os}')
+      // The body should not contain raw {browser} placeholder since it has defaultValue 'Chrome'
+      // (or auto-detected browser value)
+      expect(draft.body).not.toContain('{browser}')
+    })
+
+    it('should prefer explicit values over defaults and auto-detected values', () => {
+      const draft = generator.createFromTemplate('bug_report', {
+        browser: 'Firefox 120',
+        os: 'Linux',
+        device: 'Laptop',
+      })
+
+      expect(draft.body).toContain('Firefox 120')
+      expect(draft.body).toContain('Linux')
+      expect(draft.body).toContain('Laptop')
+      expect(draft.body).not.toContain('{browser}')
+      expect(draft.body).not.toContain('{os}')
+      expect(draft.body).not.toContain('{device}')
+    })
   })
 
   describe('Single Message Generation', () => {
@@ -706,5 +733,35 @@ describe('Issue Generator Integration Tests', () => {
     expect(result.draft.body).toContain('## Требования')
     expect(result.insights.detectedType).toBe('feature')
     expect(result.confidence).toBeGreaterThanOrEqual(0.6)
+  })
+})
+
+describe('detectEnvironment', () => {
+  it('should return an object with environment fields', () => {
+    const env = detectEnvironment()
+    expect(typeof env).toBe('object')
+    // In test environment (jsdom), navigator is available
+    // so we should get some values
+    if (typeof navigator !== 'undefined') {
+      // At minimum the function should not throw
+      expect(env).toBeDefined()
+    }
+  })
+
+  it('should return empty object when navigator is not available', () => {
+    const originalNavigator = globalThis.navigator
+    // @ts-expect-error - temporarily remove navigator for testing
+    delete globalThis.navigator
+    try {
+      const env = detectEnvironment()
+      expect(env).toEqual({})
+    } finally {
+      // Restore navigator
+      Object.defineProperty(globalThis, 'navigator', {
+        value: originalNavigator,
+        writable: true,
+        configurable: true,
+      })
+    }
   })
 })
