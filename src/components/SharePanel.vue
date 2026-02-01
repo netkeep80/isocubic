@@ -345,9 +345,15 @@ function handleDownloadQR() {
 }
 
 // Format date for display
+// Uses manual formatting instead of toLocaleDateString() to avoid
+// slow ICU locale resolution in jsdom on Windows CI environments
 function formatDate(isoDate: string): string {
   try {
-    return new Date(isoDate).toLocaleDateString()
+    const d = new Date(isoDate)
+    const year = d.getFullYear()
+    const month = d.getMonth() + 1
+    const day = d.getDate()
+    return `${month}/${day}/${year}`
   } catch {
     return isoDate
   }

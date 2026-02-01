@@ -90,9 +90,15 @@ describe('SharePanel Vue Component — Visibility Options', () => {
 
 describe('SharePanel Vue Component — Date Formatting', () => {
   it('should format date for display', () => {
+    // Uses manual formatting instead of toLocaleDateString() to avoid
+    // slow ICU locale resolution in jsdom on Windows CI environments
     function formatDate(isoDate: string): string {
       try {
-        return new Date(isoDate).toLocaleDateString()
+        const d = new Date(isoDate)
+        const year = d.getFullYear()
+        const month = d.getMonth() + 1
+        const day = d.getDate()
+        return `${month}/${day}/${year}`
       } catch {
         return isoDate
       }
@@ -102,6 +108,7 @@ describe('SharePanel Vue Component — Date Formatting', () => {
     const result = formatDate(date)
     expect(result).toBeTruthy()
     expect(typeof result).toBe('string')
+    expect(result).toMatch(/\d+\/\d+\/\d+/)
   })
 })
 
