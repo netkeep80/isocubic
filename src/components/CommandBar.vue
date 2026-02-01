@@ -11,22 +11,22 @@ export interface CommandItem {
   label: string
   icon: string
   description: string
-  category: 'window' | 'action'
+  category: 'window' | 'action' | 'layout' | 'cube' | 'export' | 'settings' | 'macro'
 }
 
 // Component metadata for DevMode (exported from non-setup script block)
 export const COMMAND_BAR_META = {
   id: 'command-bar',
   name: 'CommandBar',
-  version: '1.1.0',
-  summary: 'TinyLLM command bar for searching and opening windows.',
+  version: '1.2.0',
+  summary: 'TinyLLM command bar for searching and opening windows with extended commands.',
   description:
     'CommandBar provides a command palette-style search bar at the top of the application. ' +
     'Users can search for and open component windows, execute actions like generating cubes or exporting, ' +
     'and quickly navigate the application. Activated by clicking or pressing Ctrl+K. ' +
     'Responsive overlay optimized for mobile and tablet devices.',
   phase: 11,
-  taskId: 'TASK 75',
+  taskId: 'TASK 77',
   filePath: 'src/components/CommandBar.vue',
   history: [
     {
@@ -41,6 +41,13 @@ export const COMMAND_BAR_META = {
       date: '2026-02-01T18:00:00Z',
       description: 'Responsive overlay for mobile and tablet devices',
       taskId: 'TASK 75',
+      type: 'updated' as const,
+    },
+    {
+      version: '1.2.0',
+      date: '2026-02-01T20:00:00Z',
+      description: 'Extended command categories: layout, cube, export, settings, macro',
+      taskId: 'TASK 77',
       type: 'updated' as const,
     },
   ],
@@ -66,6 +73,13 @@ export const COMMAND_BAR_META = {
       enabled: true,
       taskId: 'TASK 68',
     },
+    {
+      id: 'extended-categories',
+      name: 'Extended Categories',
+      description: 'Support for layout, cube, export, settings, and macro command categories',
+      enabled: true,
+      taskId: 'TASK 77',
+    },
   ],
   dependencies: [],
   props: [
@@ -77,7 +91,7 @@ export const COMMAND_BAR_META = {
   ],
   tags: ['command-bar', 'search', 'tinyLLM', 'ui'],
   status: 'stable' as const,
-  lastUpdated: '2026-02-01T18:00:00Z',
+  lastUpdated: '2026-02-01T20:00:00Z',
 }
 </script>
 

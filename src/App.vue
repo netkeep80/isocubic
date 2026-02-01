@@ -36,6 +36,9 @@ import DraggableWindow from './components/DraggableWindow.vue'
 import CommandBar from './components/CommandBar.vue'
 import type { CommandItem } from './components/CommandBar.vue'
 import WindowTaskbar from './components/WindowTaskbar.vue'
+import { getAllExtendedCommands } from './lib/command-registry'
+import { calculateLayout } from './lib/window-layout-manager'
+import type { LayoutStrategy } from './lib/window-layout-manager'
 import './App.css'
 
 // Device type detection
@@ -178,20 +181,33 @@ const commandItems = computed<CommandItem[]>(() => {
     })
   }
 
-  // Action commands
-  items.push({
-    id: 'action:reset-layout',
-    label: 'Reset Layout',
-    icon: '\u21BA',
-    description: 'Reset all windows to default positions',
-    category: 'action',
-  })
+  // Extended commands (layout, cube, export, settings)
+  const extendedCommands = getAllExtendedCommands()
+  items.push(...extendedCommands)
 
   return items
 })
 
+/** Apply a window layout strategy */
+function applyLayout(strategy: LayoutStrategy): void {
+  const visible = windowManager.visibleWindows.value
+  if (visible.length === 0) return
+
+  const results = calculateLayout(strategy, visible, {
+    workspaceWidth: window.innerWidth,
+    workspaceHeight: window.innerHeight - 100,
+    topOffset: 60,
+  })
+
+  for (const result of results) {
+    windowManager.moveWindow(result.id, result.x, result.y)
+    windowManager.resizeWindow(result.id, result.width, result.height)
+  }
+}
+
 /** Handle command bar execution */
 function onCommandExecute(commandId: string) {
+  // Window toggle commands
   if (commandId.startsWith('window:')) {
     const winId = commandId.slice('window:'.length)
     const win = windowManager.getWindow(winId)
@@ -201,8 +217,56 @@ function onCommandExecute(commandId: string) {
     } else {
       windowManager.openWindow(winId)
     }
-  } else if (commandId === 'action:reset-layout') {
+    return
+  }
+
+  // Layout commands
+  if (commandId === 'layout:tile') {
+    applyLayout('tile')
+  } else if (commandId === 'layout:cascade') {
+    applyLayout('cascade')
+  } else if (commandId === 'layout:horizontal') {
+    applyLayout('horizontal')
+  } else if (commandId === 'layout:vertical') {
+    applyLayout('vertical')
+  } else if (commandId === 'layout:minimize-all') {
+    for (const win of windowManager.visibleWindows.value) {
+      windowManager.minimizeWindow(win.id)
+    }
+  } else if (commandId === 'layout:restore-all') {
+    for (const win of windowManager.minimizedWindows.value) {
+      windowManager.restoreWindow(win.id)
+    }
+  }
+  // Settings commands
+  else if (commandId === 'settings:reset-layout' || commandId === 'action:reset-layout') {
     windowManager.resetLayout()
+  } else if (commandId === 'settings:clear-storage') {
+    localStorage.clear()
+    windowManager.resetLayout()
+  }
+  // Cube commands — open relevant windows
+  else if (
+    commandId === 'cube:randomize' ||
+    commandId === 'cube:reset' ||
+    commandId === 'cube:duplicate'
+  ) {
+    // Open editor window if not already open
+    const editorWin = windowManager.getWindow('editor')
+    if (!editorWin?.isOpen) windowManager.openWindow('editor')
+    else windowManager.bringToFront('editor')
+  }
+  // Export commands — open export window
+  else if (commandId.startsWith('export:')) {
+    const exportWin = windowManager.getWindow('export')
+    if (commandId === 'export:share') {
+      const shareWin = windowManager.getWindow('share')
+      if (!shareWin?.isOpen) windowManager.openWindow('share')
+      else windowManager.bringToFront('share')
+    } else {
+      if (!exportWin?.isOpen) windowManager.openWindow('export')
+      else windowManager.bringToFront('export')
+    }
   }
 }
 
@@ -253,8 +317,8 @@ function handleSwipe() {
 const APP_META = {
   id: 'app',
   name: 'App',
-  version: '3.0.0',
-  summary: 'Root application component with windowed desktop layout and command bar.',
+  version: '3.1.0',
+  summary: 'Root application component with windowed desktop layout and extended command bar.',
   description:
     'App is the root component of isocubic. It provides a windowed desktop layout with draggable, ' +
     'resizable, collapsible windows and a TinyLLM command bar, plus adaptive tablet and mobile layouts. ' +
@@ -283,6 +347,13 @@ const APP_META = {
       date: '2026-02-01T12:00:00Z',
       description: 'Windowed desktop layout with drag/resize/minimize/close and command bar',
       taskId: 'TASK 68',
+      type: 'updated' as const,
+    },
+    {
+      version: '3.1.0',
+      date: '2026-02-01T20:00:00Z',
+      description: 'Extended command bar with layout, cube, export, and settings commands',
+      taskId: 'TASK 77',
       type: 'updated' as const,
     },
   ],
@@ -321,6 +392,13 @@ const APP_META = {
       description: 'TinyLLM command bar for searching and opening windows (Ctrl+K)',
       enabled: true,
       taskId: 'TASK 68',
+    },
+    {
+      id: 'extended-commands',
+      name: 'Extended Commands',
+      description: 'Layout management, cube operations, export/import, and settings commands',
+      enabled: true,
+      taskId: 'TASK 77',
     },
   ],
   dependencies: [
