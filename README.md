@@ -172,10 +172,13 @@ isocubic/
 │   │   ├── IssueDraftPanel.vue  # Генератор черновиков issues (Vue SFC, TASK 66)
 │   │   ├── GitHubAuthButton.vue # Авторизация GitHub (Vue SFC, TASK 66)
 │   │   └── AnnotationCanvas.vue # Аннотирование скриншотов (Vue SFC, TASK 66)
-│   ├── composables/       # Vue composables (TASK 67)
+│   ├── composables/       # Vue composables (TASK 67, 70, 75)
 │   │   ├── useDeviceType.ts    # Определение типа устройства (desktop/tablet/mobile)
 │   │   ├── useCubeEditor.ts    # Централизованное управление состоянием куба
-│   │   └── useLODStatistics.ts # Статистика LOD-системы
+│   │   ├── useLODStatistics.ts # Статистика LOD-системы
+│   │   ├── useWindowManager.ts # Управление состоянием окон (Phase 11, TASK 70)
+│   │   ├── useTouchGestures.ts # Touch-жесты: swipe, pinch, long-press (Phase 11, TASK 75)
+│   │   └── useResponsiveLayout.ts # Адаптивный layout для устройств (Phase 11, TASK 75)
 │   ├── shaders/           # GLSL-шейдеры
 │   │   ├── parametric-cube.glsl  # Исходный GLSL код
 │   │   ├── parametric-cube.ts    # TypeScript модуль для Three.js
@@ -318,7 +321,7 @@ npm run test:coverage
 ```
 
 **Текущее покрытие:**
-- 3056+ тестов (84 тестовый файл, все компоненты на @vue/test-utils)
+- 3216+ тестов (101 тестовый файл, все компоненты на @vue/test-utils)
 - Тесты 3D-компонентов Vue.js (ParametricCube, EnergyCube, CubePreview, CubeGrid, CubeStack, LODCubeGrid, LODStatisticsDisplay, MagicCubeDemo — TASK 62)
 - Тесты UI-компонентов редактора Vue.js (UnifiedEditor, ParamEditor, FFTParamEditor, FFTChannelEditor, EnergyVisualizationEditor, LODConfigEditor, StackEditor, StackPresetPicker, PromptGenerator — TASK 63)
 - Тесты компонентов галереи, экспорта и шаринга Vue.js (Gallery, CommunityGallery, ExportPanel, SharePanel, CommentsSection, SubscriptionButton, NotificationPanel, ActionHistory — TASK 64)
@@ -345,6 +348,7 @@ npm run test:coverage
 - Тесты библиотеки @isocubic/god-mode (типы, утилиты, хранилище, GodModeProvider, useGodMode)
 - Тесты DevMode компонентов Vue.js (DevModeQueryPanel, ComponentContextPanel, ExtendedSearchPanel, ComponentInfo, AnnotationCanvas — TASK 66)
 - Тесты компонентов оконной системы Vue.js (DraggableWindow, WindowTaskbar, CommandBar — TASK 70-73)
+- Тесты touch-жестов и адаптивного layout (useTouchGestures, useResponsiveLayout — TASK 75)
 - E2E тесты для полных workflow редактирования (мигрированы на Vue — TASK 68)
 
 ## Вклад в проект
