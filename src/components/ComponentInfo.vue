@@ -310,7 +310,11 @@ const actualPosition = computed(() =>
 )
 
 const showPanel = computed(
-  () => props.alwaysShow || (settings.value.showHoverInfo && (isHovered.value || isPinned.value))
+  () =>
+    props.alwaysShow ||
+    (settings.value.showHoverInfo &&
+      (isHovered.value || isPinned.value) &&
+      devModeStore.selectedComponentId !== props.meta.id)
 )
 
 const showOutline = computed(() => settings.value.showOutline)
