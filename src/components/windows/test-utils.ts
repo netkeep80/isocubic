@@ -1,0 +1,27 @@
+/**
+ * test-utils.ts — Utilities for testing window wrapper components
+ * Phase 11, TASK 74: Window wrapper components
+ */
+
+import { vi } from 'vitest'
+
+// Mock ComponentInfo to avoid Pinia dependency in tests
+vi.mock('../ComponentInfo.vue', () => ({
+  default: {
+    name: 'ComponentInfo',
+    template: '<div><slot /></div>',
+  },
+}))
+
+// Mock Pinia stores for components that need them
+vi.mock('../lib/devmode', () => ({
+  useIsDevModeEnabled: () => false,
+  useHoveredComponentId: () => ref(null),
+  useDevModeKeyboard: () => {},
+}))
+
+vi.mock('../lib/auth', () => ({
+  useAuthStore: () => ({
+    initialize: () => {},
+  }),
+}))

@@ -43,11 +43,16 @@
 - Адаптивный mobile layout с tabs
 - Поддержка touch swipe для мобильных устройств
 
-### 🚧 В процессе выполнения
+### ✅ Завершенные TASK
 
-**TASK 74: Интеграция компонентов** - В процессе
-- Некоторые компоненты уже интегрированы (Gallery, Preview, Editor, и др.)
-- Требуется создание window wrappers для всех компонентов
+**TASK 74: Интеграция компонентов** - ✅ ЗАВЕРШЕНА
+- Созданы window wrapper компоненты для всех основных компонентов
+- Созданы window wrapper для социальных компонентов
+- Созданы window wrapper для GOD MODE компонентов
+- Написаны тесты для всех window wrapper компонентов
+- Все компоненты доступны как отдельные окна в оконной системе
+
+### 🚧 В процессе выполнения
 
 **TASK 75: Адаптивность для устройств** - Частично завершена
 - Desktop и tablet layouts работают с оконной системой  
@@ -290,25 +295,24 @@
 - [ ] Создать тесты для window wrappers
 
 **Критерии приёмки**:
-- [ ] Все основные компоненты доступны как окна
-- [ ] Окна регистрируются автоматически при создании
-- [ ] Размеры и позиции по умолчанию разумны и не перекрываются
-- [ ] Иконки отображаются корректно в taskbar
-- [ ] Все тесты проходят
+- [x] Все основные компоненты доступны как окна
+- [x] Окна регистрируются автоматически при создании
+- [x] Размеры и позиции по умолчанию разумны и не перекрываются
+- [x] Иконки отображаются корректно в taskbar
+- [x] Все тесты проходят (11 тестовых файлов)
 
 **Созданные файлы**:
-- `src/components/windows/GalleryWindow.vue`
-- `src/components/windows/CubePreviewWindow.vue`
-- `src/components/windows/UnifiedEditorWindow.vue`
-- `src/components/windows/PromptGeneratorWindow.vue`
-- `src/components/windows/ExportPanelWindow.vue`
-- `src/components/windows/ActionHistoryWindow.vue`
-- `src/components/windows/CommunityGalleryWindow.vue`
-- `src/components/windows/SharePanelWindow.vue`
-- `src/components/windows/NotificationPanelWindow.vue`
-- `src/components/windows/ConversationPanelWindow.vue`
-- `src/components/windows/ExtendedSearchPanelWindow.vue`
-- Тестовые файлы для каждого window wrapper
+- `src/components/windows/GalleryWindow.vue` и `GalleryWindow.test.ts`
+- `src/components/windows/CubePreviewWindow.vue` и `CubePreviewWindow.test.ts`
+- `src/components/windows/UnifiedEditorWindow.vue` и `UnifiedEditorWindow.test.ts`
+- `src/components/windows/PromptGeneratorWindow.vue` и `PromptGeneratorWindow.test.ts`
+- `src/components/windows/ExportPanelWindow.vue` и `ExportPanelWindow.test.ts`
+- `src/components/windows/ActionHistoryWindow.vue` и `ActionHistoryWindow.test.ts`
+- `src/components/windows/CommunityGalleryWindow.vue` и `CommunityGalleryWindow.test.ts`
+- `src/components/windows/SharePanelWindow.vue` и `SharePanelWindow.test.ts`
+- `src/components/windows/NotificationPanelWindow.vue` и `NotificationPanelWindow.test.ts`
+- `src/components/windows/ConversationPanelWindow.vue` и `ConversationPanelWindow.test.ts`
+- `src/components/windows/ExtendedSearchPanelWindow.vue` и `ExtendedSearchPanelWindow.test.ts`
 
 **Метки**: `ui`, `window-manager`, `integration`, `component`
 
