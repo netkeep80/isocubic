@@ -1,5 +1,49 @@
 {
   "$schema": "../../metanet.schema.json",
   "name": "icons",
-  "description": "Application icons at various sizes for PWA manifests and favicons"
+  "description": "Application icons at various sizes for PWA manifests and favicons",
+  "files": {
+    "icon-16x16.svg": {
+      "description": "Favicon icon at 16x16 pixels"
+    },
+    "icon-32x32.svg": {
+      "description": "Favicon icon at 32x32 pixels"
+    },
+    "icon-72x72.svg": {
+      "description": "PWA icon at 72x72 pixels"
+    },
+    "icon-96x96.svg": {
+      "description": "PWA icon at 96x96 pixels"
+    },
+    "icon-128x128.svg": {
+      "description": "PWA icon at 128x128 pixels"
+    },
+    "icon-144x144.svg": {
+      "description": "PWA icon at 144x144 pixels"
+    },
+    "icon-152x152.svg": {
+      "description": "PWA icon at 152x152 pixels"
+    },
+    "icon-167x167.svg": {
+      "description": "PWA icon at 167x167 pixels"
+    },
+    "icon-180x180.svg": {
+      "description": "Apple touch icon at 180x180 pixels"
+    },
+    "icon-192x192.svg": {
+      "description": "PWA icon at 192x192 pixels"
+    },
+    "icon-384x384.svg": {
+      "description": "PWA icon at 384x384 pixels"
+    },
+    "icon-512x512.svg": {
+      "description": "PWA icon at 512x512 pixels"
+    },
+    "icon-maskable-192x192.svg": {
+      "description": "Maskable PWA icon at 192x192 pixels for adaptive icon support"
+    },
+    "icon-maskable-512x512.svg": {
+      "description": "Maskable PWA icon at 512x512 pixels for adaptive icon support"
+    }
+  }
 }

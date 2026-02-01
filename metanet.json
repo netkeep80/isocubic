@@ -55,6 +55,9 @@
     },
     ".gitignore": {
       "description": "Git ignore rules"
+    },
+    "CLAUDE.md": {
+      "description": "Instructions and context for AI coding assistants"
     }
   },
   "directories": {

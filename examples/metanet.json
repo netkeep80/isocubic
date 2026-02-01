@@ -1,5 +1,55 @@
 {
   "$schema": "../metanet.schema.json",
   "name": "examples",
-  "description": "Example cube configuration presets demonstrating various parametric cube styles"
+  "description": "Example cube configuration presets demonstrating various parametric cube styles",
+  "files": {
+    "brick-red.json": {
+      "description": "Red brick material cube preset"
+    },
+    "crystal-magic.json": {
+      "description": "Magic crystal material cube preset"
+    },
+    "energy-shield.json": {
+      "description": "Energy shield effect cube preset"
+    },
+    "grass-green.json": {
+      "description": "Green grass material cube preset"
+    },
+    "ice-frozen.json": {
+      "description": "Frozen ice material cube preset"
+    },
+    "lava-molten.json": {
+      "description": "Molten lava material cube preset"
+    },
+    "magic-crystal-energy.json": {
+      "description": "Magic crystal with energy effects cube preset"
+    },
+    "marble-white.json": {
+      "description": "White marble material cube preset"
+    },
+    "metal-rust.json": {
+      "description": "Rusty metal material cube preset"
+    },
+    "sand-desert.json": {
+      "description": "Desert sand material cube preset"
+    },
+    "stack-layered-earth.json": {
+      "description": "Layered earth cube stack preset"
+    },
+    "stack-stone-wall.json": {
+      "description": "Stone wall cube stack preset"
+    },
+    "stack-wooden-tower.json": {
+      "description": "Wooden tower cube stack preset"
+    },
+    "stone-moss.json": {
+      "description": "Mossy stone material cube preset"
+    },
+    "unstable-core.json": {
+      "description": "Unstable core energy effect cube preset"
+    },
+    "wood-oak.json": {
+      "description": "Oak wood material cube preset"
+    }
+  }
 }

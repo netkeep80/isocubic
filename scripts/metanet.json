@@ -8,6 +8,9 @@
     },
     "metanet-preprocessor.ts": {
       "description": "MetaNet preprocessor: validates metanet.json files against schema and checks file references"
+    },
+    "vite-plugin-metanet.ts": {
+      "description": "Vite plugin that compiles all metanet.json files into a virtual module for runtime access"
     }
   }
 }
