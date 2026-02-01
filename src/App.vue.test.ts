@@ -338,7 +338,7 @@ describe('App', () => {
       expect(mobileNav.exists()).toBe(true)
 
       const tabs = wrapper.findAll('.app__mobile-tab')
-      expect(tabs.length).toBe(4) // Gallery, Preview, Editor, Tools
+      expect(tabs.length).toBe(5) // Gallery, Preview, Editor, Tools, Social
     })
 
     it('should display swipe indicator on mobile', () => {
@@ -366,11 +366,12 @@ describe('App', () => {
     it('should show mobile tab labels', () => {
       const wrapper = createWrapper()
       const labels = wrapper.findAll('.app__mobile-tab-label')
-      expect(labels.length).toBe(4)
+      expect(labels.length).toBe(5)
       expect(labels[0].text()).toBe('Gallery')
       expect(labels[1].text()).toBe('Preview')
       expect(labels[2].text()).toBe('Editor')
       expect(labels[3].text()).toBe('Tools')
+      expect(labels[4].text()).toBe('Social')
     })
   })
 
