@@ -20,7 +20,7 @@
 -->
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted, type CSSProperties } from 'vue'
-import { useIsDevModeEnabled } from '../lib/devmode'
+import { useIsDevModeEnabled, useSelectedComponentId } from '../lib/devmode'
 import {
   type GodModeTab,
   type GodModeConfig,
@@ -87,6 +87,7 @@ const emit = defineEmits<{
 // ============================================================================
 
 const isDevModeEnabled = useIsDevModeEnabled()
+const clickedComponentId = useSelectedComponentId()
 
 // Merged config
 const config = computed<GodModeConfig>(() => ({
@@ -133,6 +134,9 @@ const containerRef = ref<HTMLDivElement | null>(null)
 
 // Detect language
 const language = computed<QueryLanguage>(() => config.value.preferredLanguage || 'ru')
+
+// Effective component ID: prefer store's selectedComponentId (from click), fall back to prop
+const effectiveComponentId = computed(() => clickedComponentId.value || props.selectedComponentId)
 
 // Computed visibility
 const isVisible = computed(() => isDevModeEnabled.value && windowState.value.state !== 'closed')
@@ -558,6 +562,18 @@ function handleIssuePublished(result: unknown) {
 // Watchers & Lifecycle
 // ============================================================================
 
+// Auto-open window and switch to context tab when a component is clicked
+watch(clickedComponentId, (newId) => {
+  if (newId && isDevModeEnabled.value) {
+    windowState.value = {
+      ...windowState.value,
+      state: 'open',
+      activeTab: 'context',
+      lastOpened: new Date().toISOString(),
+    }
+  }
+})
+
 // Persist state when it changes
 watch(
   windowState,
@@ -800,7 +816,7 @@ onUnmounted(() => {
 
             <ComponentContextPanel
               v-if="windowState.activeTab === 'context'"
-              :component-id="props.selectedComponentId"
+              :component-id="effectiveComponentId"
               :on-related-component-select="handleComponentSelect"
               :initial-expanded="true"
               position="top-left"
@@ -817,7 +833,7 @@ onUnmounted(() => {
 
             <ConversationPanel
               v-if="windowState.activeTab === 'conversation'"
-              :selected-component-id="props.selectedComponentId"
+              :selected-component-id="effectiveComponentId"
               :on-component-select="handleComponentSelect"
               :settings="{ preferredLanguage: language }"
               :style="styles.embeddedPanel"

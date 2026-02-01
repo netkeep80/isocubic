@@ -189,6 +189,7 @@ vi.mock('./composables/useCubeEditor', () => ({
 vi.mock('./lib/devmode', () => ({
   useDevModeKeyboard: vi.fn(),
   useHoveredComponentId: vi.fn(() => ({ value: null })),
+  useSelectedComponentId: vi.fn(() => ({ value: null })),
   useDevModeStore: () => ({
     isDevMode: false,
     toggleDevMode: vi.fn(),

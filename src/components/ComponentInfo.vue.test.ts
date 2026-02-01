@@ -39,6 +39,7 @@ const mockDevModeStore = {
   setHoveredComponent: vi.fn((id: string | null) => {
     mockDevModeStore.hoveredComponentId = id
   }),
+  setSelectedComponent: vi.fn(),
 }
 
 vi.mock('../lib/devmode', () => ({

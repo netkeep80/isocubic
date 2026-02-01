@@ -154,6 +154,9 @@ export const useDevModeStore = defineStore('devMode', () => {
   /** ID of the component currently hovered by the mouse pointer */
   const hoveredComponentId = ref<string | null>(null)
 
+  /** ID of the component selected by click (for VueDevMode inspection) */
+  const selectedComponentId = ref<string | null>(null)
+
   // Persist settings changes
   watch(
     settings,
@@ -195,14 +198,20 @@ export const useDevModeStore = defineStore('devMode', () => {
     hoveredComponentId.value = componentId
   }
 
+  function setSelectedComponent(componentId: string | null) {
+    selectedComponentId.value = componentId
+  }
+
   return {
     settings,
     hoveredComponentId,
+    selectedComponentId,
     toggleDevMode,
     updateSettings,
     updateCategory,
     resetSettings,
     setHoveredComponent,
+    setSelectedComponent,
   }
 })
 
@@ -281,6 +290,16 @@ export function useDevModeSettings(): ComputedRef<DevModeSettings> {
 export function useHoveredComponentId(): ComputedRef<string | null> {
   const store = useDevModeStore()
   return computed(() => store.hoveredComponentId)
+}
+
+/**
+ * Composable to get the currently selected (clicked) component ID
+ *
+ * Returns a ComputedRef<string | null> that reactively tracks the selected component.
+ */
+export function useSelectedComponentId(): ComputedRef<string | null> {
+  const store = useDevModeStore()
+  return computed(() => store.selectedComponentId)
 }
 
 export default useDevModeStore
