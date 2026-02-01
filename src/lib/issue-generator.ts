@@ -231,6 +231,62 @@ const PRIORITY_PATTERNS_EN: Record<IssuePriority, string[]> = {
 }
 
 /**
+ * Detects the current browser, OS, and device from the runtime environment.
+ * Returns an object with `browser`, `os`, and `device` fields.
+ */
+export function detectEnvironment(): Record<string, string> {
+  const result: Record<string, string> = {}
+
+  if (typeof navigator === 'undefined') {
+    return result
+  }
+
+  const ua = navigator.userAgent
+
+  // Detect browser
+  if (ua.includes('Firefox/')) {
+    const match = ua.match(/Firefox\/([\d.]+)/)
+    result.browser = match ? `Firefox ${match[1]}` : 'Firefox'
+  } else if (ua.includes('Edg/')) {
+    const match = ua.match(/Edg\/([\d.]+)/)
+    result.browser = match ? `Edge ${match[1]}` : 'Edge'
+  } else if (ua.includes('OPR/') || ua.includes('Opera/')) {
+    const match = ua.match(/OPR\/([\d.]+)/)
+    result.browser = match ? `Opera ${match[1]}` : 'Opera'
+  } else if (ua.includes('Chrome/')) {
+    const match = ua.match(/Chrome\/([\d.]+)/)
+    result.browser = match ? `Chrome ${match[1]}` : 'Chrome'
+  } else if (ua.includes('Safari/') && !ua.includes('Chrome')) {
+    const match = ua.match(/Version\/([\d.]+)/)
+    result.browser = match ? `Safari ${match[1]}` : 'Safari'
+  }
+
+  // Detect OS
+  if (ua.includes('Windows')) {
+    result.os = 'Windows'
+  } else if (ua.includes('Mac OS X') || ua.includes('Macintosh')) {
+    result.os = 'macOS'
+  } else if (ua.includes('Android')) {
+    result.os = 'Android'
+  } else if (ua.includes('iPhone') || ua.includes('iPad')) {
+    result.os = 'iOS'
+  } else if (ua.includes('Linux')) {
+    result.os = 'Linux'
+  }
+
+  // Detect device type
+  if (ua.includes('Mobile') || ua.includes('Android') || ua.includes('iPhone')) {
+    result.device = 'Mobile'
+  } else if (ua.includes('iPad') || ua.includes('Tablet')) {
+    result.device = 'Tablet'
+  } else {
+    result.device = 'Desktop'
+  }
+
+  return result
+}
+
+/**
  * Issue Generator class
  */
 export class IssueGenerator {
@@ -745,11 +801,36 @@ export class IssueGenerator {
       throw new Error(`Template not found: ${templateId}`)
     }
 
+    // Merge provided values with auto-detected environment values and placeholder defaults
+    const mergedValues: Record<string, string> = {}
+
+    // First, apply default values from template placeholders
+    if (template.placeholders) {
+      for (const placeholder of template.placeholders) {
+        if (placeholder.defaultValue !== undefined) {
+          mergedValues[placeholder.id] = String(placeholder.defaultValue)
+        }
+      }
+    }
+
+    // Auto-detect environment fields (browser, os, device) from the runtime environment
+    const envDefaults = detectEnvironment()
+    for (const [key, value] of Object.entries(envDefaults)) {
+      if (value) {
+        mergedValues[key] = value
+      }
+    }
+
+    // Explicitly provided values take highest priority
+    for (const [key, value] of Object.entries(values)) {
+      mergedValues[key] = value
+    }
+
     // Replace placeholders in title and body
     let title = template.titleTemplate
     let body = template.bodyTemplate
 
-    for (const [key, value] of Object.entries(values)) {
+    for (const [key, value] of Object.entries(mergedValues)) {
       const placeholder = `{${key}}`
       title = title.replace(new RegExp(placeholder, 'g'), String(value))
       body = body.replace(new RegExp(placeholder, 'g'), String(value))
