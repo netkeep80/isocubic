@@ -29,7 +29,7 @@ export type {
 /**
  * Available tabs in GOD MODE window
  */
-export type GodModeTab = 'query' | 'context' | 'search' | 'conversation' | 'issues'
+export type GodModeTab = 'query' | 'context' | 'search' | 'conversation' | 'issues' | 'metanet'
 
 /**
  * Tab information for display
@@ -99,6 +99,15 @@ export const GOD_MODE_TABS: GodModeTabInfo[] = [
     available: true,
     descriptionRu: 'Черновики GitHub Issues (TASK 56)',
     descriptionEn: 'GitHub Issue drafts (TASK 56)',
+  },
+  {
+    id: 'metanet',
+    labelRu: 'MetaNet',
+    labelEn: 'MetaNet',
+    icon: '🌳',
+    available: true,
+    descriptionRu: 'Просмотр дерева метаинформации проекта',
+    descriptionEn: 'Browse project metadata tree',
   },
 ]
 
@@ -365,7 +374,7 @@ export interface GodModeContextValue {
  * Validates a GOD MODE tab ID
  */
 export function isValidTab(tab: string): tab is GodModeTab {
-  return ['query', 'context', 'search', 'conversation', 'issues'].includes(tab)
+  return ['query', 'context', 'search', 'conversation', 'issues', 'metanet'].includes(tab)
 }
 
 /**

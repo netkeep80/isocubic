@@ -35,13 +35,14 @@ import {
 describe('god-mode types', () => {
   describe('GOD_MODE_TABS', () => {
     it('should have all required tabs', () => {
-      expect(GOD_MODE_TABS).toHaveLength(5)
+      expect(GOD_MODE_TABS).toHaveLength(6)
       expect(GOD_MODE_TABS.map((t) => t.id)).toEqual([
         'query',
         'context',
         'search',
         'conversation',
         'issues',
+        'metanet',
       ])
     })
 
@@ -152,7 +153,14 @@ describe('god-mode types', () => {
 
   describe('isValidTab', () => {
     it('should return true for valid tabs', () => {
-      const validTabs: GodModeTab[] = ['query', 'context', 'search', 'conversation', 'issues']
+      const validTabs: GodModeTab[] = [
+        'query',
+        'context',
+        'search',
+        'conversation',
+        'issues',
+        'metanet',
+      ]
       for (const tab of validTabs) {
         expect(isValidTab(tab)).toBe(true)
       }
