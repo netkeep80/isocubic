@@ -429,6 +429,7 @@ import { ref, computed } from 'vue'
 import { useIsDevModeEnabled } from '../lib/devmode'
 import type { ContextPanelSettings } from '../types/ai-query'
 import type { CSSProperties } from 'vue'
+import type { ComponentHistoryEntry } from '../types/component-meta'
 
 // ─── Props ─────────────────────────────────────────────────────────────────────
 
@@ -473,6 +474,19 @@ const isDevModeEnabled = useIsDevModeEnabled()
 
 const isExpanded = ref(props.initialExpanded)
 const hoveredRelated = ref<string | null>(null)
+const collapsedSections = ref<Record<string, boolean>>({})
+
+function isSectionExpanded(title: string, defaultExpanded: boolean): boolean {
+  if (title in collapsedSections.value) {
+    return collapsedSections.value[title]
+  }
+  return defaultExpanded
+}
+
+function toggleSection(title: string, defaultExpanded: boolean) {
+  const current = isSectionExpanded(title, defaultExpanded)
+  collapsedSections.value[title] = !current
+}
 
 // ─── Computed ──────────────────────────────────────────────────────────────────
 
@@ -519,6 +533,8 @@ const labels = computed(() => ({
       : 'Select a component to display context information',
   description: language.value === 'ru' ? 'Описание' : 'Description',
   features: language.value === 'ru' ? 'Ключевые функции' : 'Key Features',
+  allFeatures: language.value === 'ru' ? 'Функции' : 'Features',
+  history: language.value === 'ru' ? 'История' : 'History',
   tips: language.value === 'ru' ? 'Советы по использованию' : 'Usage Tips',
   related: language.value === 'ru' ? 'Связанные компоненты' : 'Related Components',
   patterns: language.value === 'ru' ? 'Паттерны использования' : 'Usage Patterns',
@@ -545,6 +561,29 @@ function handleToggle() {
 // Handle related component click
 function handleRelatedClick(relatedId: string) {
   emit('relatedComponentSelect', relatedId)
+}
+
+// History entry type icons
+const HISTORY_ICONS: Record<ComponentHistoryEntry['type'], string> = {
+  created: '+',
+  updated: '~',
+  fixed: '*',
+  deprecated: '!',
+  removed: '-',
+}
+
+// Format date for display
+function formatDate(isoDate: string): string {
+  try {
+    const date = new Date(isoDate)
+    return date.toLocaleDateString('ru-RU', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    })
+  } catch {
+    return isoDate
+  }
 }
 
 // Get status badge color
@@ -759,6 +798,56 @@ const styles: Record<string, CSSProperties> = {
   confidenceValue: {
     fontWeight: 600,
   },
+  sectionHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    cursor: 'pointer',
+    padding: '4px 0',
+    marginBottom: '4px',
+  },
+  featureItem: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: '8px',
+    marginBottom: '6px',
+    fontSize: '12px',
+    lineHeight: '1.5',
+  },
+  featureEnabled: {
+    color: '#22c55e',
+  },
+  featureDisabled: {
+    color: '#6b7280',
+  },
+  featureDescription: {
+    fontSize: '11px',
+    color: '#9ca3af',
+    marginTop: '2px',
+  },
+  historyItem: {
+    display: 'flex',
+    gap: '8px',
+    marginBottom: '8px',
+    fontSize: '12px',
+  },
+  historyIcon: {
+    width: '18px',
+    height: '18px',
+    borderRadius: '4px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(100, 200, 100, 0.2)',
+    color: '#a5fcb4',
+    fontWeight: 'bold',
+    flexShrink: '0',
+    fontSize: '11px',
+  },
+  historyDate: {
+    fontSize: '10px',
+    color: '#6b7280',
+  },
 }
 
 /**
@@ -834,6 +923,92 @@ const positionStyles: Record<string, CSSProperties> = {
             >
               {{ feature }}
             </span>
+          </div>
+        </div>
+
+        <!-- All Features (with enabled/disabled status) -->
+        <div v-if="componentMeta.features.length > 0" :style="styles.section">
+          <div
+            :style="styles.sectionHeader"
+            @click="toggleSection(`Features (${componentMeta.features.length})`, true)"
+          >
+            <div :style="styles.sectionTitle">
+              {{ labels.allFeatures }} ({{ componentMeta.features.length }})
+            </div>
+            <span :style="{ color: '#6b7280', fontSize: '11px' }">
+              {{
+                isSectionExpanded(`Features (${componentMeta.features.length})`, true)
+                  ? '\u25BC'
+                  : '\u25B6'
+              }}
+            </span>
+          </div>
+          <div v-if="isSectionExpanded(`Features (${componentMeta.features.length})`, true)">
+            <div
+              v-for="feature in componentMeta.features"
+              :key="feature.id"
+              :style="{
+                ...styles.featureItem,
+                ...(feature.enabled ? styles.featureEnabled : styles.featureDisabled),
+              }"
+            >
+              <span>{{ feature.enabled ? '\u2713' : '\u25CB' }}</span>
+              <div>
+                <div>
+                  {{ feature.name }}
+                  <span
+                    v-if="feature.taskId"
+                    :style="{ color: '#6b7280', marginLeft: '4px', fontSize: '11px' }"
+                  >
+                    ({{ feature.taskId }})
+                  </span>
+                </div>
+                <div v-if="feature.description" :style="styles.featureDescription">
+                  {{ feature.description }}
+                </div>
+                <div
+                  v-if="!feature.enabled && feature.disabledReason"
+                  :style="{ fontSize: '11px', color: '#ef4444' }"
+                >
+                  {{ feature.disabledReason }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- History -->
+        <div v-if="componentMeta.history.length > 0" :style="styles.section">
+          <div
+            :style="styles.sectionHeader"
+            @click="toggleSection(`History (${componentMeta.history.length})`, true)"
+          >
+            <div :style="styles.sectionTitle">
+              {{ labels.history }} ({{ componentMeta.history.length }})
+            </div>
+            <span :style="{ color: '#6b7280', fontSize: '11px' }">
+              {{
+                isSectionExpanded(`History (${componentMeta.history.length})`, true)
+                  ? '\u25BC'
+                  : '\u25B6'
+              }}
+            </span>
+          </div>
+          <div v-if="isSectionExpanded(`History (${componentMeta.history.length})`, true)">
+            <div v-for="(entry, i) in componentMeta.history" :key="i" :style="styles.historyItem">
+              <span :style="styles.historyIcon">{{ HISTORY_ICONS[entry.type] }}</span>
+              <div>
+                <div>
+                  <strong>v{{ entry.version }}</strong> &mdash; {{ entry.description }}
+                  <span v-if="entry.taskId" :style="{ color: '#a5fcb4', marginLeft: '4px' }">
+                    ({{ entry.taskId }})
+                  </span>
+                </div>
+                <div :style="styles.historyDate">
+                  {{ formatDate(entry.date) }}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
