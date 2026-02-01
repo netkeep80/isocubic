@@ -8,11 +8,12 @@
  * 4. Files in directories are described (sync check, warnings only)
  *
  * Usage:
- *   npx tsx scripts/metanet-preprocessor.ts [--check] [--verbose]
+ *   npx tsx scripts/metanet-preprocessor.ts [--check] [--verbose] [--compile [output]]
  *
  * Options:
- *   --check    Exit with non-zero code if any errors found (for CI)
- *   --verbose  Print detailed information about each metanet.json
+ *   --check            Exit with non-zero code if any errors found (for CI)
+ *   --verbose          Print detailed information about each metanet.json
+ *   --compile [output] Compile metanet tree to JSON file (default: metanet.compiled.json)
  */
 
 import * as fs from 'node:fs'
@@ -229,7 +230,7 @@ function walkAndValidate(
 }
 
 /**
- * Collect all metanet.json data into a single tree for compilation
+ * Collect all metanet.json data into a flat map for compilation
  */
 export function collectMetanetTree(rootMetanetPath: string): Record<string, MetanetJson> {
   const tree: Record<string, MetanetJson> = {}
@@ -262,12 +263,103 @@ export function collectMetanetTree(rootMetanetPath: string): Record<string, Meta
   return tree
 }
 
+// --- Tree compilation types ---
+
+interface MetanetTreeNode {
+  name: string
+  description: string
+  version?: string
+  languages?: string[]
+  tags?: string[]
+  files?: Record<string, FileDescriptor>
+  children?: Record<string, MetanetTreeNode>
+}
+
+/**
+ * Compile all metanet.json files into a hierarchical tree structure.
+ *
+ * Unlike collectMetanetTree() which produces a flat map keyed by file paths,
+ * this function builds a tree where metadata structure is primary
+ * and file references are secondary. The tree mirrors the project hierarchy
+ * and can be traversed without knowing file paths.
+ */
+export function compileMetanetTree(rootMetanetPath: string): MetanetTreeNode | null {
+  const visited = new Set<string>()
+
+  function visit(metanetPath: string): MetanetTreeNode | null {
+    const resolvedPath = path.resolve(metanetPath)
+    if (visited.has(resolvedPath)) return null
+    visited.add(resolvedPath)
+
+    if (!fs.existsSync(resolvedPath)) return null
+
+    const metanet = loadJson<MetanetJson>(resolvedPath)
+    if (!metanet) return null
+
+    const node: MetanetTreeNode = {
+      name: metanet.name,
+      description: metanet.description,
+    }
+
+    if (metanet.version) node.version = metanet.version
+    if (metanet.languages) node.languages = metanet.languages
+    if (metanet.tags) node.tags = metanet.tags
+    if (metanet.files) node.files = metanet.files
+
+    // Recursively build children from directories
+    if (metanet.directories) {
+      const dirPath = path.dirname(resolvedPath)
+      const children: Record<string, MetanetTreeNode> = {}
+
+      for (const [dirName, dirDesc] of Object.entries(metanet.directories)) {
+        const subMetanetPath = path.join(dirPath, dirDesc.metanet)
+        const childNode = visit(subMetanetPath)
+        if (childNode) {
+          children[dirName] = childNode
+        }
+      }
+
+      if (Object.keys(children).length > 0) {
+        node.children = children
+      }
+    }
+
+    return node
+  }
+
+  return visit(rootMetanetPath)
+}
+
 // --- Main ---
 
 function main() {
   const args = process.argv.slice(2)
   const checkMode = args.includes('--check')
   const verbose = args.includes('--verbose')
+  const compileMode = args.includes('--compile')
+
+  const rootMetanetPath = path.resolve('metanet.json')
+
+  // Compile mode: build tree and write to file
+  if (compileMode) {
+    const compileIndex = args.indexOf('--compile')
+    const nextArg = args[compileIndex + 1]
+    const hasOutput = nextArg && !nextArg.startsWith('--')
+    const outputPath = hasOutput ? nextArg : 'metanet.compiled.json'
+
+    console.log('MetaNet Compiler')
+    console.log('================')
+
+    const tree = compileMetanetTree(rootMetanetPath)
+    if (!tree) {
+      console.error('ERROR: Failed to compile metanet tree')
+      process.exit(1)
+    }
+
+    fs.writeFileSync(outputPath, JSON.stringify(tree, null, 2) + '\n')
+    console.log(`\n✅ Compiled metanet tree written to ${outputPath}`)
+    return
+  }
 
   console.log('MetaNet Preprocessor')
   console.log('====================')
@@ -285,7 +377,6 @@ function main() {
   const validate = ajv.compile(schema as object)
 
   // Walk and validate
-  const rootMetanetPath = path.resolve('metanet.json')
   const result = walkAndValidate(rootMetanetPath, validate, verbose)
 
   // Report results
