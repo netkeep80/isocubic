@@ -3,12 +3,16 @@
  * Phase 11, TASK 74: Window wrapper components
  */
 
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { createPinia, setActivePinia } from 'pinia'
 import SharePanelWindow from './SharePanelWindow.vue'
 import type { CubeConfig } from '../../types/cube'
 
 describe('SharePanelWindow', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+  })
   const mockCube: CubeConfig = {
     id: 'test-cube',
     meta: { name: 'Test Cube' },
@@ -29,7 +33,7 @@ describe('SharePanelWindow', () => {
     })
 
     const shareComponent = wrapper.findComponent({ name: 'SharePanel' })
-    expect(shareComponent.props('cube')).toEqual(mockCube)
+    expect(shareComponent.props('currentCube')).toEqual(mockCube)
   })
 
   it('works with null cube', () => {
@@ -38,6 +42,6 @@ describe('SharePanelWindow', () => {
     })
 
     expect(wrapper.findComponent({ name: 'SharePanel' }).exists()).toBe(true)
-    expect(wrapper.findComponent({ name: 'SharePanel' }).props('cube')).toBeNull()
+    expect(wrapper.findComponent({ name: 'SharePanel' }).props('currentCube')).toBeNull()
   })
 })

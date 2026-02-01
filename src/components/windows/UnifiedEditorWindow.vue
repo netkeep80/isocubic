@@ -23,6 +23,6 @@ function handleCubeUpdate(cube: CubeConfig) {
 
 <template>
   <ComponentInfo :meta="UNIFIED_EDITOR_META">
-    <UnifiedEditor :cube="cube" @update:cube="handleCubeUpdate" />
+    <UnifiedEditor :current-cube="cube" @update:cube="handleCubeUpdate" />
   </ComponentInfo>
 </template>

@@ -3,12 +3,16 @@
  * Phase 11, TASK 74: Window wrapper components
  */
 
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { createPinia, setActivePinia } from 'pinia'
 import UnifiedEditorWindow from './UnifiedEditorWindow.vue'
 import type { CubeConfig } from '../../types/cube'
 
 describe('UnifiedEditorWindow', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+  })
   const mockCube: CubeConfig = {
     id: 'test-cube',
     meta: { name: 'Test Cube' },
@@ -29,7 +33,7 @@ describe('UnifiedEditorWindow', () => {
     })
 
     const editorComponent = wrapper.findComponent({ name: 'UnifiedEditor' })
-    expect(editorComponent.props('cube')).toEqual(mockCube)
+    expect(editorComponent.props('currentCube')).toEqual(mockCube)
   })
 
   it('emits update:cube event when UnifiedEditor emits it', async () => {
@@ -48,6 +52,6 @@ describe('UnifiedEditorWindow', () => {
     })
 
     expect(wrapper.findComponent({ name: 'UnifiedEditor' }).exists()).toBe(true)
-    expect(wrapper.findComponent({ name: 'UnifiedEditor' }).props('cube')).toBeNull()
+    expect(wrapper.findComponent({ name: 'UnifiedEditor' }).props('currentCube')).toBeNull()
   })
 })

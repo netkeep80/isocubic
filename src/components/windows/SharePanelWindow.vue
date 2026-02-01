@@ -15,6 +15,6 @@ defineProps<{
 
 <template>
   <ComponentInfo :meta="SHARE_PANEL_META">
-    <SharePanel :cube="cube" />
+    <SharePanel :current-cube="cube" />
   </ComponentInfo>
 </template>

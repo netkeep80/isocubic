@@ -3,11 +3,15 @@
  * Phase 11, TASK 74: Window wrapper components
  */
 
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { createPinia, setActivePinia } from 'pinia'
 import NotificationPanelWindow from './NotificationPanelWindow.vue'
 
 describe('NotificationPanelWindow', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+  })
   it('renders NotificationPanel component', () => {
     const wrapper = mount(NotificationPanelWindow)
     expect(wrapper.findComponent({ name: 'NotificationPanel' }).exists()).toBe(true)

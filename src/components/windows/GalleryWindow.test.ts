@@ -3,8 +3,9 @@
  * Phase 11, TASK 74: Window wrapper components
  */
 
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { createPinia, setActivePinia } from 'pinia'
 import GalleryWindow from './GalleryWindow.vue'
 import type { CubeConfig } from '../../types/cube'
 
@@ -17,6 +18,9 @@ vi.mock('../ComponentInfo.vue', () => ({
 }))
 
 describe('GalleryWindow', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+  })
   const mockCube: CubeConfig = {
     id: 'test-cube',
     meta: { name: 'Test Cube' },
