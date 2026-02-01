@@ -258,16 +258,17 @@ isocubic/
 
 | Фаза | Название | Статус |
 |------|----------|--------|
-| 1 | [MVP](docs/phases/phase-1.md) | ✅ Завершена |
-| 2 | [FFT для магических объектов](docs/phases/phase-2.md) | ✅ Завершена |
-| 3 | [Оптимизация](docs/phases/phase-3.md) | ✅ Завершена |
-| 4 | [Мультиплеер](docs/phases/phase-4.md) | ✅ Завершена |
-| 5 | [Расширение редактора](docs/phases/phase-5.md) | ✅ Завершена |
-| 6 | [DX улучшения](docs/phases/phase-6.md) | ✅ Завершена |
-| 7 | [Публикация и шаринг](docs/phases/phase-7.md) | ✅ Завершена |
-| 8 | [AI + Metadata](docs/phases/phase-8.md) | ✅ Завершена |
-| 9 | [GOD MODE — Автоматизация разработки](docs/phases/phase-9.md) | ✅ Завершена |
-| 10 | [Переход на Vue.js 3.0 + TypeScript](docs/phases/phase-10.md) | ✅ Завершена |
+| 1 | [MVP](docs/phase-1.md) | ✅ Завершена |
+| 2 | [FFT для магических объектов](docs/phase-2.md) | ✅ Завершена |
+| 3 | [Оптимизация](docs/phase-3.md) | ✅ Завершена |
+| 4 | [Мультиплеер](docs/phase-4.md) | ✅ Завершена |
+| 5 | [Расширение редактора](docs/phase-5.md) | ✅ Завершена |
+| 6 | [DX улучшения](docs/phase-6.md) | ✅ Завершена |
+| 7 | [Публикация и шаринг](docs/phase-7.md) | ✅ Завершена |
+| 8 | [AI + Metadata](docs/phase-8.md) | ✅ Завершена |
+| 9 | [GOD MODE — Автоматизация разработки](docs/phase-9.md) | ✅ Завершена |
+| 10 | [Переход на Vue.js 3.0 + TypeScript](docs/phase-10.md) | ✅ Завершена |
+| 11 | [Новый пользовательский интерфейс isocubic](docs/phase-11.md) | Запланирована |
 
 ## Деплой
 
