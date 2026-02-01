@@ -50,7 +50,7 @@ describe('MetaNet Preprocessor', () => {
 
       const result = execSync(
         `npx tsx ${path.resolve('scripts/metanet-preprocessor.ts')} --check`,
-        { cwd: tmpDir, encoding: 'utf-8' },
+        { cwd: tmpDir, encoding: 'utf-8' }
       )
       expect(result).toContain('All metanet.json files are valid')
     })
@@ -65,10 +65,10 @@ describe('MetaNet Preprocessor', () => {
       })
 
       try {
-        execSync(
-          `npx tsx ${path.resolve('scripts/metanet-preprocessor.ts')} --check`,
-          { cwd: tmpDir, encoding: 'utf-8' },
-        )
+        execSync(`npx tsx ${path.resolve('scripts/metanet-preprocessor.ts')} --check`, {
+          cwd: tmpDir,
+          encoding: 'utf-8',
+        })
         // Should not reach here
         expect.unreachable('Should have thrown')
       } catch (error: unknown) {
@@ -94,7 +94,7 @@ describe('MetaNet Preprocessor', () => {
 
       const result = execSync(
         `npx tsx ${path.resolve('scripts/metanet-preprocessor.ts')} --check`,
-        { cwd: tmpDir, encoding: 'utf-8' },
+        { cwd: tmpDir, encoding: 'utf-8' }
       )
       expect(result).toContain('All metanet.json files are valid')
     })
@@ -112,10 +112,10 @@ describe('MetaNet Preprocessor', () => {
       })
 
       try {
-        execSync(
-          `npx tsx ${path.resolve('scripts/metanet-preprocessor.ts')} --check`,
-          { cwd: tmpDir, encoding: 'utf-8' },
-        )
+        execSync(`npx tsx ${path.resolve('scripts/metanet-preprocessor.ts')} --check`, {
+          cwd: tmpDir,
+          encoding: 'utf-8',
+        })
         expect.unreachable('Should have thrown')
       } catch (error: unknown) {
         const err = error as { stdout: string }
@@ -145,7 +145,7 @@ describe('MetaNet Preprocessor', () => {
 
       const result = execSync(
         `npx tsx ${path.resolve('scripts/metanet-preprocessor.ts')} --check`,
-        { cwd: tmpDir, encoding: 'utf-8' },
+        { cwd: tmpDir, encoding: 'utf-8' }
       )
       expect(result).toContain('All metanet.json files are valid')
     })
@@ -165,10 +165,10 @@ describe('MetaNet Preprocessor', () => {
       // No sub/metanet.json
 
       try {
-        execSync(
-          `npx tsx ${path.resolve('scripts/metanet-preprocessor.ts')} --check`,
-          { cwd: tmpDir, encoding: 'utf-8' },
-        )
+        execSync(`npx tsx ${path.resolve('scripts/metanet-preprocessor.ts')} --check`, {
+          cwd: tmpDir,
+          encoding: 'utf-8',
+        })
         expect.unreachable('Should have thrown')
       } catch (error: unknown) {
         const err = error as { stdout: string }
@@ -194,7 +194,7 @@ describe('MetaNet Preprocessor', () => {
 
       const result = execSync(
         `npx tsx ${path.resolve('scripts/metanet-preprocessor.ts')} --verbose`,
-        { cwd: tmpDir, encoding: 'utf-8' },
+        { cwd: tmpDir, encoding: 'utf-8' }
       )
       expect(result).toContain('File not described in metanet.json: utils.ts')
     })
@@ -203,10 +203,10 @@ describe('MetaNet Preprocessor', () => {
 
 describe('MetaNet on actual project', () => {
   it('should validate the actual project metanet.json files without errors', () => {
-    const result = execSync(
-      `npx tsx ${path.resolve('scripts/metanet-preprocessor.ts')} --check`,
-      { cwd: path.resolve('.'), encoding: 'utf-8' },
-    )
+    const result = execSync(`npx tsx ${path.resolve('scripts/metanet-preprocessor.ts')} --check`, {
+      cwd: path.resolve('.'),
+      encoding: 'utf-8',
+    })
     expect(result).toContain('All metanet.json files are valid')
   })
 })

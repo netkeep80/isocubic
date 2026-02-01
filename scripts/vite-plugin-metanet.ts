@@ -19,7 +19,16 @@ interface MetanetJson {
   description: string
   languages?: string[]
   tags?: string[]
-  files?: Record<string, { description: string; tags?: string[]; phase?: number; status?: string; dependencies?: string[] }>
+  files?: Record<
+    string,
+    {
+      description: string
+      tags?: string[]
+      phase?: number
+      status?: string
+      dependencies?: string[]
+    }
+  >
   directories?: Record<string, { description: string; metanet: string }>
 }
 
@@ -54,6 +63,7 @@ function collectMetanetTree(rootDir: string): Record<string, MetanetJson> {
 
     const relPath = path.relative(rootDir, resolvedPath)
     // Remove $schema from compiled output to save space
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { $schema: _, ...data } = metanet
     tree[relPath] = data as MetanetJson
 
