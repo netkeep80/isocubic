@@ -209,7 +209,8 @@ isocubic/
 │   │   ├── command-registry.ts # Реестр расширенных команд (Phase 11, TASK 77)
 │   │   ├── command-macros.ts  # Система записи/воспроизведения макросов (Phase 11, TASK 77)
 │   │   ├── command-plugins.ts # Система плагинов для динамических команд (Phase 11, TASK 77)
-│   │   └── window-layout-manager.ts # Менеджер раскладки окон (Phase 11, TASK 77)
+│   │   ├── window-layout-manager.ts # Менеджер раскладки окон (Phase 11, TASK 77)
+│   │   └── window-performance.ts # Утилиты мониторинга производительности (Phase 11, TASK 78)
 │   ├── types/             # TypeScript-типы
 │   │   ├── cube.ts
 │   │   ├── lod.ts             # Типы для LOD-системы
@@ -275,7 +276,7 @@ isocubic/
 | 8 | [AI + Metadata](docs/phase-8.md) | ✅ Завершена |
 | 9 | [GOD MODE — Автоматизация разработки](docs/phase-9.md) | ✅ Завершена |
 | 10 | [Переход на Vue.js 3.0 + TypeScript](docs/phase-10.md) | ✅ Завершена |
-| 11 | [Новый пользовательский интерфейс isocubic](docs/phase-11.md) | 🚧 В разработке |
+| 11 | [Новый пользовательский интерфейс isocubic](docs/phase-11.md) | ✅ Завершена |
 
 ## Деплой
 
@@ -325,7 +326,7 @@ npm run test:coverage
 ```
 
 **Текущее покрытие:**
-- 3292+ тестов (105 тестовых файлов, все компоненты на @vue/test-utils)
+- 3383+ тестов (109 тестовых файлов, все компоненты на @vue/test-utils)
 - Тесты 3D-компонентов Vue.js (ParametricCube, EnergyCube, CubePreview, CubeGrid, CubeStack, LODCubeGrid, LODStatisticsDisplay, MagicCubeDemo — TASK 62)
 - Тесты UI-компонентов редактора Vue.js (UnifiedEditor, ParamEditor, FFTParamEditor, FFTChannelEditor, EnergyVisualizationEditor, LODConfigEditor, StackEditor, StackPresetPicker, PromptGenerator — TASK 63)
 - Тесты компонентов галереи, экспорта и шаринга Vue.js (Gallery, CommunityGallery, ExportPanel, SharePanel, CommentsSection, SubscriptionButton, NotificationPanel, ActionHistory — TASK 64)
@@ -354,6 +355,8 @@ npm run test:coverage
 - Тесты компонентов оконной системы Vue.js (DraggableWindow, WindowTaskbar, CommandBar — TASK 70-73)
 - Тесты touch-жестов и адаптивного layout (useTouchGestures, useResponsiveLayout — TASK 75)
 - Тесты расширенных команд (command-registry, window-layout-manager, command-macros, command-plugins — TASK 77)
+- E2E тесты оконной системы (window-manager, command-bar, responsive — TASK 78)
+- Тесты производительности и утилит (window-performance, debounce, safe storage, state validation — TASK 78)
 - E2E тесты для полных workflow редактирования (мигрированы на Vue — TASK 68)
 
 ## Вклад в проект
