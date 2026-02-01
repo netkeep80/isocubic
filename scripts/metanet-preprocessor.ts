@@ -344,8 +344,8 @@ function main() {
   if (compileMode) {
     const compileIndex = args.indexOf('--compile')
     const nextArg = args[compileIndex + 1]
-    const outputPath =
-      nextArg && !nextArg.startsWith('--') ? nextArg : 'metanet.compiled.json'
+    const hasOutput = nextArg && !nextArg.startsWith('--')
+    const outputPath = hasOutput ? nextArg : 'metanet.compiled.json'
 
     console.log('MetaNet Compiler')
     console.log('================')
