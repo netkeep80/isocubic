@@ -847,6 +847,7 @@ onUnmounted(() => {
               :style="styles.embeddedPanel"
               :github-owner="config.github?.owner"
               :github-repo="config.github?.repo"
+              :selected-component-id="effectiveComponentId"
               @draft-created="handleDraftCreated"
               @draft-updated="handleDraftUpdated"
               @draft-ready="handleDraftReady"

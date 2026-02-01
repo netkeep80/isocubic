@@ -14,9 +14,16 @@ import {
   getDefaultIssueGenerator,
   resetDefaultIssueGenerator,
   detectEnvironment,
+  formatComponentMetaAsContext,
 } from '../lib/issue-generator'
 import type { ConversationMessage } from '../types/god-mode'
 import { validateIssueDraft } from '../types/issue-generator'
+import {
+  registerComponentMeta,
+  componentMetaRegistry,
+  createDefaultMeta,
+} from '../types/component-meta'
+import type { ComponentMeta } from '../types/component-meta'
 
 describe('IssueGenerator', () => {
   let generator: IssueGenerator
@@ -797,5 +804,180 @@ describe('detectEnvironment', () => {
         configurable: true,
       })
     }
+  })
+})
+
+describe('formatComponentMetaAsContext', () => {
+  it('should format basic component metadata as markdown', () => {
+    const meta: ComponentMeta = createDefaultMeta(
+      'test-comp',
+      'TestComponent',
+      'components/TestComponent.vue',
+      {
+        summary: 'A test component',
+        status: 'stable',
+        phase: 3,
+        tags: ['ui', 'form'],
+      }
+    )
+
+    const result = formatComponentMetaAsContext(meta)
+
+    expect(result).toContain('**Component:** TestComponent (v1.0.0)')
+    expect(result).toContain('**Status:** stable')
+    expect(result).toContain('**Phase:** 3')
+    expect(result).toContain('**File:** `components/TestComponent.vue`')
+    expect(result).toContain('**Summary:** A test component')
+    expect(result).toContain('**Tags:** ui, form')
+  })
+
+  it('should include features when present', () => {
+    const meta: ComponentMeta = createDefaultMeta(
+      'test-comp',
+      'TestComponent',
+      'components/TestComponent.vue',
+      {
+        features: [
+          { id: 'f1', name: 'Dark Mode', description: 'Dark mode support', enabled: true },
+          {
+            id: 'f2',
+            name: 'Animations',
+            description: 'CSS animations',
+            enabled: false,
+            disabledReason: 'Performance',
+          },
+        ],
+      }
+    )
+
+    const result = formatComponentMetaAsContext(meta)
+
+    expect(result).toContain('**Features:**')
+    expect(result).toContain('- Dark Mode (enabled)')
+    expect(result).toContain('- Animations (disabled) — Performance')
+  })
+
+  it('should include dependencies when present', () => {
+    const meta: ComponentMeta = createDefaultMeta(
+      'test-comp',
+      'TestComponent',
+      'components/TestComponent.vue',
+      {
+        dependencies: [{ name: 'vue-router', type: 'lib', purpose: 'Navigation' }],
+      }
+    )
+
+    const result = formatComponentMetaAsContext(meta)
+
+    expect(result).toContain('**Dependencies:**')
+    expect(result).toContain('- vue-router (lib) — Navigation')
+  })
+
+  it('should include known issues when present', () => {
+    const meta: ComponentMeta = createDefaultMeta(
+      'test-comp',
+      'TestComponent',
+      'components/TestComponent.vue',
+      {
+        knownIssues: ['Slow rendering on mobile'],
+      }
+    )
+
+    const result = formatComponentMetaAsContext(meta)
+
+    expect(result).toContain('**Known Issues:**')
+    expect(result).toContain('- Slow rendering on mobile')
+  })
+
+  it('should include taskId when present', () => {
+    const meta: ComponentMeta = createDefaultMeta(
+      'test-comp',
+      'TestComponent',
+      'components/TestComponent.vue',
+      {
+        taskId: 'TASK 42',
+      }
+    )
+
+    const result = formatComponentMetaAsContext(meta)
+
+    expect(result).toContain('**Task:** TASK 42')
+  })
+})
+
+describe('createFromTemplate with componentId', () => {
+  let generator: IssueGenerator
+
+  beforeEach(() => {
+    generator = createIssueGenerator({ language: 'ru' })
+    // Clear registry before each test
+    componentMetaRegistry.clear()
+  })
+
+  it('should auto-fill additionalContext when componentId is provided and component exists', () => {
+    const meta = createDefaultMeta('my-button', 'MyButton', 'components/MyButton.vue', {
+      summary: 'A custom button component',
+      status: 'beta',
+      phase: 2,
+      tags: ['ui'],
+    })
+    registerComponentMeta(meta)
+
+    const draft = generator.createFromTemplate('bug_report', {}, {}, 'my-button')
+
+    expect(draft.body).toContain('**Component:** MyButton (v1.0.0)')
+    expect(draft.body).toContain('**Status:** beta')
+    expect(draft.body).toContain('**Summary:** A custom button component')
+    expect(draft.body).not.toContain('{additionalContext}')
+  })
+
+  it('should leave additionalContext empty when componentId is not provided', () => {
+    const draft = generator.createFromTemplate('bug_report')
+
+    expect(draft.body).not.toContain('{additionalContext}')
+    expect(draft.body).not.toContain('**Component:**')
+  })
+
+  it('should leave additionalContext empty when component is not found in registry', () => {
+    const draft = generator.createFromTemplate('bug_report', {}, {}, 'non-existent')
+
+    expect(draft.body).not.toContain('{additionalContext}')
+    expect(draft.body).not.toContain('**Component:**')
+  })
+
+  it('should allow explicit additionalContext to override component meta', () => {
+    const meta = createDefaultMeta('my-button', 'MyButton', 'components/MyButton.vue')
+    registerComponentMeta(meta)
+
+    const draft = generator.createFromTemplate(
+      'bug_report',
+      { additionalContext: 'Custom context from user' },
+      {},
+      'my-button'
+    )
+
+    expect(draft.body).toContain('Custom context from user')
+    expect(draft.body).not.toContain('**Component:** MyButton')
+  })
+
+  it('should work with feature_request template', () => {
+    const meta = createDefaultMeta('my-form', 'MyForm', 'components/MyForm.vue', {
+      summary: 'User registration form',
+      features: [{ id: 'f1', name: 'Validation', description: 'Form validation', enabled: true }],
+    })
+    registerComponentMeta(meta)
+
+    const draft = generator.createFromTemplate('feature_request', {}, {}, 'my-form')
+
+    expect(draft.body).toContain('**Component:** MyForm')
+    expect(draft.body).toContain('**Features:**')
+    expect(draft.body).toContain('- Validation (enabled)')
+  })
+
+  it('should work with null componentId', () => {
+    const draft = generator.createFromTemplate('bug_report', {}, {}, null)
+
+    expect(draft.body).not.toContain('{additionalContext}')
+    expect(draft.body).not.toContain('**Component:**')
   })
 })
