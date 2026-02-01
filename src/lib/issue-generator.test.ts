@@ -486,6 +486,40 @@ describe('IssueGenerator', () => {
       expect(draft.body).not.toContain('{browser}')
     })
 
+    it('should replace unreplaced placeholders with empty strings', () => {
+      // Issue #194: {additionalContext} and other unfilled placeholders should not appear as literal text
+      const draft = generator.createFromTemplate('bug_report')
+
+      expect(draft.body).not.toContain('{additionalContext}')
+      expect(draft.body).not.toContain('{screenshots}')
+      expect(draft.body).not.toContain('{description}')
+      expect(draft.body).not.toContain('{expectedBehavior}')
+      expect(draft.body).not.toContain('{actualBehavior}')
+      expect(draft.body).not.toContain('{summary}')
+      expect(draft.title).not.toContain('{summary}')
+    })
+
+    it('should replace unreplaced placeholders in feature_request template', () => {
+      const draft = generator.createFromTemplate('feature_request')
+
+      expect(draft.body).not.toContain('{additionalContext}')
+      expect(draft.body).not.toContain('{description}')
+      expect(draft.body).not.toContain('{problemStatement}')
+      expect(draft.body).not.toContain('{proposedSolution}')
+      expect(draft.body).not.toContain('{alternatives}')
+      expect(draft.body).not.toContain('{implementationNotes}')
+    })
+
+    it('should replace unreplaced placeholders in improvement template', () => {
+      const draft = generator.createFromTemplate('improvement')
+
+      expect(draft.body).not.toContain('{additionalContext}')
+      expect(draft.body).not.toContain('{currentSituation}')
+      expect(draft.body).not.toContain('{proposedImprovement}')
+      expect(draft.body).not.toContain('{benefits}')
+      expect(draft.body).not.toContain('{implementationApproach}')
+    })
+
     it('should prefer explicit values over defaults and auto-detected values', () => {
       const draft = generator.createFromTemplate('bug_report', {
         browser: 'Firefox 120',
