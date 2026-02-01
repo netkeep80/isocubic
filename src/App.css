@@ -340,6 +340,62 @@
   }
 }
 
+/* Tablet windowed layout adaptations */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .app--windowed.app--tablet .app__workspace--tablet {
+    /* Tablet workspace with touch-friendly spacing */
+    padding: 8px;
+  }
+
+  .app--windowed.app--tablet .app__header--windowed {
+    /* Compact header for tablet */
+    padding: 6px 12px;
+  }
+
+  .app--windowed.app--tablet .app__title-compact {
+    font-size: 1.1rem;
+  }
+
+  .app--windowed.app--tablet .app__subtitle-compact {
+    display: none; /* Hide subtitle on tablet to save space */
+  }
+}
+
+/* Mobile windowed layout adaptations */
+@media (max-width: 768px) {
+  .app--windowed.app--mobile {
+    /* Full-screen mobile layout */
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .app--windowed.app--mobile .app__header--mobile {
+    padding: 0.5rem;
+    background: #1a1a2e;
+    border-bottom: 1px solid #3a3a5a;
+  }
+
+  .app--windowed.app--mobile .app__title-compact {
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  .app--windowed.app--mobile .app__mobile-command-bar {
+    margin-top: 0.5rem;
+  }
+
+  /* Hide window decorations on very small screens */
+  .app--windowed.app--mobile .app__header-right {
+    display: none;
+  }
+
+  /* Adjust command bar for mobile */
+  .app--windowed.app--mobile .app__header-center {
+    min-width: 150px;
+  }
+}
+
 /* ==========================================================================
    ExportPanel Styles
    ========================================================================== */
