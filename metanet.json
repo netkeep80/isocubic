@@ -1,0 +1,102 @@
+{
+  "$schema": "./metanet.schema.json",
+  "name": "isocubic",
+  "version": "0.1.0",
+  "description": "Редактор параметрических воксельных кубиков для изометрических 3D миров",
+  "languages": ["typescript", "vue", "glsl", "rust"],
+  "files": {
+    "index.html": {
+      "description": "HTML entry point for the Vite application"
+    },
+    "package.json": {
+      "description": "NPM package manifest with dependencies and scripts"
+    },
+    "vite.config.ts": {
+      "description": "Vite build configuration with Vue, Tailwind, and Vitest"
+    },
+    "tsconfig.json": {
+      "description": "Root TypeScript configuration with project references"
+    },
+    "tsconfig.app.json": {
+      "description": "TypeScript config for the application source code"
+    },
+    "tsconfig.node.json": {
+      "description": "TypeScript config for Node.js tooling (Vite, scripts)"
+    },
+    "eslint.config.js": {
+      "description": "ESLint flat config with Vue and Prettier integration"
+    },
+    "env.d.ts": {
+      "description": "Environment type declarations for Vite"
+    },
+    "metanet.md": {
+      "description": "Specification and context for the MetaNet meta-nervous system"
+    },
+    "metanet.json": {
+      "description": "Root metanet descriptor for the isocubic project"
+    },
+    "metanet.schema.json": {
+      "description": "JSON Schema for validating metanet.json files"
+    },
+    "README.md": {
+      "description": "Project documentation and overview"
+    },
+    "ANALYSIS.md": {
+      "description": "Technical analysis of the project architecture"
+    },
+    "description.md": {
+      "description": "Comprehensive project description"
+    },
+    "LICENSE": {
+      "description": "MIT/Unlicense dual license"
+    },
+    ".prettierrc": {
+      "description": "Prettier code formatting configuration"
+    },
+    ".gitignore": {
+      "description": "Git ignore rules"
+    }
+  },
+  "directories": {
+    "src": {
+      "description": "Main application source code",
+      "metanet": "src/metanet.json"
+    },
+    "server": {
+      "description": "WebSocket collaboration server",
+      "metanet": "server/metanet.json"
+    },
+    "docs": {
+      "description": "Phase-based development documentation",
+      "metanet": "docs/metanet.json"
+    },
+    "scripts": {
+      "description": "Build and utility scripts",
+      "metanet": "scripts/metanet.json"
+    },
+    "public": {
+      "description": "Static assets (icons, models, splash screens)",
+      "metanet": "public/metanet.json"
+    },
+    "packages": {
+      "description": "Standalone packages extracted from the project",
+      "metanet": "packages/metanet.json"
+    },
+    "examples": {
+      "description": "Example cube configuration presets in JSON",
+      "metanet": "examples/metanet.json"
+    },
+    "experiments": {
+      "description": "Experimental and debug scripts",
+      "metanet": "experiments/metanet.json"
+    },
+    "wasm-fft": {
+      "description": "Rust WebAssembly FFT computation module",
+      "metanet": "wasm-fft/metanet.json"
+    },
+    ".github": {
+      "description": "GitHub configuration (CI/CD workflows)",
+      "metanet": ".github/metanet.json"
+    }
+  }
+}

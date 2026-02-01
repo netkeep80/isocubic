@@ -1,0 +1,11 @@
+{
+  "$schema": "../metanet.schema.json",
+  "name": ".github",
+  "description": "GitHub configuration files",
+  "directories": {
+    "workflows": {
+      "description": "GitHub Actions CI/CD workflow definitions",
+      "metanet": "workflows/metanet.json"
+    }
+  }
+}

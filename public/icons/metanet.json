@@ -1,0 +1,5 @@
+{
+  "$schema": "../../metanet.schema.json",
+  "name": "icons",
+  "description": "Application icons at various sizes for PWA manifests and favicons"
+}

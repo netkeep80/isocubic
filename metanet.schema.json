@@ -1,0 +1,100 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "metanet.schema.json",
+  "title": "MetaNet Descriptor",
+  "description": "Schema for metanet.json files that describe project directories, files, and their relationships",
+  "type": "object",
+  "required": ["name", "description"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Reference to the JSON Schema for validation"
+    },
+    "name": {
+      "type": "string",
+      "description": "Name of the directory or module"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version (only for root metanet.json)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of this directory's purpose"
+    },
+    "languages": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Programming languages used in this directory"
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Tags for categorization and search"
+    },
+    "files": {
+      "type": "object",
+      "description": "Map of file names to their metadata",
+      "additionalProperties": {
+        "$ref": "#/$defs/FileDescriptor"
+      }
+    },
+    "directories": {
+      "type": "object",
+      "description": "Map of subdirectory names to their metadata with references to child metanet.json",
+      "additionalProperties": {
+        "$ref": "#/$defs/DirectoryDescriptor"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "FileDescriptor": {
+      "type": "object",
+      "required": ["description"],
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of the file's purpose"
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Tags for categorization"
+        },
+        "phase": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Development phase this file belongs to"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["stable", "beta", "experimental", "deprecated"],
+          "description": "File/module status"
+        },
+        "dependencies": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Relative paths to files this file depends on"
+        }
+      },
+      "additionalProperties": false
+    },
+    "DirectoryDescriptor": {
+      "type": "object",
+      "required": ["description", "metanet"],
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of the subdirectory"
+        },
+        "metanet": {
+          "type": "string",
+          "description": "Relative path to the subdirectory's metanet.json"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "$schema": "../metanet.schema.json",
+  "name": "src",
+  "description": "Main application source code for isocubic",
+  "languages": ["typescript", "vue", "glsl"],
+  "files": {
+    "main.ts": {
+      "description": "Application entry point — creates Vue app, mounts Pinia store"
+    },
+    "App.vue": {
+      "description": "Root Vue component with layout, toolbar, and scene"
+    },
+    "App.css": {
+      "description": "Global application styles"
+    },
+    "App.vue.test.ts": {
+      "description": "Unit tests for the root App component"
+    },
+    "index.css": {
+      "description": "Base CSS reset and global styles"
+    },
+    "vite-env.d.ts": {
+      "description": "Vite environment type declarations"
+    }
+  },
+  "directories": {
+    "components": {
+      "description": "Vue UI components (editor, preview, panels, windows)",
+      "metanet": "components/metanet.json"
+    },
+    "composables": {
+      "description": "Vue composables for reusable reactive logic",
+      "metanet": "composables/metanet.json"
+    },
+    "lib": {
+      "description": "TypeScript library modules (core logic, utilities, AI)",
+      "metanet": "lib/metanet.json"
+    },
+    "types": {
+      "description": "TypeScript type definitions and schemas",
+      "metanet": "types/metanet.json"
+    },
+    "shaders": {
+      "description": "GLSL shaders for parametric and energy cube rendering",
+      "metanet": "shaders/metanet.json"
+    },
+    "store": {
+      "description": "Pinia state management stores",
+      "metanet": "store/metanet.json"
+    },
+    "test": {
+      "description": "Test setup and configuration",
+      "metanet": "test/metanet.json"
+    },
+    "e2e": {
+      "description": "End-to-end integration tests",
+      "metanet": "e2e/metanet.json"
+    }
+  }
+}

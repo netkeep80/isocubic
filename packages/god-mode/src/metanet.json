@@ -1,0 +1,20 @@
+{
+  "$schema": "../../../metanet.schema.json",
+  "name": "god-mode/src",
+  "description": "Source code for the GOD MODE package",
+  "files": {
+    "index.ts": {
+      "description": "Package entry point and public API exports"
+    }
+  },
+  "directories": {
+    "components": {
+      "description": "Vue components for GOD MODE UI",
+      "metanet": "components/metanet.json"
+    },
+    "types": {
+      "description": "TypeScript type definitions",
+      "metanet": "types/metanet.json"
+    }
+  }
+}

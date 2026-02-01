@@ -1,0 +1,11 @@
+{
+  "$schema": "../../metanet.schema.json",
+  "name": "wasm-fft/src",
+  "description": "Rust source code for WebAssembly FFT module",
+  "languages": ["rust"],
+  "files": {
+    "lib.rs": {
+      "description": "Library entry point: FFT computation functions exposed via wasm-bindgen"
+    }
+  }
+}
