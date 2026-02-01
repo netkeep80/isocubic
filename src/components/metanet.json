@@ -190,6 +190,12 @@
     "MagicCubeDemo.vue": {
       "description": "Demo component showcasing magic cube effects"
     },
+    "MetanetTreeNode.vue": {
+      "description": "Recursive tree node component for displaying MetaNet hierarchy"
+    },
+    "MetanetTreePanel.vue": {
+      "description": "Panel displaying the compiled MetaNet tree in a collapsible tree view"
+    },
     "MagicCubeDemo.vue.test.ts": {
       "description": "Tests for the MagicCubeDemo component"
     },
