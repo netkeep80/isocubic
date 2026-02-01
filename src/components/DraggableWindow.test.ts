@@ -155,14 +155,14 @@ describe('DraggableWindow', () => {
     expect(wrapper.find('.dw__content').isVisible()).toBe(true)
 
     await wrapper.find('.dw__btn--collapse').trigger('click')
-    
+
     // Should be collapsed - content hidden, collapse button shows '+'
     expect(wrapper.find('.dw__content').exists()).toBe(true)
     expect(wrapper.find('.dw__content').attributes('style')).toContain('display: none')
     expect(wrapper.find('.dw__btn--collapse').text()).toBe('+')
-    
+
     await wrapper.find('.dw__btn--collapse').trigger('click')
-    
+
     // Should be expanded again
     expect(wrapper.find('.dw__content').isVisible()).toBe(true)
     expect(wrapper.find('.dw__btn--collapse').text()).toBe('–')
@@ -264,7 +264,7 @@ describe('DraggableWindow', () => {
     expect(wrapper.find('.dw__resize-handle').isVisible()).toBe(true)
 
     await wrapper.find('.dw__btn--collapse').trigger('click')
-    
+
     // Hidden when collapsed
     expect(wrapper.find('.dw__resize-handle').exists()).toBe(true)
     expect(wrapper.find('.dw__resize-handle').attributes('style')).toContain('display: none')
@@ -306,7 +306,7 @@ describe('DraggableWindow', () => {
     expect(wrapper.find('.dw__btn--collapse').attributes('aria-label')).toBe('Collapse')
 
     await wrapper.find('.dw__btn--collapse').trigger('click')
-    
+
     expect(wrapper.find('.dw__btn--collapse').attributes('aria-label')).toBe('Expand')
   })
 })

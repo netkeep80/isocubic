@@ -357,7 +357,7 @@ describe('CommandBar', () => {
     const input = document.querySelector('.cb__input') as HTMLInputElement
     expect(input).toBeTruthy()
     // Focus is set with setTimeout, so we need to wait
-    await new Promise(resolve => setTimeout(resolve, 100))
+    await new Promise((resolve) => setTimeout(resolve, 100))
     expect(document.activeElement).toBe(input)
   })
 })
