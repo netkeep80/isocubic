@@ -313,7 +313,8 @@
 .app__workspace {
   position: relative;
   flex: 1;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   background: #121218;
 }
 

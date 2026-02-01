@@ -158,13 +158,26 @@ function getClientXY(e: MouseEvent | TouchEvent): { clientX: number; clientY: nu
   return { clientX: (e as MouseEvent).clientX, clientY: (e as MouseEvent).clientY }
 }
 
+/** Get scroll offset of the parent workspace container */
+function getParentScroll(el: HTMLElement | null): { scrollLeft: number; scrollTop: number } {
+  const parent = el?.parentElement
+  if (parent) {
+    return { scrollLeft: parent.scrollLeft, scrollTop: parent.scrollTop }
+  }
+  return { scrollLeft: 0, scrollTop: 0 }
+}
+
+// Reference to the window DOM element
+const windowEl = ref<HTMLElement | null>(null)
+
 // --- Drag handlers ---
 function onDragStart(e: MouseEvent | TouchEvent) {
   if ((e.target as HTMLElement).closest('.dw__btn')) return
   isDragging.value = true
   const { clientX, clientY } = getClientXY(e)
-  dragOffsetX.value = clientX - props.x
-  dragOffsetY.value = clientY - props.y
+  const scroll = getParentScroll(windowEl.value)
+  dragOffsetX.value = clientX + scroll.scrollLeft - props.x
+  dragOffsetY.value = clientY + scroll.scrollTop - props.y
   emit('focus', props.windowId)
   if ('preventDefault' in e && !('touches' in e)) e.preventDefault()
 }
@@ -172,8 +185,9 @@ function onDragStart(e: MouseEvent | TouchEvent) {
 function onDragMove(e: MouseEvent | TouchEvent) {
   if (!isDragging.value) return
   const { clientX, clientY } = getClientXY(e)
-  const newX = clientX - dragOffsetX.value
-  const newY = clientY - dragOffsetY.value
+  const scroll = getParentScroll(windowEl.value)
+  const newX = clientX + scroll.scrollLeft - dragOffsetX.value
+  const newY = clientY + scroll.scrollTop - dragOffsetY.value
   emit('move', props.windowId, newX, newY)
 }
 
@@ -265,6 +279,7 @@ function toggleCollapse() {
 
 <template>
   <div
+    ref="windowEl"
     class="dw"
     :class="{ 'dw--dragging': isDragging, 'dw--resizing': isResizing }"
     :style="windowStyle"
