@@ -360,6 +360,9 @@ function handleWrapperClick(e: MouseEvent) {
     e.stopPropagation()
     isPinned.value = !isPinned.value
   }
+  // When DevMode is enabled, clicking selects this component for inspection
+  e.stopPropagation()
+  devModeStore.setSelectedComponent(props.meta.id)
 }
 
 function closePanel() {

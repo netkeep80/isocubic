@@ -8,7 +8,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { shallowMount } from '@vue/test-utils'
-import { nextTick } from 'vue'
+import { nextTick, ref } from 'vue'
 import GodModeWindow from './GodModeWindow.vue'
 import { GOD_MODE_STORAGE_KEY, GOD_MODE_TABS, DEFAULT_WINDOW_STATE } from '../types/god-mode'
 
@@ -30,12 +30,15 @@ vi.mock('./IssueDraftPanel.vue', () => ({
 }))
 
 // Mock devmode composable
+const mockSelectedComponentId = ref<string | null>(null)
 vi.mock('../lib/devmode', () => ({
   useIsDevModeEnabled: vi.fn(() => ({ value: true })),
+  useSelectedComponentId: vi.fn(() => mockSelectedComponentId),
 }))
 
 describe('GodModeWindow Vue Component', () => {
   beforeEach(() => {
+    mockSelectedComponentId.value = null
     localStorage.clear()
     // Set up initial open state for tests
     localStorage.setItem(
