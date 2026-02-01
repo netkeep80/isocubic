@@ -259,6 +259,70 @@
 }
 
 /* ==========================================================================
+   Windowed Desktop Layout (Phase 11)
+   ========================================================================== */
+
+.app--windowed {
+  padding: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app__header--windowed {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 16px;
+  background: #1a1a2e;
+  border-bottom: 1px solid #3a3a5a;
+  margin-bottom: 0;
+  text-align: left;
+  flex-shrink: 0;
+}
+
+.app__header--windowed h1 {
+  margin: 0;
+}
+
+.app__header-left {
+  flex-shrink: 0;
+}
+
+.app__header-center {
+  flex: 1;
+  min-width: 200px;
+}
+
+.app__header-right {
+  flex-shrink: 0;
+}
+
+.app__title-compact {
+  font-size: 1.25rem;
+  color: #646cff;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.app__subtitle-compact {
+  font-size: 0.8rem;
+  color: #666;
+  white-space: nowrap;
+}
+
+.app__workspace {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  background: #121218;
+}
+
+.app__3d-preview--windowed {
+  height: 100%;
+  min-height: 150px;
+}
+
+/* ==========================================================================
    Responsive Breakpoints
    ========================================================================== */
 
@@ -273,6 +337,62 @@
 
   .app__section--sidebar {
     max-width: 100%;
+  }
+}
+
+/* Tablet windowed layout adaptations */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .app--windowed.app--tablet .app__workspace--tablet {
+    /* Tablet workspace with touch-friendly spacing */
+    padding: 8px;
+  }
+
+  .app--windowed.app--tablet .app__header--windowed {
+    /* Compact header for tablet */
+    padding: 6px 12px;
+  }
+
+  .app--windowed.app--tablet .app__title-compact {
+    font-size: 1.1rem;
+  }
+
+  .app--windowed.app--tablet .app__subtitle-compact {
+    display: none; /* Hide subtitle on tablet to save space */
+  }
+}
+
+/* Mobile windowed layout adaptations */
+@media (max-width: 768px) {
+  .app--windowed.app--mobile {
+    /* Full-screen mobile layout */
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .app--windowed.app--mobile .app__header--mobile {
+    padding: 0.5rem;
+    background: #1a1a2e;
+    border-bottom: 1px solid #3a3a5a;
+  }
+
+  .app--windowed.app--mobile .app__title-compact {
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  .app--windowed.app--mobile .app__mobile-command-bar {
+    margin-top: 0.5rem;
+  }
+
+  /* Hide window decorations on very small screens */
+  .app--windowed.app--mobile .app__header-right {
+    display: none;
+  }
+
+  /* Adjust command bar for mobile */
+  .app--windowed.app--mobile .app__header-center {
+    min-width: 150px;
   }
 }
 

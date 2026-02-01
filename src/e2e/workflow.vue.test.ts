@@ -246,6 +246,22 @@ function createWrapper() {
           template: '<div class="component-info-mock"><slot /></div>',
           props: ['meta'],
         },
+        DraggableWindow: {
+          name: 'DraggableWindow',
+          template: '<div class="draggable-window-stub"><slot /></div>',
+          props: [
+            'windowId',
+            'title',
+            'icon',
+            'x',
+            'y',
+            'width',
+            'height',
+            'minWidth',
+            'minHeight',
+            'zIndex',
+          ],
+        },
       },
     },
   })
@@ -322,10 +338,10 @@ describe('E2E: Mobile Workflow (Vue)', () => {
     expect(wrapper.find('.app--mobile').exists()).toBe(true)
   })
 
-  it('should display 4 tab navigation buttons', () => {
+  it('should display 5 tab navigation buttons', () => {
     const wrapper = createWrapper()
     const tabs = wrapper.findAll('.app__mobile-tab')
-    expect(tabs.length).toBe(4)
+    expect(tabs.length).toBe(5) // Gallery, Preview, Editor, Tools, Social
   })
 
   it('should allow navigating between tabs', async () => {
