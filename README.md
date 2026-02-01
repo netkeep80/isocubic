@@ -268,7 +268,7 @@ isocubic/
 | 8 | [AI + Metadata](docs/phase-8.md) | ✅ Завершена |
 | 9 | [GOD MODE — Автоматизация разработки](docs/phase-9.md) | ✅ Завершена |
 | 10 | [Переход на Vue.js 3.0 + TypeScript](docs/phase-10.md) | ✅ Завершена |
-| 11 | [Новый пользовательский интерфейс isocubic](docs/phase-11.md) | Запланирована |
+| 11 | [Новый пользовательский интерфейс isocubic](docs/phase-11.md) | 🚧 В разработке |
 
 ## Деплой
 
@@ -318,7 +318,7 @@ npm run test:coverage
 ```
 
 **Текущее покрытие:**
-- 3014+ тестов (81 тестовый файл, все компоненты на @vue/test-utils)
+- 3056+ тестов (84 тестовый файл, все компоненты на @vue/test-utils)
 - Тесты 3D-компонентов Vue.js (ParametricCube, EnergyCube, CubePreview, CubeGrid, CubeStack, LODCubeGrid, LODStatisticsDisplay, MagicCubeDemo — TASK 62)
 - Тесты UI-компонентов редактора Vue.js (UnifiedEditor, ParamEditor, FFTParamEditor, FFTChannelEditor, EnergyVisualizationEditor, LODConfigEditor, StackEditor, StackPresetPicker, PromptGenerator — TASK 63)
 - Тесты компонентов галереи, экспорта и шаринга Vue.js (Gallery, CommunityGallery, ExportPanel, SharePanel, CommentsSection, SubscriptionButton, NotificationPanel, ActionHistory — TASK 64)
@@ -344,6 +344,7 @@ npm run test:coverage
 - Тесты Screen Capture & Annotation (захват экрана, Canvas API, аннотации, ScreenCaptureManager)
 - Тесты библиотеки @isocubic/god-mode (типы, утилиты, хранилище, GodModeProvider, useGodMode)
 - Тесты DevMode компонентов Vue.js (DevModeQueryPanel, ComponentContextPanel, ExtendedSearchPanel, ComponentInfo, AnnotationCanvas — TASK 66)
+- Тесты компонентов оконной системы Vue.js (DraggableWindow, WindowTaskbar, CommandBar — TASK 70-73)
 - E2E тесты для полных workflow редактирования (мигрированы на Vue — TASK 68)
 
 ## Вклад в проект
