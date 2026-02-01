@@ -205,7 +205,11 @@ isocubic/
 │   │   ├── collaboration.ts   # Модуль коллаборативного редактирования
 │   │   ├── community-gallery.ts # Сервис галереи сообщества
 │   │   ├── share-links.ts     # Сервис share-ссылок и QR-кодов
-│   │   └── publishing-api.ts  # REST API для публикации кубиков
+│   │   ├── publishing-api.ts  # REST API для публикации кубиков
+│   │   ├── command-registry.ts # Реестр расширенных команд (Phase 11, TASK 77)
+│   │   ├── command-macros.ts  # Система записи/воспроизведения макросов (Phase 11, TASK 77)
+│   │   ├── command-plugins.ts # Система плагинов для динамических команд (Phase 11, TASK 77)
+│   │   └── window-layout-manager.ts # Менеджер раскладки окон (Phase 11, TASK 77)
 │   ├── types/             # TypeScript-типы
 │   │   ├── cube.ts
 │   │   ├── lod.ts             # Типы для LOD-системы
@@ -321,7 +325,7 @@ npm run test:coverage
 ```
 
 **Текущее покрытие:**
-- 3216+ тестов (101 тестовый файл, все компоненты на @vue/test-utils)
+- 3292+ тестов (105 тестовых файлов, все компоненты на @vue/test-utils)
 - Тесты 3D-компонентов Vue.js (ParametricCube, EnergyCube, CubePreview, CubeGrid, CubeStack, LODCubeGrid, LODStatisticsDisplay, MagicCubeDemo — TASK 62)
 - Тесты UI-компонентов редактора Vue.js (UnifiedEditor, ParamEditor, FFTParamEditor, FFTChannelEditor, EnergyVisualizationEditor, LODConfigEditor, StackEditor, StackPresetPicker, PromptGenerator — TASK 63)
 - Тесты компонентов галереи, экспорта и шаринга Vue.js (Gallery, CommunityGallery, ExportPanel, SharePanel, CommentsSection, SubscriptionButton, NotificationPanel, ActionHistory — TASK 64)
@@ -349,6 +353,7 @@ npm run test:coverage
 - Тесты DevMode компонентов Vue.js (DevModeQueryPanel, ComponentContextPanel, ExtendedSearchPanel, ComponentInfo, AnnotationCanvas — TASK 66)
 - Тесты компонентов оконной системы Vue.js (DraggableWindow, WindowTaskbar, CommandBar — TASK 70-73)
 - Тесты touch-жестов и адаптивного layout (useTouchGestures, useResponsiveLayout — TASK 75)
+- Тесты расширенных команд (command-registry, window-layout-manager, command-macros, command-plugins — TASK 77)
 - E2E тесты для полных workflow редактирования (мигрированы на Vue — TASK 68)
 
 ## Вклад в проект
