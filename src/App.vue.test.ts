@@ -19,6 +19,24 @@ vi.mock('./components/Gallery.vue', () => ({
     template: '<div class="gallery-mock"><span>Gallery</span><slot /></div>',
     props: ['currentCube'],
   },
+  GALLERY_META: {
+    id: 'gallery',
+    name: 'Gallery',
+    version: '1.0.0',
+    summary: '',
+    description: '',
+    phase: 1,
+    taskId: '',
+    filePath: '',
+    history: [],
+    features: [],
+    dependencies: [],
+    relatedFiles: [],
+    props: [],
+    tags: [],
+    status: 'stable',
+    lastUpdated: '',
+  },
 }))
 
 vi.mock('./components/ExportPanel.vue', () => ({
@@ -28,6 +46,24 @@ vi.mock('./components/ExportPanel.vue', () => ({
       '<div class="export-panel-mock"><button>Download JSON</button><button>Upload JSON</button><button>Save</button></div>',
     props: ['currentCube'],
   },
+  EXPORT_PANEL_META: {
+    id: 'export-panel',
+    name: 'ExportPanel',
+    version: '1.0.0',
+    summary: '',
+    description: '',
+    phase: 1,
+    taskId: '',
+    filePath: '',
+    history: [],
+    features: [],
+    dependencies: [],
+    relatedFiles: [],
+    props: [],
+    tags: [],
+    status: 'stable',
+    lastUpdated: '',
+  },
 }))
 
 vi.mock('./components/CubePreview.vue', () => ({
@@ -36,6 +72,24 @@ vi.mock('./components/CubePreview.vue', () => ({
     template: '<div class="cube-preview-mock" data-testid="cube-preview">Preview</div>',
     props: ['config'],
   },
+  CUBE_PREVIEW_META: {
+    id: 'cube-preview',
+    name: 'CubePreview',
+    version: '1.0.0',
+    summary: '',
+    description: '',
+    phase: 1,
+    taskId: '',
+    filePath: '',
+    history: [],
+    features: [],
+    dependencies: [],
+    relatedFiles: [],
+    props: [],
+    tags: [],
+    status: 'stable',
+    lastUpdated: '',
+  },
 }))
 
 vi.mock('./components/UnifiedEditor.vue', () => ({
@@ -43,6 +97,24 @@ vi.mock('./components/UnifiedEditor.vue', () => ({
     name: 'UnifiedEditor',
     template: '<div class="unified-editor-mock"><span>Unified Editor</span></div>',
     props: ['cube'],
+  },
+  UNIFIED_EDITOR_META: {
+    id: 'unified-editor',
+    name: 'UnifiedEditor',
+    version: '1.0.0',
+    summary: '',
+    description: '',
+    phase: 1,
+    taskId: '',
+    filePath: '',
+    history: [],
+    features: [],
+    dependencies: [],
+    relatedFiles: [],
+    props: [],
+    tags: [],
+    status: 'stable',
+    lastUpdated: '',
   },
 }))
 
@@ -58,6 +130,24 @@ vi.mock('./components/PromptGenerator.vue', () => ({
   default: {
     name: 'PromptGenerator',
     template: '<div class="prompt-generator-mock">PromptGenerator</div>',
+  },
+  PROMPT_GENERATOR_META: {
+    id: 'prompt-generator',
+    name: 'PromptGenerator',
+    version: '1.0.0',
+    summary: '',
+    description: '',
+    phase: 1,
+    taskId: '',
+    filePath: '',
+    history: [],
+    features: [],
+    dependencies: [],
+    relatedFiles: [],
+    props: [],
+    tags: [],
+    status: 'stable',
+    lastUpdated: '',
   },
 }))
 
@@ -98,6 +188,7 @@ vi.mock('./composables/useCubeEditor', () => ({
 
 vi.mock('./lib/devmode', () => ({
   useDevModeKeyboard: vi.fn(),
+  useHoveredComponentId: vi.fn(() => ({ value: null })),
   useDevModeStore: () => ({
     isDevMode: false,
     toggleDevMode: vi.fn(),

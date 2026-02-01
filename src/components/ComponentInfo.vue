@@ -24,7 +24,7 @@ import type {
   ComponentHistoryEntry,
   ComponentFeature,
 } from '../types/component-meta'
-import { useIsDevModeEnabled, useDevModeSettings } from '../lib/devmode'
+import { useIsDevModeEnabled, useDevModeSettings, useDevModeStore } from '../lib/devmode'
 
 // --- Props ---
 interface ComponentInfoProps {
@@ -284,6 +284,7 @@ const positionStyles: Record<string, CSSProperties> = {
 // --- State ---
 const isDevMode = useIsDevModeEnabled()
 const settings = useDevModeSettings()
+const devModeStore = useDevModeStore()
 const isHovered = ref(false)
 const isPinned = ref(false)
 
@@ -340,6 +341,20 @@ const historyEntries = computed(() =>
 
 // --- Event handlers ---
 
+function handleMouseEnter(e: MouseEvent) {
+  e.stopPropagation()
+  isHovered.value = true
+  devModeStore.setHoveredComponent(props.meta.id)
+}
+
+function handleMouseLeave() {
+  isHovered.value = false
+  // Only clear if we are still the hovered component
+  if (devModeStore.hoveredComponentId === props.meta.id) {
+    devModeStore.setHoveredComponent(null)
+  }
+}
+
 function handleWrapperClick(e: MouseEvent) {
   if (e.ctrlKey || e.metaKey) {
     e.stopPropagation()
@@ -363,8 +378,8 @@ function closePanel() {
     v-else
     :style="wrapperStyle"
     :class="`component-info ${props.className}`"
-    @mouseenter="isHovered = true"
-    @mouseleave="isHovered = false"
+    @mouseenter="handleMouseEnter"
+    @mouseleave="handleMouseLeave"
     @click="handleWrapperClick"
   >
     <slot />

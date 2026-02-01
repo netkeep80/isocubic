@@ -151,6 +151,9 @@ export interface DevModeContextValue {
 export const useDevModeStore = defineStore('devMode', () => {
   const settings = ref<DevModeSettings>(loadSettings())
 
+  /** ID of the component currently hovered by the mouse pointer */
+  const hoveredComponentId = ref<string | null>(null)
+
   // Persist settings changes
   watch(
     settings,
@@ -188,12 +191,18 @@ export const useDevModeStore = defineStore('devMode', () => {
     settings.value = { ...DEFAULT_SETTINGS }
   }
 
+  function setHoveredComponent(componentId: string | null) {
+    hoveredComponentId.value = componentId
+  }
+
   return {
     settings,
+    hoveredComponentId,
     toggleDevMode,
     updateSettings,
     updateCategory,
     resetSettings,
+    setHoveredComponent,
   }
 })
 
@@ -262,6 +271,16 @@ export function useIsDevModeEnabled(): ComputedRef<boolean> {
 export function useDevModeSettings(): ComputedRef<DevModeSettings> {
   const store = useDevModeStore()
   return computed(() => store.settings)
+}
+
+/**
+ * Composable to get the currently hovered component ID
+ *
+ * Returns a ComputedRef<string | null> that reactively tracks the hovered component.
+ */
+export function useHoveredComponentId(): ComputedRef<string | null> {
+  const store = useDevModeStore()
+  return computed(() => store.hoveredComponentId)
 }
 
 export default useDevModeStore

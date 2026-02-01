@@ -8,14 +8,19 @@
 import { ref, onMounted } from 'vue'
 import { useDeviceType } from './composables/useDeviceType'
 import { useCubeEditor } from './composables/useCubeEditor'
-import { useDevModeKeyboard } from './lib/devmode'
+import { useDevModeKeyboard, useHoveredComponentId } from './lib/devmode'
 import { useAuthStore } from './lib/auth'
 import Gallery from './components/Gallery.vue'
+import { GALLERY_META } from './components/Gallery.vue'
 import ExportPanel from './components/ExportPanel.vue'
+import { EXPORT_PANEL_META } from './components/ExportPanel.vue'
 import CubePreview from './components/CubePreview.vue'
+import { CUBE_PREVIEW_META } from './components/CubePreview.vue'
 import UnifiedEditor from './components/UnifiedEditor.vue'
+import { UNIFIED_EDITOR_META } from './components/UnifiedEditor.vue'
 import ActionHistory from './components/ActionHistory.vue'
 import PromptGenerator from './components/PromptGenerator.vue'
+import { PROMPT_GENERATOR_META } from './components/PromptGenerator.vue'
 import GodModeWindow from './components/GodModeWindow.vue'
 import ComponentInfo from './components/ComponentInfo.vue'
 import DevModeIndicator from './components/DevModeIndicator.vue'
@@ -29,6 +34,9 @@ const { currentCube, updateCube, selectCube, loadCube } = useCubeEditor()
 
 // DevMode keyboard shortcut (Ctrl+Shift+D)
 useDevModeKeyboard()
+
+// Track which component the mouse is hovering over for GodModeWindow
+const hoveredComponentId = useHoveredComponentId()
 
 // Auth store initialization
 const authStore = useAuthStore()
@@ -212,7 +220,9 @@ const APP_META = {
       <main class="app__main">
         <!-- Gallery sidebar -->
         <section class="app__section app__section--sidebar">
-          <Gallery :current-cube="currentCube" @cube-select="selectCube" />
+          <ComponentInfo :meta="GALLERY_META">
+            <Gallery :current-cube="currentCube" @cube-select="selectCube" />
+          </ComponentInfo>
         </section>
 
         <!-- Main content: preview + editor -->
@@ -220,32 +230,40 @@ const APP_META = {
           <div class="app__current-cube">
             <h3 class="app__section-title">Preview</h3>
             <div class="app__3d-preview app__3d-preview--desktop">
-              <CubePreview :config="currentCube" data-testid="cube-preview" />
+              <ComponentInfo :meta="CUBE_PREVIEW_META">
+                <CubePreview :config="currentCube" data-testid="cube-preview" />
+              </ComponentInfo>
             </div>
           </div>
 
-          <PromptGenerator
-            @cube-generated="selectCube"
-            @cubes-generated="(cubes) => cubes.length > 0 && selectCube(cubes[0])"
-          />
+          <ComponentInfo :meta="PROMPT_GENERATOR_META">
+            <PromptGenerator
+              @cube-generated="selectCube"
+              @cubes-generated="(cubes) => cubes.length > 0 && selectCube(cubes[0])"
+            />
+          </ComponentInfo>
 
-          <UnifiedEditor :cube="currentCube" @update:cube="updateCube" />
+          <ComponentInfo :meta="UNIFIED_EDITOR_META">
+            <UnifiedEditor :cube="currentCube" @update:cube="updateCube" />
+          </ComponentInfo>
         </section>
 
         <!-- Tools sidebar -->
         <section class="app__section app__section--sidebar">
-          <ExportPanel
-            :current-cube="currentCube"
-            @cube-load="loadCube"
-            @cube-change="updateCube"
-          />
+          <ComponentInfo :meta="EXPORT_PANEL_META">
+            <ExportPanel
+              :current-cube="currentCube"
+              @cube-load="loadCube"
+              @cube-change="updateCube"
+            />
+          </ComponentInfo>
 
           <ActionHistory :actions="[]" />
         </section>
       </main>
     </ComponentInfo>
 
-    <GodModeWindow />
+    <GodModeWindow :selected-component-id="hoveredComponentId" />
     <DevModeIndicator />
   </div>
 
@@ -260,34 +278,44 @@ const APP_META = {
       <!-- Preview on top -->
       <div class="app__preview-section">
         <div class="app__3d-preview app__3d-preview--tablet">
-          <CubePreview :config="currentCube" data-testid="cube-preview" />
+          <ComponentInfo :meta="CUBE_PREVIEW_META">
+            <CubePreview :config="currentCube" data-testid="cube-preview" />
+          </ComponentInfo>
         </div>
       </div>
 
       <!-- Panels below -->
       <div class="app__tablet-panels">
         <section class="app__section">
-          <Gallery :current-cube="currentCube" @cube-select="selectCube" />
+          <ComponentInfo :meta="GALLERY_META">
+            <Gallery :current-cube="currentCube" @cube-select="selectCube" />
+          </ComponentInfo>
         </section>
 
         <section class="app__section app__section--sidebar">
-          <UnifiedEditor :cube="currentCube" @update:cube="updateCube" />
+          <ComponentInfo :meta="UNIFIED_EDITOR_META">
+            <UnifiedEditor :cube="currentCube" @update:cube="updateCube" />
+          </ComponentInfo>
 
-          <PromptGenerator
-            @cube-generated="selectCube"
-            @cubes-generated="(cubes) => cubes.length > 0 && selectCube(cubes[0])"
-          />
+          <ComponentInfo :meta="PROMPT_GENERATOR_META">
+            <PromptGenerator
+              @cube-generated="selectCube"
+              @cubes-generated="(cubes) => cubes.length > 0 && selectCube(cubes[0])"
+            />
+          </ComponentInfo>
 
-          <ExportPanel
-            :current-cube="currentCube"
-            @cube-load="loadCube"
-            @cube-change="updateCube"
-          />
+          <ComponentInfo :meta="EXPORT_PANEL_META">
+            <ExportPanel
+              :current-cube="currentCube"
+              @cube-load="loadCube"
+              @cube-change="updateCube"
+            />
+          </ComponentInfo>
         </section>
       </div>
     </main>
 
-    <GodModeWindow />
+    <GodModeWindow :selected-component-id="hoveredComponentId" />
     <DevModeIndicator />
   </div>
 
