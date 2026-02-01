@@ -1129,23 +1129,21 @@ function handleAuthStateChange(state: { authenticated: boolean }) {
         <div :style="{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '8px' }">
           <div :style="styles.formGroup">
             <label :style="{ ...styles.formLabel, fontSize: '11px' }">{{
-              props.language === 'ru'
-                ? 'Владелец репозитория (owner)'
-                : 'Repository owner'
+              props.language === 'ru' ? 'Владелец репозитория (owner)' : 'Repository owner'
             }}</label>
             <input
               type="text"
               :value="githubOwner"
-              :placeholder="props.language === 'ru' ? 'username или organization' : 'username or organization'"
+              :placeholder="
+                props.language === 'ru' ? 'username или organization' : 'username or organization'
+              "
               :style="{ ...styles.formInput, fontSize: '12px', padding: '6px 10px' }"
               @input="githubOwner = ($event.target as HTMLInputElement).value"
             />
           </div>
           <div :style="styles.formGroup">
             <label :style="{ ...styles.formLabel, fontSize: '11px' }">{{
-              props.language === 'ru'
-                ? 'Название репозитория (repo)'
-                : 'Repository name'
+              props.language === 'ru' ? 'Название репозитория (repo)' : 'Repository name'
             }}</label>
             <input
               type="text"
