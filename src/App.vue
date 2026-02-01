@@ -648,7 +648,12 @@ const APP_META = {
   </div>
 
   <!-- Mobile Layout (Windowed with tab navigation) -->
-  <div v-else class="app app--mobile app--windowed" @touchstart="handleTouchStart" @touchend="handleTouchEnd">
+  <div
+    v-else
+    class="app app--mobile app--windowed"
+    @touchstart="handleTouchStart"
+    @touchend="handleTouchEnd"
+  >
     <ComponentInfo :meta="APP_META">
       <header class="app__header app__header--mobile">
         <h1 class="app__title-compact">isocubic</h1>
@@ -660,80 +665,84 @@ const APP_META = {
 
       <!-- Tab Navigation -->
       <nav class="app__mobile-nav">
-      <button
-        v-for="tab in mobileTabs"
-        :key="tab.id"
-        class="app__mobile-tab"
-        :class="{ 'app__mobile-tab--active': activeMobileTab === tab.id }"
-        :aria-label="tab.label"
-        @click="activeMobileTab = tab.id"
-      >
-        <span class="app__mobile-tab-icon">{{ tab.icon }}</span>
-        <span class="app__mobile-tab-label">{{ tab.label }}</span>
-      </button>
-    </nav>
+        <button
+          v-for="tab in mobileTabs"
+          :key="tab.id"
+          class="app__mobile-tab"
+          :class="{ 'app__mobile-tab--active': activeMobileTab === tab.id }"
+          :aria-label="tab.label"
+          @click="activeMobileTab = tab.id"
+        >
+          <span class="app__mobile-tab-icon">{{ tab.icon }}</span>
+          <span class="app__mobile-tab-label">{{ tab.label }}</span>
+        </button>
+      </nav>
 
-    <!-- Mobile Content -->
-    <div class="app__mobile-content">
-      <!-- Gallery Tab -->
-      <div v-if="activeMobileTab === 'gallery'" class="app__mobile-panel">
-        <Gallery :current-cube="currentCube" @cube-select="selectCube" />
-      </div>
+      <!-- Mobile Content -->
+      <div class="app__mobile-content">
+        <!-- Gallery Tab -->
+        <div v-if="activeMobileTab === 'gallery'" class="app__mobile-panel">
+          <Gallery :current-cube="currentCube" @cube-select="selectCube" />
+        </div>
 
-      <!-- Preview Tab -->
-      <div
-        v-if="activeMobileTab === 'preview'"
-        class="app__mobile-panel app__mobile-panel--preview"
-      >
-        <div class="app__current-cube app__current-cube--mobile">
-          <div class="app__3d-preview app__3d-preview--mobile">
-            <CubePreview :config="currentCube" data-testid="cube-preview" />
-          </div>
-          <div class="app__cube-info">
-            <p>
-              <strong>{{
-                currentCube?.meta?.name || currentCube?.id || 'No cube selected'
-              }}</strong>
-            </p>
-            <p v-if="currentCube?.prompt">{{ currentCube.prompt }}</p>
+        <!-- Preview Tab -->
+        <div
+          v-if="activeMobileTab === 'preview'"
+          class="app__mobile-panel app__mobile-panel--preview"
+        >
+          <div class="app__current-cube app__current-cube--mobile">
+            <div class="app__3d-preview app__3d-preview--mobile">
+              <CubePreview :config="currentCube" data-testid="cube-preview" />
+            </div>
+            <div class="app__cube-info">
+              <p>
+                <strong>{{
+                  currentCube?.meta?.name || currentCube?.id || 'No cube selected'
+                }}</strong>
+              </p>
+              <p v-if="currentCube?.prompt">{{ currentCube.prompt }}</p>
+            </div>
           </div>
         </div>
+
+        <!-- Editor Tab -->
+        <div v-if="activeMobileTab === 'editor'" class="app__mobile-panel">
+          <UnifiedEditor :cube="currentCube" @update:cube="updateCube" />
+
+          <PromptGenerator
+            @cube-generated="selectCube"
+            @cubes-generated="(cubes) => cubes.length > 0 && selectCube(cubes[0])"
+          />
+        </div>
+
+        <!-- Tools Tab -->
+        <div v-if="activeMobileTab === 'tools'" class="app__mobile-panel">
+          <ComponentInfo :meta="EXPORT_PANEL_META">
+            <ExportPanel
+              :current-cube="currentCube"
+              @cube-load="loadCube"
+              @cube-change="updateCube"
+            />
+          </ComponentInfo>
+
+          <ActionHistory :actions="[]" />
+        </div>
+
+        <!-- Social Tab -->
+        <div v-if="activeMobileTab === 'social'" class="app__mobile-panel">
+          <ComponentInfo :meta="COMMUNITY_GALLERY_META">
+            <CommunityGallery @cube-select="selectCube" />
+          </ComponentInfo>
+
+          <ComponentInfo :meta="SHARE_PANEL_META">
+            <SharePanel :cube="currentCube" />
+          </ComponentInfo>
+
+          <ComponentInfo :meta="NOTIFICATION_PANEL_META">
+            <NotificationPanel />
+          </ComponentInfo>
+        </div>
       </div>
-
-      <!-- Editor Tab -->
-      <div v-if="activeMobileTab === 'editor'" class="app__mobile-panel">
-        <UnifiedEditor :cube="currentCube" @update:cube="updateCube" />
-
-        <PromptGenerator
-          @cube-generated="selectCube"
-          @cubes-generated="(cubes) => cubes.length > 0 && selectCube(cubes[0])"
-        />
-      </div>
-
-      <!-- Tools Tab -->
-      <div v-if="activeMobileTab === 'tools'" class="app__mobile-panel">
-        <ComponentInfo :meta="EXPORT_PANEL_META">
-          <ExportPanel :current-cube="currentCube" @cube-load="loadCube" @cube-change="updateCube" />
-        </ComponentInfo>
-
-        <ActionHistory :actions="[]" />
-      </div>
-
-      <!-- Social Tab -->
-      <div v-if="activeMobileTab === 'social'" class="app__mobile-panel">
-        <ComponentInfo :meta="COMMUNITY_GALLERY_META">
-          <CommunityGallery @cube-select="selectCube" />
-        </ComponentInfo>
-
-        <ComponentInfo :meta="SHARE_PANEL_META">
-          <SharePanel :cube="currentCube" />
-        </ComponentInfo>
-
-        <ComponentInfo :meta="NOTIFICATION_PANEL_META">
-          <NotificationPanel />
-        </ComponentInfo>
-      </div>
-    </div>
 
       <!-- Swipe Indicator -->
       <div class="app__swipe-indicator">
