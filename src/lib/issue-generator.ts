@@ -836,6 +836,16 @@ export class IssueGenerator {
       body = body.replace(new RegExp(placeholder, 'g'), String(value))
     }
 
+    // Replace any remaining unreplaced template placeholders with empty strings
+    // so that {additionalContext}, {screenshots}, etc. don't appear as literal text
+    if (template.placeholders) {
+      for (const placeholder of template.placeholders) {
+        const pattern = `{${placeholder.id}}`
+        title = title.replace(new RegExp(pattern, 'g'), '')
+        body = body.replace(new RegExp(pattern, 'g'), '')
+      }
+    }
+
     return createIssueDraft({
       title,
       body,
