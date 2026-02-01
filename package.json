@@ -15,7 +15,9 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "check:all": "npm run lint && npm run typecheck && npm run format:check && npm run test:run"
+    "metanet:validate": "tsx scripts/metanet-preprocessor.ts --check",
+    "metanet:validate:verbose": "tsx scripts/metanet-preprocessor.ts --check --verbose",
+    "check:all": "npm run lint && npm run typecheck && npm run format:check && npm run metanet:validate && npm run test:run"
   },
   "dependencies": {
     "@tresjs/cientos": "^5.2.5",
@@ -46,6 +48,7 @@
     "jsdom": "^27.4.0",
     "prettier": "^3.8.1",
     "tailwindcss": "^4.1.18",
+    "tsx": "^4.21.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
     "vite": "^7.2.4",
