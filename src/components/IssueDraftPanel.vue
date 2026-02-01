@@ -379,11 +379,13 @@ const activeScreenshot = ref<IssueScreenshot | null>(null)
 const isCapturing = ref(false)
 
 // GitHub state
+const githubOwner = ref(props.githubOwner || '')
+const githubRepo = ref(props.githubRepo || '')
 const internalGithubClient = shallowRef<GitHubApiClient>(
   props.githubClient ||
     createGitHubClient({
-      owner: props.githubOwner || '',
-      repo: props.githubRepo || '',
+      owner: githubOwner.value,
+      repo: githubRepo.value,
       oauthClientId: props.githubOAuthClientId,
     })
 )
@@ -493,9 +495,17 @@ function handleTemplateChange(event: Event) {
 // Handle publish to GitHub
 async function handlePublishToGitHub() {
   if (!draft.value || !validation.value.isValid) return
+  if (!githubOwner.value.trim() || !githubRepo.value.trim()) return
 
   isPublishing.value = true
   publishResult.value = null
+
+  // Update client with current owner/repo
+  internalGithubClient.value = createGitHubClient({
+    owner: githubOwner.value.trim(),
+    repo: githubRepo.value.trim(),
+    oauthClientId: props.githubOAuthClientId,
+  })
 
   const result = await internalGithubClient.value.createIssue(draft.value)
   publishResult.value = result
@@ -1115,12 +1125,44 @@ function handleAuthStateChange(state: { authenticated: boolean }) {
           {{ props.language === 'ru' ? '\uD83D\uDC19 GitHub' : '\uD83D\uDC19 GitHub' }}
         </div>
 
+        <!-- Repository inputs -->
+        <div :style="{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '8px' }">
+          <div :style="styles.formGroup">
+            <label :style="{ ...styles.formLabel, fontSize: '11px' }">{{
+              props.language === 'ru'
+                ? 'Владелец репозитория (owner)'
+                : 'Repository owner'
+            }}</label>
+            <input
+              type="text"
+              :value="githubOwner"
+              :placeholder="props.language === 'ru' ? 'username или organization' : 'username or organization'"
+              :style="{ ...styles.formInput, fontSize: '12px', padding: '6px 10px' }"
+              @input="githubOwner = ($event.target as HTMLInputElement).value"
+            />
+          </div>
+          <div :style="styles.formGroup">
+            <label :style="{ ...styles.formLabel, fontSize: '11px' }">{{
+              props.language === 'ru'
+                ? 'Название репозитория (repo)'
+                : 'Repository name'
+            }}</label>
+            <input
+              type="text"
+              :value="githubRepo"
+              :placeholder="props.language === 'ru' ? 'repository-name' : 'repository-name'"
+              :style="{ ...styles.formInput, fontSize: '12px', padding: '6px 10px' }"
+              @input="githubRepo = ($event.target as HTMLInputElement).value"
+            />
+          </div>
+        </div>
+
         <!-- Auth Button -->
         <GitHubAuthButton
           :language="props.language"
           :client="internalGithubClient"
-          :owner="props.githubOwner"
-          :repo="props.githubRepo"
+          :owner="githubOwner"
+          :repo="githubRepo"
           :oauth-client-id="props.githubOAuthClientId"
           :compact="isGithubAuthenticated"
           @auth-state-change="handleAuthStateChange"
@@ -1128,7 +1170,7 @@ function handleAuthStateChange(state: { authenticated: boolean }) {
 
         <!-- Publish Button -->
         <div
-          v-if="isGithubAuthenticated && props.githubOwner && props.githubRepo"
+          v-if="isGithubAuthenticated && githubOwner.trim() && githubRepo.trim()"
           :style="{ marginTop: '8px' }"
         >
           <div
