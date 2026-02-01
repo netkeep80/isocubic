@@ -246,6 +246,22 @@ function createWrapper() {
           template: '<div class="component-info-mock"><slot /></div>',
           props: ['meta'],
         },
+        DraggableWindow: {
+          name: 'DraggableWindow',
+          template: '<div class="draggable-window-stub"><slot /></div>',
+          props: [
+            'windowId',
+            'title',
+            'icon',
+            'x',
+            'y',
+            'width',
+            'height',
+            'minWidth',
+            'minHeight',
+            'zIndex',
+          ],
+        },
       },
     },
   })
