@@ -119,7 +119,7 @@ function validateMetanetFile(
   metanetPath: string,
   metanet: MetanetJson,
   schemaValidator: Ajv.ValidateFunction,
-  verbose: boolean,
+  verbose: boolean
 ): ValidationResult {
   const result: ValidationResult = { errors: [], warnings: [] }
   const dirPath = path.dirname(metanetPath)
@@ -157,9 +157,7 @@ function validateMetanetFile(
       }
       const subMetanetPath = path.join(dirPath, dirDesc.metanet)
       if (!fs.existsSync(subMetanetPath)) {
-        result.errors.push(
-          `${relPath}: Referenced metanet.json does not exist: ${dirDesc.metanet}`,
-        )
+        result.errors.push(`${relPath}: Referenced metanet.json does not exist: ${dirDesc.metanet}`)
       }
     }
   }
@@ -191,7 +189,7 @@ function validateMetanetFile(
 function walkAndValidate(
   rootMetanetPath: string,
   schemaValidator: Ajv.ValidateFunction,
-  verbose: boolean,
+  verbose: boolean
 ): ValidationResult {
   const totalResult: ValidationResult = { errors: [], warnings: [] }
   const visited = new Set<string>()
@@ -305,14 +303,11 @@ function main() {
     }
   }
 
-  const total =
-    result.errors.length + (verbose ? result.warnings.length : 0)
+  const total = result.errors.length + (verbose ? result.warnings.length : 0)
   if (total === 0) {
     console.log('\n✅ All metanet.json files are valid!')
   } else {
-    console.log(
-      `\nSummary: ${result.errors.length} error(s), ${result.warnings.length} warning(s)`,
-    )
+    console.log(`\nSummary: ${result.errors.length} error(s), ${result.warnings.length} warning(s)`)
   }
 
   if (checkMode && result.errors.length > 0) {
