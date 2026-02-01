@@ -1125,34 +1125,27 @@ function handleAuthStateChange(state: { authenticated: boolean }) {
           {{ props.language === 'ru' ? '\uD83D\uDC19 GitHub' : '\uD83D\uDC19 GitHub' }}
         </div>
 
-        <!-- Repository inputs -->
-        <div :style="{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '8px' }">
-          <div :style="styles.formGroup">
-            <label :style="{ ...styles.formLabel, fontSize: '11px' }">{{
-              props.language === 'ru' ? 'Владелец репозитория (owner)' : 'Repository owner'
-            }}</label>
-            <input
-              type="text"
-              :value="githubOwner"
-              :placeholder="
-                props.language === 'ru' ? 'username или organization' : 'username or organization'
-              "
-              :style="{ ...styles.formInput, fontSize: '12px', padding: '6px 10px' }"
-              @input="githubOwner = ($event.target as HTMLInputElement).value"
-            />
-          </div>
-          <div :style="styles.formGroup">
-            <label :style="{ ...styles.formLabel, fontSize: '11px' }">{{
-              props.language === 'ru' ? 'Название репозитория (repo)' : 'Repository name'
-            }}</label>
-            <input
-              type="text"
-              :value="githubRepo"
-              :placeholder="props.language === 'ru' ? 'repository-name' : 'repository-name'"
-              :style="{ ...styles.formInput, fontSize: '12px', padding: '6px 10px' }"
-              @input="githubRepo = ($event.target as HTMLInputElement).value"
-            />
-          </div>
+        <!-- Repository info (read-only, configured in project settings) -->
+        <div
+          v-if="githubOwner && githubRepo"
+          :style="{
+            fontSize: '12px',
+            color: '#9ca3af',
+            marginBottom: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+          }"
+        >
+          <span>{{ props.language === 'ru' ? 'Репозиторий:' : 'Repository:' }}</span>
+          <a
+            :href="`https://github.com/${githubOwner}/${githubRepo}`"
+            target="_blank"
+            rel="noopener noreferrer"
+            :style="{ color: '#818cf8', textDecoration: 'underline' }"
+          >
+            {{ githubOwner }}/{{ githubRepo }}
+          </a>
         </div>
 
         <!-- Auth Button -->

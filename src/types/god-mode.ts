@@ -215,6 +215,10 @@ export interface GodModeConfig {
  * Default GOD MODE configuration
  */
 export const DEFAULT_GOD_MODE_CONFIG: GodModeConfig = {
+  github: {
+    owner: 'netkeep80',
+    repo: 'isocubic',
+  },
   position: DEFAULT_WINDOW_POSITION,
   size: DEFAULT_WINDOW_SIZE,
   tabs: ['query', 'context', 'search'],
