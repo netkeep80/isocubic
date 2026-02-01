@@ -3,6 +3,278 @@
   "name": "components",
   "description": "Vue UI components for the isocubic application: editors, previews, panels, and tools",
   "tags": ["vue", "ui", "components"],
+  "files": {
+    "ActionHistory.vue": {
+      "description": "Action history panel showing undo/redo operations"
+    },
+    "ActionHistory.vue.test.ts": {
+      "description": "Tests for the ActionHistory component"
+    },
+    "AnnotationCanvas.vue": {
+      "description": "Canvas overlay for drawing annotations on the 3D scene"
+    },
+    "AnnotationCanvas.vue.test.ts": {
+      "description": "Tests for the AnnotationCanvas component"
+    },
+    "AuthForms.vue": {
+      "description": "Authentication forms for login and registration"
+    },
+    "AuthForms.vue.test.ts": {
+      "description": "Tests for the AuthForms component"
+    },
+    "CollaborativeParamEditor.vue": {
+      "description": "Collaborative parameter editor with real-time sync"
+    },
+    "CollaborativeParamEditor.vue.test.ts": {
+      "description": "Tests for the CollaborativeParamEditor component"
+    },
+    "CommandBar.test.ts": {
+      "description": "Tests for the CommandBar component (alternate test file)"
+    },
+    "CommandBar.vue": {
+      "description": "Command palette for quick access to application actions"
+    },
+    "CommandBar.vue.test.ts": {
+      "description": "Tests for the CommandBar component"
+    },
+    "CommentsSection.vue": {
+      "description": "Comments section for discussing cube designs"
+    },
+    "CommentsSection.vue.test.ts": {
+      "description": "Tests for the CommentsSection component"
+    },
+    "CommunityGallery.vue": {
+      "description": "Gallery of community-shared cube designs"
+    },
+    "CommunityGallery.vue.test.ts": {
+      "description": "Tests for the CommunityGallery component"
+    },
+    "ComponentContextPanel.vue": {
+      "description": "Panel showing context and metadata for selected components"
+    },
+    "ComponentContextPanel.vue.test.ts": {
+      "description": "Tests for the ComponentContextPanel component"
+    },
+    "ComponentInfo.vue": {
+      "description": "Component information display with MetaNet integration"
+    },
+    "ComponentInfo.vue.test.ts": {
+      "description": "Tests for the ComponentInfo component"
+    },
+    "ConversationPanel.vue": {
+      "description": "AI conversation panel for natural language interaction"
+    },
+    "ConversationPanel.vue.test.ts": {
+      "description": "Tests for the ConversationPanel component"
+    },
+    "CubeGrid.vue": {
+      "description": "Grid layout for displaying multiple cube previews"
+    },
+    "CubeGrid.vue.test.ts": {
+      "description": "Tests for the CubeGrid component"
+    },
+    "CubePreview.vue": {
+      "description": "3D preview renderer for a single parametric cube"
+    },
+    "CubePreview.vue.test.ts": {
+      "description": "Tests for the CubePreview component"
+    },
+    "CubeStack.vue": {
+      "description": "Stacked cube visualization component"
+    },
+    "CubeStack.vue.test.ts": {
+      "description": "Tests for the CubeStack component"
+    },
+    "CubeStackGrid.vue": {
+      "description": "Grid layout for displaying multiple cube stacks"
+    },
+    "DevModeIndicator.vue": {
+      "description": "Visual indicator showing when developer mode is active"
+    },
+    "DevModeQueryPanel.vue": {
+      "description": "Developer mode panel for querying MetaNet metadata"
+    },
+    "DevModeQueryPanel.vue.test.ts": {
+      "description": "Tests for the DevModeQueryPanel component"
+    },
+    "DraggableWindow.test.ts": {
+      "description": "Tests for the DraggableWindow component (alternate test file)"
+    },
+    "DraggableWindow.vue": {
+      "description": "Draggable and resizable window container for the window manager"
+    },
+    "DraggableWindow.vue.test.ts": {
+      "description": "Tests for the DraggableWindow component"
+    },
+    "EnergyCube.vue": {
+      "description": "Energy-visualized parametric cube with animated effects"
+    },
+    "EnergyCube.vue.test.ts": {
+      "description": "Tests for the EnergyCube component"
+    },
+    "EnergyVisualizationEditor.vue": {
+      "description": "Editor for configuring energy visualization parameters"
+    },
+    "EnergyVisualizationEditor.vue.test.ts": {
+      "description": "Tests for the EnergyVisualizationEditor component"
+    },
+    "ExportPanel.vue": {
+      "description": "Panel for exporting cube designs in various formats"
+    },
+    "ExportPanel.vue.test.ts": {
+      "description": "Tests for the ExportPanel component"
+    },
+    "ExtendedSearchPanel.vue": {
+      "description": "Advanced search panel with filters for finding cube designs"
+    },
+    "ExtendedSearchPanel.vue.test.ts": {
+      "description": "Tests for the ExtendedSearchPanel component"
+    },
+    "FFTChannelEditor.vue": {
+      "description": "Editor for FFT frequency channel configuration"
+    },
+    "FFTChannelEditor.vue.test.ts": {
+      "description": "Tests for the FFTChannelEditor component"
+    },
+    "FFTParamEditor.vue": {
+      "description": "Editor for FFT computation parameters"
+    },
+    "FFTParamEditor.vue.test.ts": {
+      "description": "Tests for the FFTParamEditor component"
+    },
+    "Gallery.vue": {
+      "description": "Gallery view for browsing saved cube presets"
+    },
+    "Gallery.vue.test.ts": {
+      "description": "Tests for the Gallery component"
+    },
+    "GitHubAuthButton.vue": {
+      "description": "GitHub OAuth authentication button"
+    },
+    "GitHubAuthButton.vue.test.ts": {
+      "description": "Tests for the GitHubAuthButton component"
+    },
+    "GodModeProvider.test.ts": {
+      "description": "Tests for the GodMode provider integration"
+    },
+    "GodModeWindow.vue": {
+      "description": "God mode AI assistant window component"
+    },
+    "GodModeWindow.vue.test.ts": {
+      "description": "Tests for the GodModeWindow component"
+    },
+    "IssueDraftPanel.vue": {
+      "description": "Panel for drafting GitHub issues from the application"
+    },
+    "IssueDraftPanel.vue.test.ts": {
+      "description": "Tests for the IssueDraftPanel component"
+    },
+    "LODConfigEditor.vue": {
+      "description": "Editor for Level of Detail (LOD) configuration"
+    },
+    "LODConfigEditor.vue.test.ts": {
+      "description": "Tests for the LODConfigEditor component"
+    },
+    "LODCubeGrid.vue": {
+      "description": "Cube grid with Level of Detail (LOD) rendering support"
+    },
+    "LODCubeGrid.vue.test.ts": {
+      "description": "Tests for the LODCubeGrid component"
+    },
+    "LODStatisticsDisplay.vue": {
+      "description": "Display panel for LOD rendering statistics"
+    },
+    "LODStatisticsDisplay.vue.test.ts": {
+      "description": "Tests for the LODStatisticsDisplay component"
+    },
+    "MagicCubeDemo.vue": {
+      "description": "Demo component showcasing magic cube effects"
+    },
+    "MagicCubeDemo.vue.test.ts": {
+      "description": "Tests for the MagicCubeDemo component"
+    },
+    "NotificationPanel.vue": {
+      "description": "Panel for displaying application notifications"
+    },
+    "NotificationPanel.vue.test.ts": {
+      "description": "Tests for the NotificationPanel component"
+    },
+    "ParamEditor.vue": {
+      "description": "Parameter editor for adjusting cube properties"
+    },
+    "ParamEditor.vue.test.ts": {
+      "description": "Tests for the ParamEditor component"
+    },
+    "ParametricCube.vue": {
+      "description": "Core parametric cube 3D rendering component"
+    },
+    "ParametricCube.vue.test.ts": {
+      "description": "Tests for the ParametricCube component"
+    },
+    "ParticipantCursor.vue": {
+      "description": "Collaborative cursor showing other participants' positions"
+    },
+    "ParticipantCursor.vue.test.ts": {
+      "description": "Tests for the ParticipantCursor component"
+    },
+    "PromptGenerator.vue": {
+      "description": "AI prompt generator for creating cube designs from text"
+    },
+    "PromptGenerator.vue.test.ts": {
+      "description": "Tests for the PromptGenerator component"
+    },
+    "SessionPanel.vue": {
+      "description": "Panel for managing collaborative editing sessions"
+    },
+    "SessionPanel.vue.test.ts": {
+      "description": "Tests for the SessionPanel component"
+    },
+    "SharePanel.vue": {
+      "description": "Panel for sharing cube designs via links"
+    },
+    "SharePanel.vue.test.ts": {
+      "description": "Tests for the SharePanel component"
+    },
+    "StackEditor.vue": {
+      "description": "Editor for configuring cube stack arrangements"
+    },
+    "StackEditor.vue.test.ts": {
+      "description": "Tests for the StackEditor component"
+    },
+    "StackPresetPicker.vue": {
+      "description": "Picker for selecting predefined cube stack presets"
+    },
+    "StackPresetPicker.vue.test.ts": {
+      "description": "Tests for the StackPresetPicker component"
+    },
+    "SubscriptionButton.vue": {
+      "description": "Button for managing subscription to updates"
+    },
+    "SubscriptionButton.vue.test.ts": {
+      "description": "Tests for the SubscriptionButton component"
+    },
+    "UnifiedEditor.vue": {
+      "description": "Unified editor combining parameter editing and preview"
+    },
+    "UnifiedEditor.vue.test.ts": {
+      "description": "Tests for the UnifiedEditor component"
+    },
+    "UserProfile.vue": {
+      "description": "User profile display and settings component"
+    },
+    "UserProfile.vue.test.ts": {
+      "description": "Tests for the UserProfile component"
+    },
+    "WindowTaskbar.test.ts": {
+      "description": "Tests for the WindowTaskbar component (alternate test file)"
+    },
+    "WindowTaskbar.vue": {
+      "description": "Taskbar for managing open windows in the window manager"
+    },
+    "WindowTaskbar.vue.test.ts": {
+      "description": "Tests for the WindowTaskbar component"
+    }
+  },
   "directories": {
     "windows": {
       "description": "Window-wrapped components for the window manager system",

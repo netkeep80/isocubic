@@ -1,5 +1,22 @@
 {
   "$schema": "../../metanet.schema.json",
   "name": "splash",
-  "description": "PWA splash screen images for various device sizes"
+  "description": "PWA splash screen images for various device sizes",
+  "files": {
+    "splash-640x1136.svg": {
+      "description": "Splash screen for iPhone 5/SE (640x1136)"
+    },
+    "splash-750x1334.svg": {
+      "description": "Splash screen for iPhone 6/7/8 (750x1334)"
+    },
+    "splash-1125x2436.svg": {
+      "description": "Splash screen for iPhone X/XS (1125x2436)"
+    },
+    "splash-1170x2532.svg": {
+      "description": "Splash screen for iPhone 12/13 (1170x2532)"
+    },
+    "splash-1242x2208.svg": {
+      "description": "Splash screen for iPhone 6/7/8 Plus (1242x2208)"
+    }
+  }
 }
