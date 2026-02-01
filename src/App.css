@@ -917,13 +917,17 @@
 
 .app__3d-preview--desktop {
   height: 400px;
-  min-height: 300px;
+  min-height: 200px;
+  resize: vertical;
+  overflow: auto;
 }
 
 .app__3d-preview--tablet {
   height: 300px;
-  min-height: 250px;
+  min-height: 200px;
   margin-bottom: 1rem;
+  resize: vertical;
+  overflow: auto;
 }
 
 .app__3d-preview--mobile {

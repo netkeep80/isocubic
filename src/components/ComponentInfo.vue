@@ -100,14 +100,10 @@ function formatDate(isoDate: string): string {
 
 const styles: Record<string, CSSProperties> = {
   wrapper: {
-    position: 'relative',
     display: 'contents',
   },
   wrapperOutline: {
-    position: 'relative',
-    outline: '2px dashed rgba(59, 130, 246, 0.5)',
-    outlineOffset: '2px',
-    borderRadius: '4px',
+    display: 'contents',
   },
   panel: {
     position: 'absolute',
@@ -309,13 +305,8 @@ const actualPosition = computed(() =>
   props.position === 'auto' ? settings.value.panelPosition : props.position
 )
 
-const showPanel = computed(
-  () =>
-    props.alwaysShow ||
-    (settings.value.showHoverInfo &&
-      (isHovered.value || isPinned.value) &&
-      devModeStore.selectedComponentId !== props.meta.id)
-)
+// Info panel is disabled inline — all metadata is shown in the GodMode window (Issue #198)
+const showPanel = computed(() => false)
 
 const showOutline = computed(() => settings.value.showOutline)
 
