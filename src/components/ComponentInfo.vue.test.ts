@@ -263,45 +263,13 @@ describe('ComponentInfo Vue Component', () => {
       expect(wrapper.text()).toContain('Child Content')
     })
 
-    it('should display component name in panel', () => {
+    // Issue #198: Inline info panel is disabled — all metadata is shown in the GodMode window only
+    it('should not display inline panel even with alwaysShow (Issue #198)', () => {
       const wrapper = mountInfo({ alwaysShow: true })
-      expect(wrapper.text()).toContain('TestComponent')
-    })
-
-    it('should display version in panel', () => {
-      const wrapper = mountInfo({ alwaysShow: true })
-      expect(wrapper.text()).toMatch(/v1\.0\.0/)
-    })
-
-    it('should display status badge', () => {
-      const wrapper = mountInfo({ alwaysShow: true })
-      expect(wrapper.text()).toContain('Stable')
-    })
-
-    it('should display component summary when alwaysShow is true', () => {
-      const wrapper = mountInfo({ alwaysShow: true })
-      expect(wrapper.text()).toContain(testMeta.summary)
-    })
-
-    it('should display phase information', () => {
-      const wrapper = mountInfo({ alwaysShow: true })
-      expect(wrapper.text()).toMatch(/Phase 1/)
-    })
-
-    it('should display features when panel is visible', () => {
-      const wrapper = mountInfo({ alwaysShow: true })
-      expect(wrapper.text()).toContain('Feature One')
-      expect(wrapper.text()).toContain('Feature Two')
-    })
-
-    it('should display history section', () => {
-      const wrapper = mountInfo({ alwaysShow: true })
-      expect(wrapper.text()).toMatch(/History/)
-    })
-
-    it('should display tips when available', () => {
-      const wrapper = mountInfo({ alwaysShow: true })
-      expect(wrapper.text()).toContain('Use this component for testing')
+      // Panel content should not appear inline
+      expect(wrapper.text()).not.toContain(testMeta.summary)
+      // Slot content should still render
+      expect(wrapper.text()).toContain('Child Content')
     })
 
     it('should not render overlay when DevMode is disabled', async () => {
@@ -321,13 +289,17 @@ describe('ComponentInfo Vue Component', () => {
   // Hover behavior (from React test)
   // ========================================================================
   describe('Hover behavior', () => {
-    it('should show info panel on hover', async () => {
+    // Issue #198: Inline info panel is disabled — hover only updates store for GodMode window
+    it('should not show inline info panel on hover (Issue #198)', async () => {
       const wrapper = mountInfo()
       const wrapperEl = wrapper.find('.component-info')
       if (wrapperEl.exists()) {
         await wrapperEl.trigger('mouseenter')
         await nextTick()
-        expect(wrapper.text()).toContain(testMeta.summary)
+        // Panel content should NOT appear inline
+        expect(wrapper.text()).not.toContain(testMeta.summary)
+        // But slot content should still render
+        expect(wrapper.text()).toContain('Child Content')
       }
     })
   })
