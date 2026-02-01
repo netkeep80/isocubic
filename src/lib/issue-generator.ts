@@ -30,7 +30,7 @@ import {
   validateIssueDraft,
   DEFAULT_ISSUE_DRAFT_SETTINGS,
 } from '../types/issue-generator'
-import { getAllComponentMeta } from '../types/component-meta'
+import { getAllComponentMeta, getComponentMeta } from '../types/component-meta'
 import type { ComponentMeta } from '../types/component-meta'
 
 /**
@@ -284,6 +284,61 @@ export function detectEnvironment(): Record<string, string> {
   }
 
   return result
+}
+
+/**
+ * Formats component metadata as a markdown string for the Additional Context section of issues.
+ * When a component is selected in VueDevMode, its metadata is auto-populated into the issue draft.
+ */
+export function formatComponentMetaAsContext(meta: ComponentMeta): string {
+  const lines: string[] = []
+
+  lines.push(`**Component:** ${meta.name} (v${meta.version})`)
+  lines.push(`**Status:** ${meta.status}`)
+  lines.push(`**Phase:** ${meta.phase}`)
+  lines.push(`**File:** \`${meta.filePath}\``)
+
+  if (meta.summary) {
+    lines.push(`**Summary:** ${meta.summary}`)
+  }
+
+  if (meta.taskId) {
+    lines.push(`**Task:** ${meta.taskId}`)
+  }
+
+  if (meta.features.length > 0) {
+    lines.push('')
+    lines.push('**Features:**')
+    for (const feature of meta.features) {
+      const status = feature.enabled ? 'enabled' : 'disabled'
+      lines.push(
+        `- ${feature.name} (${status})${feature.disabledReason ? ` — ${feature.disabledReason}` : ''}`
+      )
+    }
+  }
+
+  if (meta.dependencies.length > 0) {
+    lines.push('')
+    lines.push('**Dependencies:**')
+    for (const dep of meta.dependencies) {
+      lines.push(`- ${dep.name} (${dep.type}) — ${dep.purpose}`)
+    }
+  }
+
+  if (meta.knownIssues && meta.knownIssues.length > 0) {
+    lines.push('')
+    lines.push('**Known Issues:**')
+    for (const issue of meta.knownIssues) {
+      lines.push(`- ${issue}`)
+    }
+  }
+
+  if (meta.tags.length > 0) {
+    lines.push('')
+    lines.push(`**Tags:** ${meta.tags.join(', ')}`)
+  }
+
+  return lines.join('\n')
 }
 
 /**
@@ -794,7 +849,8 @@ export class IssueGenerator {
   createFromTemplate(
     templateId: string,
     values: Record<string, string> = {},
-    overrides: Partial<IssueDraft> = {}
+    overrides: Partial<IssueDraft> = {},
+    componentId?: string | null
   ): IssueDraft {
     const template = this.getTemplate(templateId)
     if (!template) {
@@ -818,6 +874,14 @@ export class IssueGenerator {
     for (const [key, value] of Object.entries(envDefaults)) {
       if (value) {
         mergedValues[key] = value
+      }
+    }
+
+    // Auto-fill additionalContext with component metadata when a component is selected
+    if (componentId) {
+      const componentMeta = getComponentMeta(componentId)
+      if (componentMeta) {
+        mergedValues['additionalContext'] = formatComponentMetaAsContext(componentMeta)
       }
     }
 

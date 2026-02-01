@@ -56,6 +56,8 @@ interface IssueDraftPanelProps {
   githubOAuthClientId?: string
   /** Settings for the panel */
   settings?: Partial<IssueDraftSettings>
+  /** Currently selected component ID (for auto-filling Additional Context) */
+  selectedComponentId?: string | null
 }
 
 const props = withDefaults(defineProps<IssueDraftPanelProps>(), {
@@ -69,6 +71,7 @@ const props = withDefaults(defineProps<IssueDraftPanelProps>(), {
   githubRepo: undefined,
   githubOAuthClientId: undefined,
   settings: undefined,
+  selectedComponentId: null,
 })
 
 // --- Emits ---
@@ -472,7 +475,12 @@ async function handleGenerateFromConversation() {
 async function handleGenerateFromTemplate(templateId: string) {
   isGenerating.value = true
   try {
-    const templateDraft = generator.value.createFromTemplate(templateId)
+    const templateDraft = generator.value.createFromTemplate(
+      templateId,
+      {},
+      {},
+      props.selectedComponentId
+    )
     draft.value = templateDraft
     generationInsights.value = null
     emit('draftCreated', templateDraft)
