@@ -1,15 +1,17 @@
 <!--
   App.vue — Root component for isocubic
-  Adaptive layout with desktop, tablet, and mobile support
+  Adaptive layout with desktop (windowed), tablet, and mobile support
 
-  Phase 10, TASK 67: App.vue layout and adaptive design
+  Phase 11, TASK 68: Windowed desktop layout with command bar
 -->
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useDeviceType } from './composables/useDeviceType'
 import { useCubeEditor } from './composables/useCubeEditor'
 import { useDevModeKeyboard, useHoveredComponentId } from './lib/devmode'
 import { useAuthStore } from './lib/auth'
+import { useWindowManager } from './composables/useWindowManager'
+import type { WindowDefinition } from './composables/useWindowManager'
 import Gallery from './components/Gallery.vue'
 import { GALLERY_META } from './components/Gallery.vue'
 import ExportPanel from './components/ExportPanel.vue'
@@ -24,6 +26,10 @@ import { PROMPT_GENERATOR_META } from './components/PromptGenerator.vue'
 import GodModeWindow from './components/GodModeWindow.vue'
 import ComponentInfo from './components/ComponentInfo.vue'
 import DevModeIndicator from './components/DevModeIndicator.vue'
+import DraggableWindow from './components/DraggableWindow.vue'
+import CommandBar from './components/CommandBar.vue'
+import type { CommandItem } from './components/CommandBar.vue'
+import WindowTaskbar from './components/WindowTaskbar.vue'
 import './App.css'
 
 // Device type detection
@@ -43,6 +49,123 @@ const authStore = useAuthStore()
 onMounted(() => {
   authStore.initialize()
 })
+
+// --- Window Manager (Desktop only) ---
+const windowDefinitions: WindowDefinition[] = [
+  {
+    id: 'gallery',
+    title: 'Gallery',
+    icon: '\uD83C\uDFA8',
+    defaultX: 20,
+    defaultY: 100,
+    defaultWidth: 380,
+    defaultHeight: 500,
+    minWidth: 280,
+    minHeight: 300,
+  },
+  {
+    id: 'preview',
+    title: 'Preview',
+    icon: '\uD83D\uDC41',
+    defaultX: 420,
+    defaultY: 100,
+    defaultWidth: 500,
+    defaultHeight: 400,
+    minWidth: 300,
+    minHeight: 250,
+  },
+  {
+    id: 'editor',
+    title: 'Unified Editor',
+    icon: '\u270F\uFE0F',
+    defaultX: 420,
+    defaultY: 520,
+    defaultWidth: 500,
+    defaultHeight: 350,
+    minWidth: 350,
+    minHeight: 250,
+  },
+  {
+    id: 'prompt',
+    title: 'Generate by Description',
+    icon: '\uD83E\uDD16',
+    defaultX: 940,
+    defaultY: 100,
+    defaultWidth: 400,
+    defaultHeight: 300,
+    minWidth: 300,
+    minHeight: 200,
+  },
+  {
+    id: 'export',
+    title: 'Export / Import',
+    icon: '\uD83D\uDCE6',
+    defaultX: 940,
+    defaultY: 420,
+    defaultWidth: 400,
+    defaultHeight: 280,
+    minWidth: 280,
+    minHeight: 200,
+  },
+  {
+    id: 'history',
+    title: 'Action History',
+    icon: '\uD83D\uDCCB',
+    defaultX: 940,
+    defaultY: 720,
+    defaultWidth: 400,
+    defaultHeight: 250,
+    minWidth: 250,
+    minHeight: 180,
+  },
+]
+
+const windowManager = useWindowManager(windowDefinitions)
+
+/** Command items for the command bar */
+const commandItems = computed<CommandItem[]>(() => {
+  const items: CommandItem[] = []
+
+  // Window toggle commands
+  for (const def of windowDefinitions) {
+    const win = windowManager.getWindow(def.id)
+    const isOpen = win?.isOpen ?? false
+    items.push({
+      id: `window:${def.id}`,
+      label: `${isOpen ? 'Focus' : 'Open'} ${def.title}`,
+      icon: def.icon,
+      description: isOpen ? `Bring ${def.title} to front` : `Open ${def.title} window`,
+      category: 'window',
+    })
+  }
+
+  // Action commands
+  items.push({
+    id: 'action:reset-layout',
+    label: 'Reset Layout',
+    icon: '\u21BA',
+    description: 'Reset all windows to default positions',
+    category: 'action',
+  })
+
+  return items
+})
+
+/** Handle command bar execution */
+function onCommandExecute(commandId: string) {
+  if (commandId.startsWith('window:')) {
+    const winId = commandId.slice('window:'.length)
+    const win = windowManager.getWindow(winId)
+    if (win?.isOpen) {
+      windowManager.bringToFront(winId)
+      if (win.isMinimized) windowManager.restoreWindow(winId)
+    } else {
+      windowManager.openWindow(winId)
+    }
+  } else if (commandId === 'action:reset-layout') {
+    windowManager.resetLayout()
+  }
+}
 
 // Mobile tab navigation
 type MobileTab = 'gallery' | 'preview' | 'editor' | 'tools'
@@ -90,14 +213,15 @@ function handleSwipe() {
 const APP_META = {
   id: 'app',
   name: 'App',
-  version: '2.0.0',
-  summary: 'Root application component with adaptive layout.',
+  version: '3.0.0',
+  summary: 'Root application component with windowed desktop layout and command bar.',
   description:
-    'App is the root component of isocubic. It provides adaptive layout for desktop, tablet, and ' +
-    'mobile devices, integrates all subsystems (Gallery, Editor, Preview, Export, GOD MODE), and ' +
-    'manages the global cube editing state through the useCubeEditor composable.',
-  phase: 10,
-  taskId: 'TASK 67',
+    'App is the root component of isocubic. It provides a windowed desktop layout with draggable, ' +
+    'resizable, collapsible windows and a TinyLLM command bar, plus adaptive tablet and mobile layouts. ' +
+    'Integrates all subsystems (Gallery, Editor, Preview, Export, GOD MODE) and manages the global ' +
+    'cube editing state through the useCubeEditor composable.',
+  phase: 11,
+  taskId: 'TASK 68',
   filePath: 'src/App.vue',
   history: [
     {
@@ -112,6 +236,13 @@ const APP_META = {
       date: '2026-01-31T18:00:00Z',
       description: 'Full adaptive layout with all component integrations',
       taskId: 'TASK 67',
+      type: 'updated' as const,
+    },
+    {
+      version: '3.0.0',
+      date: '2026-02-01T12:00:00Z',
+      description: 'Windowed desktop layout with drag/resize/minimize/close and command bar',
+      taskId: 'TASK 68',
       type: 'updated' as const,
     },
   ],
@@ -136,6 +267,20 @@ const APP_META = {
       description: 'Centralized cube state with undo/redo and autosave',
       enabled: true,
       taskId: 'TASK 67',
+    },
+    {
+      id: 'windowed-layout',
+      name: 'Windowed Desktop Layout',
+      description: 'Draggable, resizable windows with minimize/close/z-order on desktop',
+      enabled: true,
+      taskId: 'TASK 68',
+    },
+    {
+      id: 'command-bar',
+      name: 'Command Bar',
+      description: 'TinyLLM command bar for searching and opening windows (Ctrl+K)',
+      enabled: true,
+      taskId: 'TASK 68',
     },
   ],
   dependencies: [
@@ -187,6 +332,30 @@ const APP_META = {
       path: 'composables/useCubeEditor.ts',
       purpose: 'Centralized cube editing state',
     },
+    {
+      name: 'useWindowManager',
+      type: 'hook',
+      path: 'composables/useWindowManager.ts',
+      purpose: 'Window state management for desktop layout',
+    },
+    {
+      name: 'DraggableWindow',
+      type: 'component',
+      path: 'components/DraggableWindow.vue',
+      purpose: 'Draggable/resizable window container',
+    },
+    {
+      name: 'CommandBar',
+      type: 'component',
+      path: 'components/CommandBar.vue',
+      purpose: 'TinyLLM command bar for search and actions',
+    },
+    {
+      name: 'WindowTaskbar',
+      type: 'component',
+      path: 'components/WindowTaskbar.vue',
+      purpose: 'Taskbar for minimized/closed windows',
+    },
   ],
   relatedFiles: [
     { path: 'src/App.css', type: 'style', description: 'Styles for all layout variants' },
@@ -209,58 +378,97 @@ const APP_META = {
 </script>
 
 <template>
-  <!-- Desktop Layout -->
-  <div v-if="isDesktop" class="app app--desktop">
+  <!-- Desktop Layout (Windowed) -->
+  <div v-if="isDesktop" class="app app--desktop app--windowed">
     <ComponentInfo :meta="APP_META">
-      <header class="app__header">
-        <h1>isocubic</h1>
-        <p>Web editor for parametric cubes</p>
+      <!-- Header with command bar -->
+      <header class="app__header app__header--windowed">
+        <div class="app__header-left">
+          <h1 class="app__title-compact">isocubic</h1>
+        </div>
+        <div class="app__header-center">
+          <CommandBar :commands="commandItems" @execute="onCommandExecute" />
+        </div>
+        <div class="app__header-right">
+          <span class="app__subtitle-compact">Web editor for parametric cubes</span>
+        </div>
       </header>
 
-      <main class="app__main">
-        <!-- Gallery sidebar -->
-        <section class="app__section app__section--sidebar">
-          <ComponentInfo :meta="GALLERY_META">
-            <Gallery :current-cube="currentCube" @cube-select="selectCube" />
-          </ComponentInfo>
-        </section>
+      <!-- Windowed workspace -->
+      <main class="app__workspace">
+        <!-- Gallery window -->
+        <DraggableWindow
+          v-for="win in windowManager.visibleWindows.value"
+          :key="win.id"
+          :window-id="win.id"
+          :title="win.title"
+          :icon="win.icon"
+          :x="win.x"
+          :y="win.y"
+          :width="win.width"
+          :height="win.height"
+          :min-width="win.minWidth"
+          :min-height="win.minHeight"
+          :z-index="win.zIndex"
+          @move="windowManager.moveWindow"
+          @resize="windowManager.resizeWindow"
+          @minimize="windowManager.minimizeWindow"
+          @close="windowManager.closeWindow"
+          @focus="windowManager.bringToFront"
+        >
+          <template v-if="win.id === 'gallery'">
+            <ComponentInfo :meta="GALLERY_META">
+              <Gallery :current-cube="currentCube" @cube-select="selectCube" />
+            </ComponentInfo>
+          </template>
 
-        <!-- Main content: preview + editor -->
-        <section class="app__section app__section--main">
-          <div class="app__current-cube">
-            <h3 class="app__section-title">Preview</h3>
-            <div class="app__3d-preview app__3d-preview--desktop">
-              <ComponentInfo :meta="CUBE_PREVIEW_META">
+          <template v-else-if="win.id === 'preview'">
+            <ComponentInfo :meta="CUBE_PREVIEW_META">
+              <div class="app__3d-preview app__3d-preview--windowed">
                 <CubePreview :config="currentCube" data-testid="cube-preview" />
-              </ComponentInfo>
-            </div>
-          </div>
+              </div>
+            </ComponentInfo>
+          </template>
 
-          <ComponentInfo :meta="PROMPT_GENERATOR_META">
-            <PromptGenerator
-              @cube-generated="selectCube"
-              @cubes-generated="(cubes) => cubes.length > 0 && selectCube(cubes[0])"
-            />
-          </ComponentInfo>
+          <template v-else-if="win.id === 'editor'">
+            <ComponentInfo :meta="UNIFIED_EDITOR_META">
+              <UnifiedEditor :cube="currentCube" @update:cube="updateCube" />
+            </ComponentInfo>
+          </template>
 
-          <ComponentInfo :meta="UNIFIED_EDITOR_META">
-            <UnifiedEditor :cube="currentCube" @update:cube="updateCube" />
-          </ComponentInfo>
-        </section>
+          <template v-else-if="win.id === 'prompt'">
+            <ComponentInfo :meta="PROMPT_GENERATOR_META">
+              <PromptGenerator
+                @cube-generated="selectCube"
+                @cubes-generated="(cubes) => cubes.length > 0 && selectCube(cubes[0])"
+              />
+            </ComponentInfo>
+          </template>
 
-        <!-- Tools sidebar -->
-        <section class="app__section app__section--sidebar">
-          <ComponentInfo :meta="EXPORT_PANEL_META">
-            <ExportPanel
-              :current-cube="currentCube"
-              @cube-load="loadCube"
-              @cube-change="updateCube"
-            />
-          </ComponentInfo>
+          <template v-else-if="win.id === 'export'">
+            <ComponentInfo :meta="EXPORT_PANEL_META">
+              <ExportPanel
+                :current-cube="currentCube"
+                @cube-load="loadCube"
+                @cube-change="updateCube"
+              />
+            </ComponentInfo>
+          </template>
 
-          <ActionHistory :actions="[]" />
-        </section>
+          <template v-else-if="win.id === 'history'">
+            <ActionHistory :actions="[]" />
+          </template>
+        </DraggableWindow>
       </main>
+
+      <!-- Taskbar -->
+      <WindowTaskbar
+        :minimized-windows="windowManager.minimizedWindows.value"
+        :closed-windows="windowManager.closedWindows.value"
+        @restore="windowManager.restoreWindow"
+        @open="windowManager.openWindow"
+        @reset-layout="windowManager.resetLayout"
+      />
     </ComponentInfo>
 
     <GodModeWindow :selected-component-id="hoveredComponentId" />

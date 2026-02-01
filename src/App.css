@@ -259,6 +259,70 @@
 }
 
 /* ==========================================================================
+   Windowed Desktop Layout (Phase 11)
+   ========================================================================== */
+
+.app--windowed {
+  padding: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app__header--windowed {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 16px;
+  background: #1a1a2e;
+  border-bottom: 1px solid #3a3a5a;
+  margin-bottom: 0;
+  text-align: left;
+  flex-shrink: 0;
+}
+
+.app__header--windowed h1 {
+  margin: 0;
+}
+
+.app__header-left {
+  flex-shrink: 0;
+}
+
+.app__header-center {
+  flex: 1;
+  min-width: 200px;
+}
+
+.app__header-right {
+  flex-shrink: 0;
+}
+
+.app__title-compact {
+  font-size: 1.25rem;
+  color: #646cff;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.app__subtitle-compact {
+  font-size: 0.8rem;
+  color: #666;
+  white-space: nowrap;
+}
+
+.app__workspace {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  background: #121218;
+}
+
+.app__3d-preview--windowed {
+  height: 100%;
+  min-height: 150px;
+}
+
+/* ==========================================================================
    Responsive Breakpoints
    ========================================================================== */
 
