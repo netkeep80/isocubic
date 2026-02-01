@@ -1,566 +1,322 @@
-# MetaNet: Универсальная мета-нервная система проекта
+# MetaNet: Мета-нервная система проекта
 
-## Введение
+## 1. Назначение
 
-Данный документ — результат анализа проекта **isocubic** и размышлений о создании универсальной мета-нервной системы, одинаково доступной как ИИ-агентам, так и людям. Цель — выработать подход, который легко интегрируется в любые языки программирования и обеспечивает структурированную метаинформацию на трёх уровнях: **development time**, **compile time** и **runtime**.
+MetaNet — это система структурированных метаданных проекта, одинаково доступная людям, ИИ-агентам и инструментам автоматизации. Она обеспечивает:
 
----
+- **Описание** каждого файла и каталога проекта в машиночитаемом формате
+- **Валидацию** метаданных по JSON Schema в CI/CD
+- **Компиляцию** распределённых метаданных в единый артефакт для рантайма
+- **Самоидентификацию** объектов, классов и компонентов через доступ к метаинформации в рантайме
 
-## 1. Анализ текущего состояния isocubic
-
-### 1.1 Что уже существует
-
-В isocubic уже заложена многоуровневая мета-инфраструктура:
-
-| Уровень | Механизм | Файлы |
-|---------|----------|-------|
-| **Development time** | ComponentMeta — самодокументирующиеся компоненты с версионированием, историей, feature-флагами, зависимостями | `src/types/component-meta.ts` |
-| **Development time** | Фазовая документация с задачами, критериями приёмки, файловыми зависимостями | `docs/phase-*.md` |
-| **Development time** | JSON Schema для валидации структуры кубиков | `src/types/cube-schema.json` |
-| **Compile time** | TypeScript типы + `validateComponentMeta()` type guard | `src/types/component-meta.ts` |
-| **Compile time** | CI pipeline: lint, typecheck, file size check, build verification | `.github/workflows/ci.yml` |
-| **Runtime** | DevMode Pinia store: вербозность, категории отображения, persistence | `src/lib/devmode.ts` |
-| **Runtime** | AI Metadata Processor: TF-IDF индексация, семантический поиск | `src/lib/ai-metadata-processor.ts` |
-| **Runtime** | Conversation Agent: классификация намерений, контекст компонентов | `src/lib/conversation-agent.ts` |
-| **Runtime** | Issue Generator: автогенерация GitHub issues из диалогов | `src/lib/issue-generator.ts` |
-| **Runtime** | GOD MODE: единое окно для AI-assisted development | `src/components/GodModeWindow.vue` |
-
-### 1.2 Текущие ограничения
-
-1. **Привязка к Vue/TypeScript** — метаданные определены через TS-интерфейсы и Vue composables, что делает систему специфичной для данного стека.
-2. **Ручная регистрация** — каждый компонент вручную вызывает `registerComponentMeta()`, что может стать источником рассинхронизации.
-3. **Отсутствие единого формата обмена** — нет стандартного формата, через который AI-агент или внешний инструмент может запросить полную карту проекта.
-4. **Нет runtime-сигналов** — система не предоставляет "пульс" проекта в реальном времени (health checks, метрики, аномалии).
-5. **Нет обратной связи от runtime к development** — информация из runtime (ошибки, паттерны использования) не возвращается автоматически в development-слой.
+MetaNet — не замена существующих инструментов (TypeScript типов, ESLint, CI), а **объединяющий слой**, делающий метаинформацию проекта доступной на всех уровнях: development time, compile time и runtime.
 
 ---
 
-## 2. Концепция MetaNet
+## 2. Принципы
 
-### 2.1 Метафора нервной системы
-
-Биологическая нервная система обеспечивает:
-- **Сенсорную функцию** — сбор сигналов из окружающей среды
-- **Интегративную функцию** — анализ и принятие решений
-- **Моторную функцию** — выполнение действий на основе анализа
-
-По аналогии, MetaNet проекта:
-- **Сенсоры** → сбор метаинформации (код, конфиги, логи, метрики)
-- **Нервные узлы** → агрегация и анализ (индексы, графы зависимостей, health checks)
-- **Эффекторы** → действия (автогенерация issues, рефакторинг, алерты)
-
-### 2.2 Ключевые принципы
-
-1. **Языконезависимый формат** — основа на JSON/YAML, читаемая любым языком
-2. **Конвенция над конфигурацией** — стандартные пути файлов, предсказуемая структура
-3. **Инкрементальность** — можно внедрять по частям, начиная с минимума
-4. **Двунаправленность** — информация течёт как из development в runtime, так и обратно
-5. **Человекочитаемость** — каждый узел MetaNet понятен и без инструментов
+1. **Языконезависимость** — формат JSON читаем любым языком программирования и любым инструментом
+2. **Локальность** — информация о каталоге находится в самом каталоге (`metanet.json`)
+3. **Иерархичность** — файлы `metanet.json` ссылаются на `metanet.json` в подкаталогах, образуя дерево
+4. **Инкрементальность** — можно описывать проект постепенно, начиная с корня
+5. **Конвенция над конфигурацией** — стандартное имя файла `metanet.json`, предсказуемая структура
+6. **Человекочитаемость** — каждый `metanet.json` понятен без специальных инструментов
+7. **Git-friendliness** — каждый `metanet.json` имеет собственную историю изменений
 
 ---
 
-## 3. Архитектура MetaNet
+## 3. Структура проекта
 
-### 3.1 Три уровня (три "нервных слоя")
+В каждом каталоге проекта находится файл `metanet.json`, описывающий содержимое этого каталога. В корне проекта дополнительно находятся:
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    LAYER 1: DEVELOPMENT TIME                    │
-│                     (Статическая метаинформация)                │
-│                                                                 │
-│  .metanet/                                                      │
-│  ├── project.json          # Манифест проекта                   │
-│  ├── components/           # Метаданные компонентов             │
-│  │   ├── _index.json       # Реестр всех компонентов            │
-│  │   ├── cube-editor.json  # Метаданные одного компонента       │
-│  │   └── ...                                                    │
-│  ├── graph.json            # Граф зависимостей                  │
-│  ├── phases.json           # Фазы разработки                    │
-│  └── schemas/              # JSON Schema для валидации           │
-│      ├── component.schema.json                                  │
-│      └── project.schema.json                                    │
-├─────────────────────────────────────────────────────────────────┤
-│                    LAYER 2: COMPILE TIME                        │
-│                    (Проверки и трансформации)                    │
-│                                                                 │
-│  • JSON Schema валидация .metanet/ файлов                       │
-│  • Генерация типов из .metanet/ (TS, Python, Rust, Go, ...)    │
-│  • Проверка консистентности графа зависимостей                  │
-│  • Генерация health check endpoint из метаданных                │
-│  • CI pipeline интеграция (автоматические проверки)              │
-├─────────────────────────────────────────────────────────────────┤
-│                    LAYER 3: RUNTIME                              │
-│                    (Живые сигналы)                               │
-│                                                                 │
-│  • Health endpoint: GET /.metanet/health                        │
-│  • Метрики: /.metanet/metrics (использование, ошибки)           │
-│  • Обратная связь: /.metanet/feedback (от runtime к dev)        │
-│  • AI API: /.metanet/query (запросы к метаданным)               │
-│  • Events: /.metanet/events (WebSocket/SSE стрим)               │
-└─────────────────────────────────────────────────────────────────┘
-```
+| Файл                  | Назначение                                    |
+| --------------------- | --------------------------------------------- |
+| `metanet.json`        | Корневой дескриптор проекта                   |
+| `metanet.schema.json` | JSON Schema для валидации всех `metanet.json` |
+| `metanet.md`          | Данный документ — спецификация MetaNet        |
 
-### 3.2 Манифест проекта — `.metanet/project.json`
+---
 
-Единая точка входа для человека и AI-агента:
+## 4. Формат `metanet.json`
+
+### 4.1 Обязательные поля
+
+| Поле          | Тип    | Описание                                      |
+| ------------- | ------ | --------------------------------------------- |
+| `name`        | string | Имя каталога или модуля                       |
+| `description` | string | Человекочитаемое описание назначения каталога |
+
+### 4.2 Необязательные поля
+
+| Поле          | Тип      | Описание                                                   |
+| ------------- | -------- | ---------------------------------------------------------- |
+| `$schema`     | string   | Относительный путь к `metanet.schema.json`                 |
+| `version`     | string   | Семантическая версия (только для корневого `metanet.json`) |
+| `languages`   | string[] | Языки программирования, используемые в каталоге            |
+| `tags`        | string[] | Теги для категоризации и поиска                            |
+| `files`       | object   | Описания файлов каталога (ключ — имя файла)                |
+| `directories` | object   | Описания подкаталогов (ключ — имя подкаталога)             |
+
+### 4.3 Описание файла (`FileDescriptor`)
+
+| Поле           | Тип      | Обязательное | Описание                                               |
+| -------------- | -------- | :----------: | ------------------------------------------------------ |
+| `description`  | string   |      ✓       | Описание назначения файла                              |
+| `tags`         | string[] |              | Теги для категоризации                                 |
+| `phase`        | integer  |              | Фаза разработки                                        |
+| `status`       | string   |              | Статус: `stable`, `beta`, `experimental`, `deprecated` |
+| `dependencies` | string[] |              | Относительные пути к файлам-зависимостям               |
+
+### 4.4 Описание подкаталога (`DirectoryDescriptor`)
+
+| Поле          | Тип    | Обязательное | Описание                                        |
+| ------------- | ------ | :----------: | ----------------------------------------------- |
+| `description` | string |      ✓       | Описание назначения подкаталога                 |
+| `metanet`     | string |      ✓       | Относительный путь к `metanet.json` подкаталога |
+
+### 4.5 Пример корневого `metanet.json`
 
 ```json
 {
-  "$schema": "./schemas/project.schema.json",
-  "name": "isocubic",
-  "version": "0.1.0",
-  "description": "Редактор параметрических воксельных кубиков для изометрических 3D миров",
-  "languages": ["typescript", "vue", "glsl", "rust"],
-  "entryPoints": {
-    "app": "src/main.ts",
-    "tests": "src/**/*.test.ts",
-    "build": "vite.config.ts",
-    "ci": ".github/workflows/ci.yml"
-  },
-  "conventions": {
-    "components": "src/components/*.vue",
-    "composables": "src/composables/use*.ts",
-    "types": "src/types/*.ts",
-    "libs": "src/lib/*.ts",
-    "tests": "src/**/*.test.{ts,tsx}",
-    "docs": "docs/phase-*.md"
-  },
-  "phases": {
-    "current": 11,
-    "total": 11,
-    "ref": "./phases.json"
-  },
-  "capabilities": {
-    "devmode": true,
-    "godmode": true,
-    "ai": true,
-    "collaboration": true,
-    "offline": true
-  },
-  "health": {
-    "endpoint": "/.metanet/health",
-    "checks": ["build", "tests", "lint", "typecheck"]
-  }
-}
-```
-
-### 3.3 Метаданные компонента — `.metanet/components/cube-editor.json`
-
-Языконезависимая версия `ComponentMeta`:
-
-```json
-{
-  "$schema": "../schemas/component.schema.json",
-  "id": "cube-editor",
-  "name": "UnifiedEditor",
-  "version": "2.1.0",
-  "status": "stable",
-  "summary": "Unified cube parameter editor with tabs for basic params, FFT, LOD, and stacks",
-  "file": "src/components/UnifiedEditor.vue",
-  "phase": 5,
-  "tags": ["editor", "core", "ui"],
-  "dependencies": [
-    { "id": "cube-preview", "type": "component", "purpose": "Live preview of edited cube" },
-    { "id": "use-cube-editor", "type": "composable", "purpose": "Centralized cube state" },
-    { "id": "pinia", "type": "external", "purpose": "State management" }
-  ],
-  "features": [
-    { "id": "fft-editing", "enabled": true, "description": "Edit FFT coefficients" },
-    { "id": "lod-config", "enabled": true, "description": "Configure LOD levels" },
-    { "id": "ai-generation", "enabled": true, "description": "Generate cubes from text prompts" }
-  ],
-  "history": [
-    { "version": "2.1.0", "date": "2025-04-15", "type": "updated", "description": "Added LOD tab" },
-    { "version": "2.0.0", "date": "2025-03-01", "type": "updated", "description": "Unified editor from separate editors" },
-    { "version": "1.0.0", "date": "2025-01-15", "type": "created", "description": "Initial param editor" }
-  ],
-  "tests": ["src/components/UnifiedEditor.test.ts"],
-  "knownIssues": [],
-  "tips": [
-    "Use Ctrl+Z within the editor for undo/redo",
-    "FFT tab shows real-time spectrum visualization"
-  ]
-}
-```
-
-### 3.4 Граф зависимостей — `.metanet/graph.json`
-
-```json
-{
-  "nodes": [
-    { "id": "cube-editor", "type": "component", "file": "src/components/UnifiedEditor.vue" },
-    { "id": "cube-preview", "type": "component", "file": "src/components/CubePreview.vue" },
-    { "id": "use-cube-editor", "type": "composable", "file": "src/composables/useCubeEditor.ts" },
-    { "id": "shader-utils", "type": "lib", "file": "src/lib/shader-utils.ts" }
-  ],
-  "edges": [
-    { "from": "cube-editor", "to": "cube-preview", "type": "uses" },
-    { "from": "cube-editor", "to": "use-cube-editor", "type": "uses" },
-    { "from": "cube-preview", "to": "shader-utils", "type": "uses" }
-  ]
-}
-```
-
-Этот граф может быть визуализирован (Mermaid, D3, Graphviz) и проанализирован (циклы, orphan-ноды, связность).
-
----
-
-## 4. Варианты реализации
-
-### 4.1 Вариант A: Файловая конвенция (минималистичный)
-
-**Суть**: Стандартная структура `.metanet/` директории с JSON-файлами.
-
-**Плюсы**:
-- Нулевая зависимость от runtime — работает даже без запущенного проекта
-- Любой AI-агент (Claude, GPT, Copilot) может прочитать файлы напрямую
-- Любой язык может парсить JSON
-- Git-friendly: история изменений, diff, code review
-- Работает с существующими CI/CD системами
-
-**Минусы**:
-- Ручная синхронизация с кодом (может устареть)
-- Нет runtime-сигналов
-
-**Интеграция в isocubic**:
-1. Создать `.metanet/` директорию с `project.json`
-2. Написать скрипт `scripts/metanet-sync.ts` для генерации `.metanet/components/` из существующих `ComponentMeta`
-3. Добавить CI-проверку: `.metanet/` файлы валидны и соответствуют коду
-
-```
-Сложность: ★★☆☆☆
-Универсальность: ★★★★★
-Поддержка AI: ★★★★★
-```
-
-### 4.2 Вариант B: Аннотации в коде + генератор (полуавтоматический)
-
-**Суть**: Метаданные хранятся как аннотации/комментарии в самом коде, а скрипт генерирует `.metanet/` из них.
-
-**Пример для TypeScript/Vue**:
-```typescript
-/**
- * @metanet
- * id: cube-editor
- * phase: 5
- * status: stable
- * tags: editor, core, ui
- * depends: cube-preview, use-cube-editor
- */
-export default defineComponent({ ... })
-```
-
-**Пример для Python**:
-```python
-# @metanet
-# id: cube-editor
-# phase: 5
-# status: stable
-# tags: editor, core, ui
-# depends: cube-preview, use-cube-editor
-
-class CubeEditor:
-    ...
-```
-
-**Пример для Rust**:
-```rust
-/// @metanet
-/// id: cube-editor
-/// phase: 5
-/// status: stable
-/// tags: editor, core, ui
-/// depends: cube-preview, use-cube-editor
-pub struct CubeEditor { ... }
-```
-
-**Плюсы**:
-- Метаданные живут рядом с кодом → меньше рассинхронизации
-- Универсальный формат аннотаций через комментарии — работает в любом языке
-- Поддержка IDE через расширения
-
-**Минусы**:
-- Нужен парсер для каждого языка (но простой — ищет `@metanet` в комментариях)
-- Загромождает код комментариями
-
-```
-Сложность: ★★★☆☆
-Универсальность: ★★★★☆
-Поддержка AI: ★★★★☆
-```
-
-### 4.3 Вариант C: Гибридный (рекомендуемый)
-
-**Суть**: Комбинация вариантов A и B:
-1. **Каноническая версия** — `.metanet/` директория с JSON (источник истины)
-2. **Аннотации в коде** — лёгкие `@metanet id: ...` для привязки к каноническим записям
-3. **Генератор/синхронизатор** — CLI-инструмент для синхронизации в обоих направлениях
-4. **Runtime-слой** — опциональный эндпоинт для проектов с серверной частью
-
-```
-┌──────────────────────────────────────────────────────────┐
-│                  Код с аннотациями                        │
-│  /** @metanet id: cube-editor */                         │
-│  export default defineComponent({ ... })                 │
-└────────────┬─────────────────────────┬───────────────────┘
-             │ metanet sync            │ metanet generate
-             ▼                         ▼
-┌──────────────────────┐  ┌───────────────────────────────┐
-│  .metanet/            │  │  Runtime API (опционально)     │
-│  ├── project.json     │  │  GET /.metanet/health          │
-│  ├── components/      │→→│  GET /.metanet/query?q=...     │
-│  ├── graph.json       │  │  WS  /.metanet/events          │
-│  └── schemas/         │  └───────────────────────────────┘
-└──────────────────────┘
-             │
-             ▼
-┌──────────────────────────────────────────────────────────┐
-│  CI/CD Pipeline                                          │
-│  • Валидация .metanet/ по JSON Schema                    │
-│  • Проверка аннотаций ↔ .metanet/ соответствия           │
-│  • Генерация типов для целевого языка                    │
-│  • Обновление графа зависимостей                         │
-└──────────────────────────────────────────────────────────┘
-```
-
-**Плюсы**:
-- Максимальная гибкость — работает на всех уровнях
-- JSON как lingua franca — понятен и людям, и AI
-- Аннотации минимизируют рассинхронизацию
-- Runtime-слой добавляется по необходимости
-- CLI-инструмент можно реализовать на любом языке
-
-**Минусы**:
-- Наибольшая сложность первоначальной настройки
-
-```
-Сложность: ★★★★☆
-Универсальность: ★★★★★
-Поддержка AI: ★★★★★
-```
-
----
-
-## 5. CLI-инструмент `metanet`
-
-Ключевой элемент системы — CLI-инструмент для управления MetaNet:
-
-```bash
-# Инициализация MetaNet в проекте
-metanet init
-
-# Сканирование кода и генерация .metanet/ из аннотаций
-metanet sync
-
-# Валидация .metanet/ файлов
-metanet validate
-
-# Визуализация графа зависимостей
-metanet graph --format mermaid
-
-# Поиск по метаданным (для AI-агентов и людей)
-metanet query "editor components in phase 5"
-
-# Генерация типов для целевого языка
-metanet codegen --lang typescript --output src/types/metanet.generated.ts
-metanet codegen --lang python --output metanet_types.py
-metanet codegen --lang rust --output src/metanet.rs
-
-# Health check
-metanet health
-
-# Экспорт в разные форматы
-metanet export --format markdown > PROJECT_MAP.md
-metanet export --format mermaid > architecture.mmd
-```
-
----
-
-## 6. Применение к isocubic
-
-### 6.1 Шаг 1: Инициализация `.metanet/`
-
-Создать директорию `.metanet/` со следующей структурой:
-
-```
-.metanet/
-├── project.json              # Манифест (см. раздел 3.2)
-├── schemas/
-│   ├── project.schema.json   # JSON Schema для project.json
-│   └── component.schema.json # JSON Schema для компонентов
-├── components/
-│   ├── _index.json           # Реестр: массив ID → file
-│   ├── cube-editor.json      # По одному файлу на компонент
-│   ├── cube-preview.json
-│   └── ...
-├── graph.json                # Граф зависимостей
-└── phases.json               # Фазы с прогрессом
-```
-
-### 6.2 Шаг 2: Миграция существующих ComponentMeta
-
-Написать скрипт `scripts/migrate-to-metanet.ts`:
-1. Прочитать все `ComponentMeta` из `componentMetaRegistry`
-2. Сконвертировать каждый в JSON-файл в `.metanet/components/`
-3. Построить `graph.json` из зависимостей
-4. Сгенерировать `_index.json`
-
-### 6.3 Шаг 3: Интеграция в CI
-
-Добавить в `.github/workflows/ci.yml`:
-```yaml
-- name: Validate MetaNet
-  run: npx metanet validate
-
-- name: Check MetaNet sync
-  run: npx metanet sync --check  # Проверяет, что .metanet/ актуален
-```
-
-### 6.4 Шаг 4: Обновление GOD MODE
-
-Обновить AI Metadata Processor для чтения из `.metanet/` вместо (или в дополнение к) `componentMetaRegistry`. Это позволит:
-- AI-агентам читать `.metanet/project.json` как "карту проекта"
-- Поисковой системе индексировать JSON-файлы напрямую
-- Внешним инструментам интегрироваться без запуска Vue-приложения
-
----
-
-## 7. Сравнение с существующими подходами
-
-| Аспект | package.json | JSDoc | TypeDoc | MetaNet |
-|--------|-------------|-------|---------|---------|
-| Языконезависимость | ❌ JS/Node only | ❌ JS/TS only | ❌ TS only | ✅ Любой язык |
-| Структура проекта | Частично | ❌ | Частично | ✅ Полная |
-| Граф зависимостей | ❌ npm deps only | ❌ | Частично | ✅ Внутренние |
-| Фазы/roadmap | ❌ | ❌ | ❌ | ✅ |
-| AI-доступность | Частично | Частично | Частично | ✅ Первоклассная |
-| Runtime-сигналы | ❌ | ❌ | ❌ | ✅ Опционально |
-| Человекочитаемость | ✅ | ✅ | Частично | ✅ |
-
----
-
-## 8. Реализация: `metanet.json` в каждом каталоге
-
-### 8.1 Выбранный подход
-
-Вместо централизованной директории `.metanet/` реализован **распределённый** подход: файл `metanet.json` размещается **в каждом каталоге** проекта. Это обеспечивает:
-
-- **Локальность** — информация о каталоге находится в самом каталоге
-- **Иерархичность** — файлы `metanet.json` ссылаются на `metanet.json` в подкаталогах
-- **Инкрементальность** — можно добавлять описания постепенно
-- **Git-friendliness** — каждый `metanet.json` — отдельный файл с историей изменений
-
-### 8.2 Структура `metanet.json`
-
-Каждый `metanet.json` описывает свой каталог и содержит:
-
-```json
-{
-  "$schema": "<относительный путь к metanet.schema.json>",
-  "name": "имя каталога",
-  "description": "описание каталога",
-  "languages": ["typescript", "vue"],
-  "tags": ["ui", "components"],
+  "$schema": "./metanet.schema.json",
+  "name": "my-project",
+  "version": "1.0.0",
+  "description": "Описание проекта",
+  "languages": ["typescript"],
   "files": {
-    "file.ts": {
-      "description": "Описание файла"
+    "package.json": {
+      "description": "NPM package manifest"
+    },
+    "README.md": {
+      "description": "Project documentation"
     }
   },
   "directories": {
-    "subdir": {
-      "description": "Описание подкаталога",
-      "metanet": "subdir/metanet.json"
+    "src": {
+      "description": "Source code",
+      "metanet": "src/metanet.json"
     }
   }
 }
 ```
 
-Полная JSON Schema находится в файле `metanet.schema.json` в корне проекта.
+### 4.6 Пример `metanet.json` подкаталога
 
-### 8.3 Препроцессор
+```json
+{
+  "$schema": "../metanet.schema.json",
+  "name": "src",
+  "description": "Исходный код приложения",
+  "languages": ["typescript"],
+  "files": {
+    "main.ts": {
+      "description": "Entry point of the application",
+      "status": "stable"
+    }
+  },
+  "directories": {
+    "components": {
+      "description": "UI components",
+      "metanet": "components/metanet.json"
+    }
+  }
+}
+```
 
-Скрипт `scripts/metanet-preprocessor.ts` выполняет:
+---
 
-1. **Валидацию** — проверяет все `metanet.json` по JSON Schema
-2. **Проверку ссылок** — убеждается, что описанные файлы и каталоги существуют
-3. **Проверку синхронизации** — предупреждает о файлах, не описанных в `metanet.json`
-4. **Рекурсивный обход** — начинает с корневого `metanet.json` и обходит все ссылки
+## 5. Валидация
+
+### 5.1 JSON Schema
+
+Файл `metanet.schema.json` в корне проекта содержит JSON Schema (draft-07) для валидации всех `metanet.json`. Schema обеспечивает:
+
+- Проверку обязательных полей (`name`, `description`)
+- Проверку типов всех полей
+- Ограничение допустимых значений (`status` — enum из 4 значений)
+- Запрет дополнительных полей (`additionalProperties: false`)
+- Валидацию формата версии (semver)
+
+### 5.2 Препроцессор
+
+Скрипт `scripts/metanet-preprocessor.ts` выполняет расширенную валидацию:
+
+1. **Валидация по JSON Schema** — проверяет каждый `metanet.json` по схеме
+2. **Проверка ссылок на файлы** — убеждается, что файлы из секции `files` существуют на диске
+3. **Проверка ссылок на каталоги** — убеждается, что `metanet.json` подкаталогов из секции `directories` существуют
+4. **Проверка полноты** — предупреждает о файлах и каталогах, не описанных в `metanet.json`
+5. **Рекурсивный обход** — начинает с корневого `metanet.json` и обходит всё дерево по ссылкам
 
 ```bash
-# Валидация (для CI)
+# Валидация (для CI/CD, только ошибки)
 npm run metanet:validate
 
-# Валидация с подробностями
+# Валидация с предупреждениями о неописанных файлах
 npm run metanet:validate:verbose
 ```
 
-### 8.4 Компиляция в артефакты
+### 5.3 CI/CD интеграция
 
-Vite-плагин `scripts/vite-plugin-metanet.ts` при сборке:
+В `.github/workflows/ci.yml` шаг валидации MetaNet запускается в составе lint-задачи:
 
-1. Обходит все `metanet.json` файлы рекурсивно
-2. Собирает их в единое дерево
-3. Предоставляет данные через виртуальный модуль `virtual:metanet`
+```yaml
+- name: Validate MetaNet
+  run: npm run metanet:validate
+```
+
+При обнаружении ошибок (невалидный JSON, несуществующие ссылки) сборка завершается с ошибкой.
+
+---
+
+## 6. Компиляция в артефакты
+
+### 6.1 Vite-плагин
+
+Плагин `scripts/vite-plugin-metanet.ts` при сборке проекта:
+
+1. Рекурсивно обходит все `metanet.json` файлы, начиная с корня
+2. Собирает их в единую структуру `Record<string, MetanetEntry>`
+3. Удаляет поля `$schema` для экономии размера бандла
+4. Предоставляет данные через виртуальный модуль `virtual:metanet`
+
+### 6.2 Использование в рантайме
 
 ```typescript
 import metanet from 'virtual:metanet'
 
-// metanet — это Record<string, MetanetEntry>
+// metanet — Record<string, MetanetEntry>
 // Ключи — относительные пути к metanet.json файлам
+
+// Получить описание проекта
 console.log(metanet['metanet.json'].name) // "isocubic"
+console.log(metanet['metanet.json'].description)
+
+// Получить описание модуля
 console.log(metanet['src/metanet.json'].description)
+
+// Обход файлов каталога
+const srcMeta = metanet['src/metanet.json']
+for (const [filename, fileMeta] of Object.entries(srcMeta.files ?? {})) {
+  console.log(`${filename}: ${fileMeta.description}`)
+}
 ```
 
-Это обеспечивает доступность метасети в рантайме без дополнительных HTTP-запросов.
+TypeScript типы для виртуального модуля объявлены в `env.d.ts`.
 
-### 8.5 CI-интеграция
+### 6.3 Самоидентификация компонентов
 
-В `.github/workflows/ci.yml` добавлен шаг валидации MetaNet в job `lint`:
-- Запускается `npm run metanet:validate`
-- При ошибках (невалидный JSON, несуществующие ссылки) сборка падает
+Объекты, классы и компоненты проекта могут в рантайме ссылаться на свою метаинформацию из MetaNet и идентифицировать себя:
 
----
+```typescript
+import metanet from 'virtual:metanet'
 
-## 9. Дальнейшие шаги
+export default defineComponent({
+  setup() {
+    // Компонент знает свои метаданные
+    const myMeta = metanet['src/components/metanet.json']?.files?.['MyComponent.vue']
 
-### Ближайшие
-
-1. ~~**Обсудить** данный документ и выбрать вариант реализации~~ ✅ Выбран распределённый подход
-2. ~~**metanet.json** в каждом каталоге проекта~~ ✅ Реализовано
-3. ~~**Препроцессор** для валидации~~ ✅ Реализовано
-4. ~~**JSON Schema** для валидации~~ ✅ Реализовано
-5. ~~**CI-интеграция**~~ ✅ Реализовано
-6. ~~**Компиляция в артефакты**~~ ✅ Реализовано через Vite-плагин
-
-### Среднесрочные
-
-7. **Обновление GOD MODE** для чтения `metanet.json` вместо (или в дополнение к) `componentMetaRegistry`
-8. **Расширение описаний** — добавить описания всех файлов в `src/components/` и `src/lib/`
-9. **Обратная синхронизация** — генерация `metanet.json` из аннотаций `@metanet` в коде
-
-### Долгосрочные
-
-10. **CLI-инструмент** `metanet` как отдельный npm-пакет
-11. **Плагины** для VS Code, JetBrains — визуализация MetaNet в IDE
-12. **Runtime-слой** — API для мониторинга и AI-запросов
-13. **Стандартизация** — RFC/спецификация для широкого применения
+    console.log(`Я: ${myMeta?.description}`)
+    console.log(`Статус: ${myMeta?.status}`)
+  },
+})
+```
 
 ---
 
-## 10. Заключение
+## 7. Рабочий процесс
 
-MetaNet — это не замена существующих инструментов (TypeScript типов, ESLint, CI), а **объединяющий слой**, который делает метаинформацию проекта одинаково доступной для:
-- **Человека** — через JSON/Markdown/визуализации
-- **AI-агента** — через структурированные JSON-файлы и API
-- **CI/CD** — через JSON Schema валидацию
-- **IDE** — через плагины и Language Server Protocol
+### 7.1 Генерация `metanet.json`
 
-Ключевое отличие от существующих подходов — MetaNet специально проектируется как **двуязычный интерфейс** между человеком и AI, с одинаковыми возможностями для обоих. Это не документация для людей с AI-навигацией поверху и не конфиг для AI с human-readable обёрткой — это единый формат, нативный для обеих сторон.
+Генерацией и заполнением `metanet.json` занимается ИИ-агент по специальному заданию. Агент:
 
-Реализация через `metanet.json` в каждом каталоге проекта обеспечивает:
-- **Локальность**: информация рядом с кодом
-- **Валидацию**: JSON Schema + препроцессор + CI
-- **Рантайм**: Vite-плагин компилирует метасеть в артефакты
-- **Универсальность**: JSON читаем любым языком и инструментом
+1. Анализирует содержимое каждого каталога
+2. Создаёт `metanet.json` с описаниями файлов и подкаталогов
+3. Устанавливает ссылки на `metanet.json` подкаталогов
+4. Проставляет теги, статусы и зависимости
 
-Проект isocubic, с его существующей инфраструктурой ComponentMeta и GOD MODE, является идеальной площадкой для развития MetaNet.
+### 7.2 Проверка `metanet.json`
+
+Проверкой занимается CI/CD:
+
+1. При каждом push/PR запускается `npm run metanet:validate`
+2. Препроцессор проверяет все `metanet.json` по схеме
+3. Проверяет существование описанных файлов и каталогов
+4. При ошибках сборка не проходит
+
+### 7.3 Исправление `metanet.json`
+
+По результатам CI/CD ИИ-агент исправляет ошибки в `metanet.json`:
+
+1. Анализирует вывод препроцессора
+2. Добавляет описания для новых файлов и каталогов
+3. Удаляет ссылки на удалённые файлы
+4. Фиксирует изменения в pull request
+
+---
+
+## 8. Утилиты
+
+### 8.1 Утилита валидации (`metanet-preprocessor.ts --check`)
+
+Проверяет, что `metanet.json` присутствует во всех каталогах и описывает все файлы и каталоги:
+
+```bash
+npm run metanet:validate          # Ошибки
+npm run metanet:validate:verbose  # Ошибки + предупреждения
+```
+
+**Что проверяет:**
+
+- `metanet.json` существует в каждом описанном каталоге
+- Все описанные файлы существуют на диске
+- Все описанные подкаталоги имеют свой `metanet.json`
+- Структура соответствует `metanet.schema.json`
+
+### 8.2 Утилита компиляции (`vite-plugin-metanet.ts`)
+
+Собирает все распределённые `metanet.json` в единый артефакт:
+
+- При сборке через Vite — виртуальный модуль `virtual:metanet`
+- Данные доступны в рантайме без дополнительных HTTP-запросов
+- Может быть расширена для экспорта в другие форматы (JSON-файл для поставки с проектом, загрузка в рантайме)
+
+---
+
+## 9. Типы TypeScript
+
+Типы для работы с MetaNet в рантайме объявлены в `env.d.ts`:
+
+```typescript
+interface MetanetFileDescriptor {
+  description: string
+  tags?: string[]
+  phase?: number
+  status?: string
+  dependencies?: string[]
+}
+
+interface MetanetDirectoryDescriptor {
+  description: string
+  metanet: string
+}
+
+interface MetanetEntry {
+  name: string
+  version?: string
+  description: string
+  languages?: string[]
+  tags?: string[]
+  files?: Record<string, MetanetFileDescriptor>
+  directories?: Record<string, MetanetDirectoryDescriptor>
+}
+```
+
+---
+
+## 10. Дальнейшее развитие
+
+1. **Расширение описаний** — добавить детальные описания всех файлов проекта (теги, фазы, зависимости)
+2. **Обратная синхронизация** — генерация `metanet.json` из аннотаций `@metanet` в коде
+3. **CLI-инструмент** — отдельный npm-пакет `metanet` для инициализации, валидации и компиляции в произвольных проектах
+4. **IDE-плагины** — визуализация MetaNet в VS Code, JetBrains (навигация по дереву метаданных)
+5. **Runtime-мониторинг** — API для health checks и AI-запросов к метаданным работающего приложения
