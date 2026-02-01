@@ -9,13 +9,14 @@
 export const WINDOW_TASKBAR_META = {
   id: 'window-taskbar',
   name: 'WindowTaskbar',
-  version: '1.0.0',
+  version: '1.1.0',
   summary: 'Taskbar for managing minimized and closed windows.',
   description:
     'WindowTaskbar displays minimized windows as clickable chips at the bottom of the screen. ' +
-    'It also provides access to closed windows for reopening and a reset layout button.',
+    'It also provides access to closed windows for reopening and a reset layout button. ' +
+    'Touch-optimized for tablet and mobile devices.',
   phase: 11,
-  taskId: 'TASK 68',
+  taskId: 'TASK 75',
   filePath: 'src/components/WindowTaskbar.vue',
   history: [
     {
@@ -24,6 +25,13 @@ export const WINDOW_TASKBAR_META = {
       description: 'Initial implementation of window taskbar',
       taskId: 'TASK 68',
       type: 'created' as const,
+    },
+    {
+      version: '1.1.0',
+      date: '2026-02-01T18:00:00Z',
+      description: 'Touch-optimized for tablet and mobile devices',
+      taskId: 'TASK 75',
+      type: 'updated' as const,
     },
   ],
   features: [
@@ -71,7 +79,7 @@ export const WINDOW_TASKBAR_META = {
   ],
   tags: ['taskbar', 'window-manager', 'ui'],
   status: 'stable' as const,
-  lastUpdated: '2026-02-01T12:00:00Z',
+  lastUpdated: '2026-02-01T18:00:00Z',
 }
 </script>
 
@@ -208,5 +216,29 @@ const emit = defineEmits<{
 .taskbar__reset:hover {
   background: #333;
   color: #ccc;
+}
+
+/* Touch device optimizations */
+@media (pointer: coarse) {
+  .taskbar {
+    padding: 8px 12px;
+    min-height: 52px;
+  }
+
+  .taskbar__chip {
+    padding: 8px 14px;
+    font-size: 14px;
+    min-height: 44px;
+  }
+
+  .taskbar__chip-icon {
+    font-size: 18px;
+  }
+
+  .taskbar__reset {
+    padding: 8px 14px;
+    font-size: 13px;
+    min-height: 44px;
+  }
 }
 </style>

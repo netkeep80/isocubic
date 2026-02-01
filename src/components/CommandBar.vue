@@ -18,14 +18,15 @@ export interface CommandItem {
 export const COMMAND_BAR_META = {
   id: 'command-bar',
   name: 'CommandBar',
-  version: '1.0.0',
+  version: '1.1.0',
   summary: 'TinyLLM command bar for searching and opening windows.',
   description:
     'CommandBar provides a command palette-style search bar at the top of the application. ' +
     'Users can search for and open component windows, execute actions like generating cubes or exporting, ' +
-    'and quickly navigate the application. Activated by clicking or pressing Ctrl+K.',
+    'and quickly navigate the application. Activated by clicking or pressing Ctrl+K. ' +
+    'Responsive overlay optimized for mobile and tablet devices.',
   phase: 11,
-  taskId: 'TASK 68',
+  taskId: 'TASK 75',
   filePath: 'src/components/CommandBar.vue',
   history: [
     {
@@ -34,6 +35,13 @@ export const COMMAND_BAR_META = {
       description: 'Initial implementation of command bar',
       taskId: 'TASK 68',
       type: 'created' as const,
+    },
+    {
+      version: '1.1.0',
+      date: '2026-02-01T18:00:00Z',
+      description: 'Responsive overlay for mobile and tablet devices',
+      taskId: 'TASK 75',
+      type: 'updated' as const,
     },
   ],
   features: [
@@ -69,7 +77,7 @@ export const COMMAND_BAR_META = {
   ],
   tags: ['command-bar', 'search', 'tinyLLM', 'ui'],
   status: 'stable' as const,
-  lastUpdated: '2026-02-01T12:00:00Z',
+  lastUpdated: '2026-02-01T18:00:00Z',
 }
 </script>
 
@@ -363,5 +371,45 @@ onUnmounted(() => {
   text-align: center;
   color: #666;
   font-size: 14px;
+}
+
+/* Responsive: tablet and mobile */
+@media (max-width: 768px) {
+  .cb__overlay {
+    padding-top: 0;
+    align-items: stretch;
+  }
+
+  .cb__modal {
+    width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+    border: none;
+  }
+
+  .cb__trigger-kbd {
+    display: none;
+  }
+}
+
+/* Touch device optimizations */
+@media (pointer: coarse) {
+  .cb__trigger {
+    padding: 12px 16px;
+    min-height: 48px;
+  }
+
+  .cb__item {
+    padding: 12px 16px;
+    min-height: 48px;
+  }
+
+  .cb__input-row {
+    padding: 14px 16px;
+  }
+
+  .cb__input {
+    font-size: 18px;
+  }
 }
 </style>
