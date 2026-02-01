@@ -168,24 +168,120 @@ npm run metanet:validate:verbose
 
 ---
 
-## 6. Компиляция в артефакты
+## 6. Хранение и потоки метаинформации
 
-### 6.1 Vite-плагин
+Структура метаинформации первична, а её раскладка по файлам `metanet.json` вторична. При компиляции описания файлов, каталогов, компонентов и объектов объединяются в единое дерево, в котором ссылки на файлы — дополнительная информация.
+
+### 6.1 Места хранения метаинформации
+
+| Фаза          | Хранилище                              | Формат                      | Назначение                                         |
+| ------------- | -------------------------------------- | --------------------------- | -------------------------------------------------- |
+| Development   | `metanet.json` в каждом каталоге       | JSON (по `metanet.schema.json`) | Локальные описания файлов и подкаталогов       |
+| Development   | `metanet.schema.json` в корне          | JSON Schema (draft-07)      | Валидация структуры всех `metanet.json`            |
+| Development   | `metanet.md` в корне                   | Markdown                    | Спецификация MetaNet (данный документ)             |
+| Compilation   | `metanet.compiled.json`                | JSON (дерево)               | Скомпилированное дерево метаданных                 |
+| Compilation   | Виртуальные модули Vite                | JS (в бандле)               | Метаданные, встроенные в production-сборку         |
+| Runtime       | `virtual:metanet`                      | JS-объект (плоская карта)   | Доступ по пути файла: `metanet['src/metanet.json']` |
+| Runtime       | `virtual:metanet/tree`                 | JS-объект (дерево)          | Иерархический обход: `tree.children.src`           |
+
+### 6.2 Потоки данных
+
+```
+Development                    Compilation                   Runtime
+───────────                    ───────────                   ───────
+
+metanet.json (в каждом    ──┬── metanet-preprocessor.ts ──── metanet.compiled.json
+каталоге)                   │   (--compile)                  (дерево, JSON-файл)
+                            │
+metanet.schema.json ────────┤── metanet-preprocessor.ts ──── CI/CD валидация
+                            │   (--check)                    (ошибки → сборка не проходит)
+                            │
+                            └── vite-plugin-metanet.ts ──┬── virtual:metanet
+                                (при сборке Vite)        │   (плоская карта в бандле)
+                                                         │
+                                                         └── virtual:metanet/tree
+                                                             (дерево в бандле)
+```
+
+**Направления потоков:**
+
+1. **Development → Compilation**: `metanet.json` файлы читаются препроцессором и Vite-плагином
+2. **Development → CI/CD**: препроцессор валидирует `metanet.json` при каждом push/PR
+3. **Compilation → Runtime**: скомпилированные данные доступны в приложении через виртуальные модули
+4. **Compilation → Файловая система**: `metanet:compile` записывает дерево в `metanet.compiled.json`
+
+---
+
+## 7. Компиляция в артефакты
+
+### 7.1 Два формата компиляции
+
+MetaNet компилируется в два формата: **плоскую карту** и **дерево**.
+
+**Плоская карта** (`Record<string, MetanetEntry>`) — обратно-совместимый формат, где ключи — относительные пути к `metanet.json` файлам:
+
+```json
+{
+  "metanet.json": { "name": "isocubic", "description": "...", "files": {...}, "directories": {...} },
+  "src/metanet.json": { "name": "src", "description": "...", "files": {...} }
+}
+```
+
+**Дерево** (`MetanetTreeNode`) — иерархический формат, где структура метаданных первична, а ссылки на файлы — дополнительная информация:
+
+```json
+{
+  "name": "isocubic",
+  "description": "...",
+  "files": { "package.json": { "description": "..." } },
+  "children": {
+    "src": {
+      "name": "src",
+      "description": "...",
+      "files": { "main.ts": { "description": "..." } },
+      "children": {
+        "components": { "name": "components", "description": "..." }
+      }
+    }
+  }
+}
+```
+
+В дереве `directories` заменяется на `children`, а поле `metanet` (путь к файлу) убирается — структура дерева сама определяет иерархию.
+
+### 7.2 Vite-плагин
 
 Плагин `scripts/vite-plugin-metanet.ts` при сборке проекта:
 
 1. Рекурсивно обходит все `metanet.json` файлы, начиная с корня
-2. Собирает их в единую структуру `Record<string, MetanetEntry>`
-3. Удаляет поля `$schema` для экономии размера бандла
-4. Предоставляет данные через виртуальный модуль `virtual:metanet`
+2. Удаляет поля `$schema` для экономии размера бандла
+3. Предоставляет данные через два виртуальных модуля:
+   - `virtual:metanet` — плоская карта `Record<string, MetanetEntry>`
+   - `virtual:metanet/tree` — иерархическое дерево `MetanetTreeNode`
 
-### 6.2 Использование в рантайме
+### 7.3 Компиляция в JSON-файл
+
+Скрипт `metanet-preprocessor.ts --compile` записывает дерево в файл:
+
+```bash
+# Компиляция в metanet.compiled.json (по умолчанию)
+npm run metanet:compile
+
+# Компиляция в произвольный файл
+npx tsx scripts/metanet-preprocessor.ts --compile dist/metanet.json
+```
+
+Этот файл может использоваться:
+- Для поставки с проектом (npm-пакет, Docker-образ)
+- Для загрузки метаданных в рантайме через HTTP
+- Для анализа проекта внешними инструментами и ИИ-агентами
+
+### 7.4 Использование в рантайме
+
+**Плоская карта** (доступ по пути):
 
 ```typescript
 import metanet from 'virtual:metanet'
-
-// metanet — Record<string, MetanetEntry>
-// Ключи — относительные пути к metanet.json файлам
 
 // Получить описание проекта
 console.log(metanet['metanet.json'].name) // "isocubic"
@@ -201,9 +297,29 @@ for (const [filename, fileMeta] of Object.entries(srcMeta.files ?? {})) {
 }
 ```
 
-TypeScript типы для виртуального модуля объявлены в `env.d.ts`.
+**Дерево** (иерархический обход):
 
-### 6.3 Самоидентификация компонентов
+```typescript
+import metanetTree from 'virtual:metanet/tree'
+
+// Обход дерева — структура метаданных первична
+console.log(metanetTree.name) // "isocubic"
+console.log(metanetTree.children?.src?.description)
+console.log(metanetTree.children?.src?.children?.components?.description)
+
+// Рекурсивный обход всех узлов
+function walk(node: MetanetTreeNode, depth = 0) {
+  console.log('  '.repeat(depth) + `${node.name}: ${node.description}`)
+  for (const [name, child] of Object.entries(node.children ?? {})) {
+    walk(child, depth + 1)
+  }
+}
+walk(metanetTree)
+```
+
+TypeScript типы для виртуальных модулей объявлены в `env.d.ts`.
+
+### 7.5 Самоидентификация компонентов
 
 Объекты, классы и компоненты проекта могут в рантайме ссылаться на свою метаинформацию из MetaNet и идентифицировать себя:
 
@@ -223,9 +339,9 @@ export default defineComponent({
 
 ---
 
-## 7. Рабочий процесс
+## 8. Рабочий процесс
 
-### 7.1 Генерация `metanet.json`
+### 8.1 Генерация `metanet.json`
 
 Генерацией и заполнением `metanet.json` занимается ИИ-агент по специальному заданию. Агент:
 
@@ -234,7 +350,7 @@ export default defineComponent({
 3. Устанавливает ссылки на `metanet.json` подкаталогов
 4. Проставляет теги, статусы и зависимости
 
-### 7.2 Проверка `metanet.json`
+### 8.2 Проверка `metanet.json`
 
 Проверкой занимается CI/CD:
 
@@ -243,7 +359,7 @@ export default defineComponent({
 3. Проверяет существование описанных файлов и каталогов
 4. При ошибках сборка не проходит
 
-### 7.3 Исправление `metanet.json`
+### 8.3 Исправление `metanet.json`
 
 По результатам CI/CD ИИ-агент исправляет ошибки в `metanet.json`:
 
@@ -254,9 +370,9 @@ export default defineComponent({
 
 ---
 
-## 8. Утилиты
+## 9. Утилиты
 
-### 8.1 Утилита валидации (`metanet-preprocessor.ts --check`)
+### 9.1 Утилита валидации (`metanet-preprocessor.ts --check`)
 
 Проверяет, что `metanet.json` присутствует во всех каталогах и описывает все файлы и каталоги:
 
@@ -272,21 +388,31 @@ npm run metanet:validate:verbose  # Ошибки + предупреждения
 - Все описанные подкаталоги имеют свой `metanet.json`
 - Структура соответствует `metanet.schema.json`
 
-### 8.2 Утилита компиляции (`vite-plugin-metanet.ts`)
+### 9.2 Утилита компиляции (`metanet-preprocessor.ts --compile`)
 
-Собирает все распределённые `metanet.json` в единый артефакт:
+Собирает все распределённые `metanet.json` в единое дерево:
 
-- При сборке через Vite — виртуальный модуль `virtual:metanet`
+```bash
+npm run metanet:compile                                      # → metanet.compiled.json
+npx tsx scripts/metanet-preprocessor.ts --compile output.json # → output.json
+```
+
+### 9.3 Vite-плагин (`vite-plugin-metanet.ts`)
+
+Собирает все распределённые `metanet.json` в виртуальные модули:
+
+- `virtual:metanet` — плоская карта (`Record<string, MetanetEntry>`)
+- `virtual:metanet/tree` — иерархическое дерево (`MetanetTreeNode`)
 - Данные доступны в рантайме без дополнительных HTTP-запросов
-- Может быть расширена для экспорта в другие форматы (JSON-файл для поставки с проектом, загрузка в рантайме)
 
 ---
 
-## 9. Типы TypeScript
+## 10. Типы TypeScript
 
 Типы для работы с MetaNet в рантайме объявлены в `env.d.ts`:
 
 ```typescript
+// Общие типы (глобальные)
 interface MetanetFileDescriptor {
   description: string
   tags?: string[]
@@ -300,6 +426,7 @@ interface MetanetDirectoryDescriptor {
   metanet: string
 }
 
+// Тип для плоской карты (virtual:metanet)
 interface MetanetEntry {
   name: string
   version?: string
@@ -309,11 +436,22 @@ interface MetanetEntry {
   files?: Record<string, MetanetFileDescriptor>
   directories?: Record<string, MetanetDirectoryDescriptor>
 }
+
+// Тип для дерева (virtual:metanet/tree)
+interface MetanetTreeNode {
+  name: string
+  description: string
+  version?: string
+  languages?: string[]
+  tags?: string[]
+  files?: Record<string, MetanetFileDescriptor>
+  children?: Record<string, MetanetTreeNode>
+}
 ```
 
 ---
 
-## 10. Дальнейшее развитие
+## 11. Дальнейшее развитие
 
 1. **Расширение описаний** — добавить детальные описания всех файлов проекта (теги, фазы, зависимости)
 2. **Обратная синхронизация** — генерация `metanet.json` из аннотаций `@metanet` в коде
