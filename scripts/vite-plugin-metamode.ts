@@ -11,11 +11,19 @@
  * The tree provides a hierarchical view where metadata structure is primary
  * and file references are secondary information.
  * The AI module provides a token-optimized format for AI agents (TASK 74).
+ *
+ * TASK 75: Added inline metamode extraction support
+ * Inline metadata in Vue components has higher priority than file-based metamode.json
  */
 
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import type { Plugin } from 'vite'
+import {
+  extractInlineMetamodeFromVue,
+  normalizeInlineMetamode,
+  type InlineMetamode,
+} from './metamode-inline-extractor'
 
 interface FileDescriptor {
   description: string
@@ -84,7 +92,98 @@ function loadJson(filePath: string): MetamodeJson | null {
 }
 
 /**
+ * Convert inline metamode format to file descriptor format (TASK 75)
+ */
+function inlineToFileDescriptor(inline: InlineMetamode): FileDescriptor {
+  const result: FileDescriptor = {
+    description: inline.desc || '',
+  }
+
+  if (inline.tags && inline.tags.length > 0) result.tags = inline.tags
+  if (inline.phase !== undefined) result.phase = inline.phase
+  if (inline.status) {
+    // Map short status to full name for backward compatibility
+    const statusMap: Record<string, string> = {
+      exp: 'experimental',
+      dep: 'deprecated',
+      stable: 'stable',
+      beta: 'beta',
+    }
+    result.status = statusMap[inline.status] || inline.status
+  }
+  if (inline.deps && inline.deps.length > 0) result.dependencies = inline.deps
+
+  return result
+}
+
+/**
+ * Scan directory for Vue files with inline metamode (TASK 75)
+ * Returns a map of filename -> inline metadata
+ */
+function scanDirectoryForInlineMetamode(dirPath: string): Record<string, InlineMetamode> {
+  const result: Record<string, InlineMetamode> = {}
+
+  if (!fs.existsSync(dirPath)) {
+    return result
+  }
+
+  try {
+    const entries = fs.readdirSync(dirPath, { withFileTypes: true })
+
+    for (const entry of entries) {
+      if (entry.isFile() && entry.name.endsWith('.vue')) {
+        const fullPath = path.join(dirPath, entry.name)
+        const extracted = extractInlineMetamodeFromVue(fullPath)
+        if (extracted) {
+          result[entry.name] = normalizeInlineMetamode(extracted.metadata)
+        }
+      }
+    }
+  } catch {
+    // Ignore read errors
+  }
+
+  return result
+}
+
+/**
+ * Merge file-based metamode with inline metadata (TASK 75)
+ * Inline metadata has higher priority
+ */
+function mergeWithInlineMetamode(metamode: MetamodeJson, dirPath: string): MetamodeJson {
+  const inlineMetadata = scanDirectoryForInlineMetamode(dirPath)
+
+  if (Object.keys(inlineMetadata).length === 0) {
+    return metamode
+  }
+
+  // Create a copy to avoid mutation
+  const merged: MetamodeJson = { ...metamode }
+  merged.files = { ...metamode.files }
+
+  // Merge inline metadata (higher priority)
+  for (const [filename, inline] of Object.entries(inlineMetadata)) {
+    const fileDescriptor = inlineToFileDescriptor(inline)
+
+    if (merged.files?.[filename]) {
+      // Merge with existing: inline fields override file-based
+      merged.files[filename] = {
+        ...merged.files[filename],
+        ...fileDescriptor,
+      }
+    } else {
+      // Add new entry from inline
+      if (!merged.files) merged.files = {}
+      merged.files[filename] = fileDescriptor
+    }
+  }
+
+  return merged
+}
+
+/**
  * Recursively collect all metamode.json data into a flat map
+ * Includes inline metamode extraction (TASK 75)
  */
 function collectMetamodeFlat(rootDir: string): Record<string, MetamodeJson> {
   const tree: Record<string, MetamodeJson> = {}
@@ -100,14 +199,18 @@ function collectMetamodeFlat(rootDir: string): Record<string, MetamodeJson> {
     const metamode = loadJson(resolvedPath)
     if (!metamode) return
 
+    const dirPath = path.dirname(resolvedPath)
     const relPath = path.relative(rootDir, resolvedPath)
+
+    // Merge with inline metadata (TASK 75)
+    const merged = mergeWithInlineMetamode(metamode, dirPath)
+
     // Remove $schema from compiled output to save space
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { $schema: _, ...data } = metamode
+    const { $schema: _, ...data } = merged
     tree[relPath] = data as MetamodeJson
 
     if (metamode.directories) {
-      const dirPath = path.dirname(resolvedPath)
       for (const dirDesc of Object.values(metamode.directories)) {
         const subMetamodePath = path.join(dirPath, dirDesc.metamode)
         visit(subMetamodePath)
@@ -122,6 +225,7 @@ function collectMetamodeFlat(rootDir: string): Record<string, MetamodeJson> {
 /**
  * Compile all metamode.json files into a hierarchical tree.
  * The tree structure makes metadata primary and file paths secondary.
+ * Includes inline metamode extraction (TASK 75)
  */
 function compileMetamodeTree(rootDir: string): MetamodeTreeNode | null {
   const visited = new Set<string>()
@@ -136,18 +240,22 @@ function compileMetamodeTree(rootDir: string): MetamodeTreeNode | null {
     const metamode = loadJson(resolvedPath)
     if (!metamode) return null
 
+    const dirPath = path.dirname(resolvedPath)
+
+    // Merge with inline metadata (TASK 75)
+    const merged = mergeWithInlineMetamode(metamode, dirPath)
+
     const node: MetamodeTreeNode = {
-      name: metamode.name,
-      description: metamode.description,
+      name: merged.name,
+      description: merged.description,
     }
 
-    if (metamode.version) node.version = metamode.version
-    if (metamode.languages) node.languages = metamode.languages
-    if (metamode.tags) node.tags = metamode.tags
-    if (metamode.files) node.files = metamode.files
+    if (merged.version) node.version = merged.version
+    if (merged.languages) node.languages = merged.languages
+    if (merged.tags) node.tags = merged.tags
+    if (merged.files) node.files = merged.files
 
     if (metamode.directories) {
-      const dirPath = path.dirname(resolvedPath)
       const children: Record<string, MetamodeTreeNode> = {}
 
       for (const [dirName, dirDesc] of Object.entries(metamode.directories)) {
@@ -218,6 +326,7 @@ function convertFileToAI(file: FileDescriptor): AIFileDescriptor {
 /**
  * Compile AI-optimized metamode tree for AI agents (TASK 74)
  * Uses shortened field names and auto-generated AI summaries
+ * Includes inline metamode extraction (TASK 75)
  */
 function compileAIMetamodeTree(rootDir: string): AIMetamodeTreeNode | null {
   const visited = new Set<string>()
@@ -232,27 +341,31 @@ function compileAIMetamodeTree(rootDir: string): AIMetamodeTreeNode | null {
     const metamode = loadJson(resolvedPath)
     if (!metamode) return null
 
+    const dirPath = path.dirname(resolvedPath)
+
+    // Merge with inline metadata (TASK 75)
+    const merged = mergeWithInlineMetamode(metamode, dirPath)
+
     const node: AIMetamodeTreeNode = {
-      name: metamode.name,
-      desc: metamode.description,
+      name: merged.name,
+      desc: merged.description,
     }
 
-    if (metamode.version) node.ver = metamode.version
-    if (metamode.languages) node.lang = metamode.languages
-    if (metamode.tags) node.tags = metamode.tags
-    if (metamode.description.length > 30) node.ai = generateAISummary(metamode.description, 150)
+    if (merged.version) node.ver = merged.version
+    if (merged.languages) node.lang = merged.languages
+    if (merged.tags) node.tags = merged.tags
+    if (merged.description.length > 30) node.ai = generateAISummary(merged.description, 150)
 
     // Convert files to AI format
-    if (metamode.files && Object.keys(metamode.files).length > 0) {
+    if (merged.files && Object.keys(merged.files).length > 0) {
       node.files = {}
-      for (const [filename, file] of Object.entries(metamode.files)) {
+      for (const [filename, file] of Object.entries(merged.files)) {
         node.files[filename] = convertFileToAI(file)
       }
     }
 
     // Recursively build children
     if (metamode.directories) {
-      const dirPath = path.dirname(resolvedPath)
       const children: Record<string, AIMetamodeTreeNode> = {}
 
       for (const [dirName, dirDesc] of Object.entries(metamode.directories)) {
