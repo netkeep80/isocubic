@@ -2,34 +2,53 @@
   "name": "@isocubic/metamode",
   "version": "0.1.0",
   "description": "MetaMode — unified floating development window with AI conversation, GitHub issue generation, screen capture & annotations for Vue.js 3.0 apps",
+  "author": "netkeep80",
+  "license": "Unlicense",
   "type": "module",
   "main": "./src/index.ts",
+  "module": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
   },
   "files": [
     "src",
+    "examples",
     "README.md"
   ],
+  "sideEffects": false,
   "keywords": [
     "vue",
     "vue3",
     "devtools",
     "metamode",
+    "metainfo",
     "ai",
+    "ai-assisted",
     "github",
     "issues",
     "conversation",
     "screenshot",
     "annotation",
-    "developer-experience"
+    "developer-experience",
+    "floating-window",
+    "vue-composable"
   ],
-  "license": "Unlicense",
   "repository": {
     "type": "git",
     "url": "https://github.com/netkeep80/isocubic.git",
     "directory": "packages/metamode"
+  },
+  "homepage": "https://github.com/netkeep80/isocubic/tree/main/packages/metamode#readme",
+  "bugs": {
+    "url": "https://github.com/netkeep80/isocubic/issues"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "peerDependencies": {
     "vue": ">=3.5.0"
@@ -37,5 +56,8 @@
   "devDependencies": {
     "vue": "^3.5.0",
     "typescript": "~5.9.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

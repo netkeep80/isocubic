@@ -1,10 +1,13 @@
 {
   "$schema": "../../../metamode.schema.json",
-  "name": "god-mode/examples",
-  "description": "Usage examples for the GOD MODE package",
+  "name": "metamode/examples",
+  "description": "Usage examples for the MetaMode package",
   "files": {
     "basic-usage.vue": {
-      "description": "Basic example of integrating GOD MODE into a Vue app"
+      "description": "Basic example of integrating MetaMode into a Vue app"
+    },
+    "advanced-usage.ts": {
+      "description": "Advanced TypeScript usage patterns for MetaMode"
     }
   }
 }

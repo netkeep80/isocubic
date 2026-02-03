@@ -1,15 +1,16 @@
 <!--
-  Basic Usage Example for @isocubic/god-mode
+  Basic Usage Example for @isocubic/metamode
 
-  Demonstrates how to integrate GOD MODE into a Vue.js 3.0 application.
+  Demonstrates how to integrate MetaMode into a Vue.js 3.0 application.
 
-  TASK 66: Migrate GOD MODE to Vue.js 3.0 (Phase 10)
+  TASK 72: Unified DevMode + GodMode → MetaMode (Phase 12)
+  TASK 79: Updated example to use MetaMode API (Phase 12)
 -->
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { provideGodMode } from '../src'
-import type { ComponentRegistry, GodModeConfig } from '../src'
+import { provideMetaMode } from '../src'
+import type { ComponentRegistry, MetaModeConfig } from '../src'
 
 // ============================================================================
 // Component Registry (optional)
@@ -55,39 +56,39 @@ const myComponentRegistry: ComponentRegistry = {
 void myComponentRegistry
 
 // ============================================================================
-// GOD MODE Configuration
+// MetaMode Configuration
 // ============================================================================
 
-const godModeConfig: GodModeConfig = {
+const metaModeConfig: MetaModeConfig = {
   github: {
     owner: 'my-org',
     repo: 'my-app',
-    defaultLabels: ['from-god-mode'],
+    defaultLabels: ['from-metamode'],
   },
   preferredLanguage: 'en',
   tabs: ['conversation', 'issues', 'search'],
-  storageKeyPrefix: 'my_app_god_mode',
+  storageKeyPrefix: 'my_app_metamode',
   persistState: true,
   shortcuts: {
-    toggleWindow: 'Ctrl+Shift+G',
+    toggleWindow: 'Ctrl+Shift+M',
   },
 }
 
 // ============================================================================
-// Provide GOD MODE context
+// Provide MetaMode context
 // ============================================================================
 
-const godMode = provideGodMode(godModeConfig)
+const metaMode = provideMetaMode(metaModeConfig)
 
 // ============================================================================
 // Toggle Button State
 // ============================================================================
 
-const isVisible = computed(() => godMode.isVisible)
-const isPinned = computed(() => godMode.windowState.isPinned)
+const isVisible = computed(() => metaMode.isVisible)
+const isPinned = computed(() => metaMode.windowState.isPinned)
 
 function handleToggle() {
-  godMode.toggleWindow()
+  metaMode.toggleWindow()
 }
 
 const toggleButtonStyle = computed(() => ({
@@ -109,16 +110,16 @@ const toggleButtonStyle = computed(() => ({
 <template>
   <div style="padding: 20px">
     <h1>My Application</h1>
-    <p>Press Ctrl+Shift+G or click the button to open GOD MODE.</p>
+    <p>Press Ctrl+Shift+M or click the button to open MetaMode.</p>
 
     <!-- Your application content -->
     <main>
       <p>Application content goes here...</p>
     </main>
 
-    <!-- GOD MODE toggle button -->
+    <!-- MetaMode toggle button -->
     <button :style="toggleButtonStyle" @click="handleToggle">
-      {{ isVisible ? 'Close' : 'Open' }} GOD MODE
+      {{ isVisible ? 'Close' : 'Open' }} MetaMode
       {{ isPinned ? ' (Pinned)' : '' }}
     </button>
   </div>

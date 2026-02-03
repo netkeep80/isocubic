@@ -1,7 +1,7 @@
 {
   "$schema": "../../../metamode.schema.json",
-  "name": "god-mode/src",
-  "description": "Source code for the GOD MODE package",
+  "name": "metamode/src",
+  "description": "Source code for the MetaMode package",
   "files": {
     "index.ts": {
       "description": "Package entry point and public API exports"
@@ -9,7 +9,7 @@
   },
   "directories": {
     "components": {
-      "description": "Vue components for GOD MODE UI",
+      "description": "Vue components for MetaMode UI",
       "metamode": "components/metamode.json"
     },
     "types": {
