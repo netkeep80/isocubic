@@ -414,12 +414,10 @@ export class MetamodeDatabaseClient {
 
       // Check text matches
       if (normalizedQuery) {
-        const name = isDir
-          ? (entry as MetamodeDirEntry).name
-          : path.split('/').pop() || ''
+        const name = isDir ? (entry as MetamodeDirEntry).name : path.split('/').pop() || ''
         const description = entry.description || ''
         const entryTags = isDir
-          ? ((entry as MetamodeDirEntry).tags || [])
+          ? (entry as MetamodeDirEntry).tags || []
           : ('tags' in entry && entry.tags) || []
 
         const normalizedName = caseInsensitive ? name.toLowerCase() : name
@@ -431,10 +429,13 @@ export class MetamodeDatabaseClient {
         if (searchDescription && normalizedDesc.includes(normalizedQuery)) {
           score += 5
         }
-        if (searchTags && entryTags.some((t) => {
-          const normalizedTag = caseInsensitive ? t.toLowerCase() : t
-          return normalizedTag.includes(normalizedQuery)
-        })) {
+        if (
+          searchTags &&
+          entryTags.some((t) => {
+            const normalizedTag = caseInsensitive ? t.toLowerCase() : t
+            return normalizedTag.includes(normalizedQuery)
+          })
+        ) {
           score += 8
         }
 
@@ -451,7 +452,10 @@ export class MetamodeDatabaseClient {
         }
 
         // Phase filter
-        if (phaseFilter && (fileEntry.phase === undefined || !phaseFilter.includes(fileEntry.phase))) {
+        if (
+          phaseFilter &&
+          (fileEntry.phase === undefined || !phaseFilter.includes(fileEntry.phase))
+        ) {
           continue
         }
 
@@ -569,7 +573,11 @@ export class MetamodeDatabaseClient {
    * @param options - Traversal options
    */
   traverse(
-    callback: (entry: MetamodeDirEntry | MetamodeFileEntry, path: string, type: 'file' | 'directory') => void | boolean,
+    callback: (
+      entry: MetamodeDirEntry | MetamodeFileEntry,
+      path: string,
+      type: 'file' | 'directory'
+    ) => void | boolean,
     options: { includeFiles?: boolean; includeDirectories?: boolean } = {}
   ): void {
     const { includeFiles = true, includeDirectories = true } = options

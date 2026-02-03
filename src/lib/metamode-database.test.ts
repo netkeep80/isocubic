@@ -560,7 +560,7 @@ describe('MetamodeDatabaseClient', () => {
     it('should filter by type', () => {
       const files: string[] = []
       client.traverse(
-        (entry, path, type) => {
+        (_entry, path) => {
           files.push(path)
         },
         { includeFiles: true, includeDirectories: false }
