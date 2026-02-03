@@ -262,6 +262,77 @@ isocubic/
 - **PNG** — скриншот превью
 - **LocalStorage** — автосохранение в браузере
 
+## MetaMode
+
+MetaMode — это унифицированная система метаинформации проекта, объединяющая функциональность DevMode и GodMode в единую компактную систему, оптимизированную для работы с AI-агентами.
+
+### Возможности MetaMode
+
+- **Режим разработчика** — отображение метаданных компонентов при наведении
+- **Окно MetaMode** — панель с AI-запросами, деревом метаданных и генератором issues
+- **AI-оптимизация** — компактный формат JSON для минимизации токенов
+- **Inline-метаданные** — возможность хранить метаинформацию прямо в Vue-компонентах
+
+### Активация MetaMode
+
+MetaMode активируется клавиатурной комбинацией **Ctrl+Shift+M** или через UI-переключатель.
+
+```typescript
+// Программное управление MetaMode
+import { useMetaModeStore } from '@/lib/metamode-store'
+
+const store = useMetaModeStore()
+store.toggleMetaMode() // Включить/выключить
+```
+
+### Формат metamode.json
+
+Каждый каталог может содержать файл `metamode.json` с метаинформацией:
+
+```json
+{
+  "$schema": "./metamode.schema.json",
+  "name": "components",
+  "description": "Vue UI components",
+  "tags": ["vue", "ui"],
+  "files": {
+    "ParamEditor.vue": { "description": "Parameter editor", "status": "stable" }
+  },
+  "directories": {
+    "windows": {
+      "description": "Window-wrapped components",
+      "metamode": "windows/metamode.json"
+    }
+  }
+}
+```
+
+### Inline-метаданные в компонентах
+
+MetaMode поддерживает inline-метаданные через JSDoc `@metamode`:
+
+```vue
+<script setup lang="ts">
+/**
+ * @metamode
+ * desc: Parameter editor for cube properties
+ * status: stable
+ * phase: 5
+ * tags: [editor, params, ui]
+ */
+</script>
+```
+
+### Команды MetaMode
+
+| Команда                    | Описание                               |
+| -------------------------- | -------------------------------------- |
+| `npm run metamode:validate` | Валидация всех metamode.json файлов   |
+| `npm run metamode:compile`  | Компиляция в единое дерево            |
+| `npm run metamode:ai`       | Генерация AI-оптимизированного формата |
+
+Подробная документация: [metamode.md](metamode.md)
+
 ## Roadmap
 
 **Фазы разработки:**
@@ -312,7 +383,7 @@ npm run preview
 ## Документация
 
 - [API Reference](docs/API.md) — полное описание компонентов и модулей
-- [MetaMode](metamode.md) — унифицированная система метаинформации (Phase 12, TASK 70-71)
+- [MetaMode](metamode.md) — унифицированная система метаинформации (Phase 12, TASK 70-78)
 - [ANALYSIS.md](ANALYSIS.md) — анализ подходов к реализации
 
 ## Тестирование
