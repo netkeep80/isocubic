@@ -12,8 +12,11 @@
     "metamode-ai-optimizer.ts": {
       "description": "MetaMode AI Optimizer: converts metamode.json to token-efficient format for AI agents (TASK 74)"
     },
+    "metamode-inline-extractor.ts": {
+      "description": "MetaMode inline extractor: extracts @metamode JSDoc and const metamode declarations from Vue SFC files (TASK 75)"
+    },
     "vite-plugin-metamode.ts": {
-      "description": "Vite plugin that compiles metamode.json into virtual modules including AI-optimized format (TASK 74)"
+      "description": "Vite plugin that compiles metamode.json into virtual modules with inline extraction support (TASK 74, 75)"
     }
   }
 }
