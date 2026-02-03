@@ -75,7 +75,12 @@ const activeTree = computed(() => {
                 description: v.desc,
                 tags: v.tags,
                 phase: v.phase,
-                status: v.status === 'exp' ? 'experimental' : v.status === 'dep' ? 'deprecated' : v.status,
+                status:
+                  v.status === 'exp'
+                    ? 'experimental'
+                    : v.status === 'dep'
+                      ? 'deprecated'
+                      : v.status,
                 dependencies: v.deps,
               },
             ])
@@ -99,7 +104,12 @@ const activeTree = computed(() => {
                           description: fv.desc,
                           tags: fv.tags,
                           phase: fv.phase,
-                          status: fv.status === 'exp' ? 'experimental' : fv.status === 'dep' ? 'deprecated' : fv.status,
+                          status:
+                            fv.status === 'exp'
+                              ? 'experimental'
+                              : fv.status === 'dep'
+                                ? 'deprecated'
+                                : fv.status,
                           dependencies: fv.deps,
                         },
                       ])
@@ -384,7 +394,9 @@ const styles: Record<string, CSSProperties> = {
         <!-- TASK 76: AI format indicator -->
         <span v-if="showAIFormat" :style="styles.aiBadge">
           <span>&#129302;</span>
-          <span>{{ props.language === 'ru' ? 'AI-\u0444\u043E\u0440\u043C\u0430\u0442' : 'AI Format' }}</span>
+          <span>{{
+            props.language === 'ru' ? 'AI-\u0444\u043E\u0440\u043C\u0430\u0442' : 'AI Format'
+          }}</span>
         </span>
       </div>
       <div :style="styles.headerButtons">
@@ -395,26 +407,44 @@ const styles: Record<string, CSSProperties> = {
           :style="{ ...styles.aiButton, ...(showAIFormat ? styles.aiButtonActive : {}) }"
           :title="
             props.language === 'ru'
-              ? (showAIFormat ? '\u041E\u0431\u044B\u0447\u043D\u044B\u0439 \u0444\u043E\u0440\u043C\u0430\u0442' : 'AI-\u043E\u043F\u0442\u0438\u043C\u0438\u0437\u0438\u0440\u043E\u0432\u0430\u043D\u043D\u044B\u0439 \u0444\u043E\u0440\u043C\u0430\u0442')
-              : (showAIFormat ? 'Standard format' : 'AI-optimized format')
+              ? showAIFormat
+                ? '\u041E\u0431\u044B\u0447\u043D\u044B\u0439 \u0444\u043E\u0440\u043C\u0430\u0442'
+                : 'AI-\u043E\u043F\u0442\u0438\u043C\u0438\u0437\u0438\u0440\u043E\u0432\u0430\u043D\u043D\u044B\u0439 \u0444\u043E\u0440\u043C\u0430\u0442'
+              : showAIFormat
+                ? 'Standard format'
+                : 'AI-optimized format'
           "
           data-testid="metamode-ai-toggle"
           @click="toggleAIFormat"
         >
           <span>&#129302;</span>
-          <span>{{ showAIFormat ? (props.language === 'ru' ? '\u041E\u0431\u044B\u0447\u043D\u044B\u0439' : 'Standard') : 'AI' }}</span>
+          <span>{{
+            showAIFormat
+              ? props.language === 'ru'
+                ? '\u041E\u0431\u044B\u0447\u043D\u044B\u0439'
+                : 'Standard'
+              : 'AI'
+          }}</span>
         </button>
         <!-- TASK 76: Copy AI JSON button -->
         <button
           v-if="showAIFormat && hasAITree"
           type="button"
           :style="styles.copyButton"
-          :title="props.language === 'ru' ? '\u041A\u043E\u043F\u0438\u0440\u043E\u0432\u0430\u0442\u044C JSON' : 'Copy JSON'"
+          :title="
+            props.language === 'ru'
+              ? '\u041A\u043E\u043F\u0438\u0440\u043E\u0432\u0430\u0442\u044C JSON'
+              : 'Copy JSON'
+          "
           data-testid="metamode-copy-ai-json"
           @click="copyAIJson"
         >
           <span>&#128203;</span>
-          <span>{{ props.language === 'ru' ? '\u041A\u043E\u043F\u0438\u0440\u043E\u0432\u0430\u0442\u044C' : 'Copy' }}</span>
+          <span>{{
+            props.language === 'ru'
+              ? '\u041A\u043E\u043F\u0438\u0440\u043E\u0432\u0430\u0442\u044C'
+              : 'Copy'
+          }}</span>
         </button>
         <button type="button" :style="styles.expandButton" @click="toggleExpandAll">
           {{
