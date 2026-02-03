@@ -187,9 +187,9 @@ describe('MetaModeWindow Vue Component', () => {
       expect(wrapper.find('[data-testid="metamode-window"]').exists()).toBe(false)
     })
 
-    it('should render VueDevMode title in header', () => {
+    it('should render MetaMode title in header', () => {
       const wrapper = mountWindow()
-      expect(wrapper.text()).toContain('VueDevMode')
+      expect(wrapper.text()).toContain('MetaMode')
     })
   })
 

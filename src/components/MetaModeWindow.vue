@@ -733,7 +733,7 @@ onUnmounted(() => {
         <div :style="styles.header" data-testid="metamode-header" @mousedown="handleDragStart">
           <div :style="styles.headerTitle">
             <span :style="styles.headerIcon">&#9889;</span>
-            <span>VueDevMode</span>
+            <span>MetaMode</span>
           </div>
           <div :style="styles.headerButtons">
             <!-- Pin button -->
