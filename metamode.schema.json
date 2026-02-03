@@ -1,0 +1,116 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "metamode.schema.json",
+  "title": "MetaMode Descriptor",
+  "description": "Compact schema for metamode.json files optimized for AI agents. Unified meta-information system for project directories, files, and components.",
+  "type": "object",
+  "required": ["name", "desc"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Reference to the JSON Schema for validation"
+    },
+    "name": {
+      "type": "string",
+      "description": "Name of the directory or module"
+    },
+    "ver": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version (only for root metamode.json)"
+    },
+    "desc": {
+      "type": "string",
+      "description": "Human-readable description of this directory's purpose"
+    },
+    "lang": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Programming languages used in this directory"
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Tags for categorization and search"
+    },
+    "ai": {
+      "type": "string",
+      "description": "Pre-compiled AI summary for quick context (max 200 chars)"
+    },
+    "files": {
+      "type": "object",
+      "description": "Map of file names to their metadata",
+      "additionalProperties": {
+        "$ref": "#/$defs/File"
+      }
+    },
+    "dirs": {
+      "type": "object",
+      "description": "Map of subdirectory names to their descriptions (metamode.json path is auto-inferred)",
+      "additionalProperties": {
+        "oneOf": [
+          { "type": "string", "description": "Short description of the subdirectory" },
+          { "$ref": "#/$defs/Dir" }
+        ]
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "File": {
+      "type": "object",
+      "required": ["desc"],
+      "properties": {
+        "desc": {
+          "type": "string",
+          "description": "Human-readable description of the file's purpose"
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Tags for categorization"
+        },
+        "phase": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Development phase this file belongs to"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["stable", "beta", "exp", "dep"],
+          "description": "File status: stable, beta, experimental (exp), deprecated (dep)"
+        },
+        "deps": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Relative paths to file dependencies"
+        },
+        "ai": {
+          "type": "string",
+          "description": "AI summary for this file (max 100 chars)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Dir": {
+      "type": "object",
+      "required": ["desc"],
+      "properties": {
+        "desc": {
+          "type": "string",
+          "description": "Human-readable description of the subdirectory"
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Tags for this directory"
+        },
+        "ai": {
+          "type": "string",
+          "description": "AI summary for this directory (max 100 chars)"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
