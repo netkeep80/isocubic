@@ -1,0 +1,108 @@
+{
+  "$schema": "./metamode.schema.json",
+  "name": "isocubic",
+  "version": "0.1.0",
+  "description": "Редактор параметрических воксельных кубиков для изометрических 3D миров",
+  "languages": ["typescript", "vue", "glsl", "rust"],
+  "files": {
+    "index.html": {
+      "description": "HTML entry point for the Vite application"
+    },
+    "package.json": {
+      "description": "NPM package manifest with dependencies and scripts"
+    },
+    "vite.config.ts": {
+      "description": "Vite build configuration with Vue, Tailwind, and Vitest"
+    },
+    "tsconfig.json": {
+      "description": "Root TypeScript configuration with project references"
+    },
+    "tsconfig.app.json": {
+      "description": "TypeScript config for the application source code"
+    },
+    "tsconfig.node.json": {
+      "description": "TypeScript config for Node.js tooling (Vite, scripts)"
+    },
+    "eslint.config.js": {
+      "description": "ESLint flat config with Vue and Prettier integration"
+    },
+    "env.d.ts": {
+      "description": "Environment type declarations for Vite"
+    },
+    "metanet.md": {
+      "description": "Legacy MetaNet specification (deprecated, see metamode.md)"
+    },
+    "metamode.json": {
+      "description": "Root metamode descriptor for the isocubic project"
+    },
+    "metamode.schema.json": {
+      "description": "JSON Schema for validating metamode.json files"
+    },
+    "metamode.md": {
+      "description": "MetaMode specification - unified meta-information system"
+    },
+    "README.md": {
+      "description": "Project documentation and overview"
+    },
+    "ANALYSIS.md": {
+      "description": "Technical analysis of the project architecture"
+    },
+    "description.md": {
+      "description": "Comprehensive project description"
+    },
+    "LICENSE": {
+      "description": "MIT/Unlicense dual license"
+    },
+    ".prettierrc": {
+      "description": "Prettier code formatting configuration"
+    },
+    ".gitignore": {
+      "description": "Git ignore rules"
+    },
+    "CLAUDE.md": {
+      "description": "Instructions and context for AI coding assistants"
+    }
+  },
+  "directories": {
+    "src": {
+      "description": "Main application source code",
+      "metamode": "src/metamode.json"
+    },
+    "server": {
+      "description": "WebSocket collaboration server",
+      "metamode": "server/metamode.json"
+    },
+    "docs": {
+      "description": "Phase-based development documentation",
+      "metamode": "docs/metamode.json"
+    },
+    "scripts": {
+      "description": "Build and utility scripts",
+      "metamode": "scripts/metamode.json"
+    },
+    "public": {
+      "description": "Static assets (icons, models, splash screens)",
+      "metamode": "public/metamode.json"
+    },
+    "packages": {
+      "description": "Standalone packages extracted from the project",
+      "metamode": "packages/metamode.json"
+    },
+    "examples": {
+      "description": "Example cube configuration presets in JSON",
+      "metamode": "examples/metamode.json"
+    },
+    "experiments": {
+      "description": "Experimental and debug scripts",
+      "metamode": "experiments/metamode.json"
+    },
+    "wasm-fft": {
+      "description": "Rust WebAssembly FFT computation module",
+      "metamode": "wasm-fft/metamode.json"
+    },
+    ".github": {
+      "description": "GitHub configuration (CI/CD workflows)",
+      "metamode": ".github/metamode.json"
+    }
+  }
+}

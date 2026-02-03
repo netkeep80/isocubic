@@ -54,8 +54,8 @@ jobs:
       - name: Check formatting
         run: npx prettier --check "src/**/*.{ts,tsx,vue,js,jsx,json,css}" "*.{ts,js,json}" || echo "::warning::Some files need formatting. Run 'npx prettier --write' to fix."
 
-      - name: Validate MetaNet
-        run: npm run metanet:validate
+      - name: Validate MetaMode
+        run: npm run metamode:validate
 
   # === FILE SIZE CHECK ===
   # Enforce maximum file size to keep code maintainable for both AI and humans

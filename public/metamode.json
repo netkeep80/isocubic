@@ -1,0 +1,30 @@
+{
+  "$schema": "../metamode.schema.json",
+  "name": "public",
+  "description": "Static assets served directly by the web server",
+  "files": {
+    "isocubic.svg": {
+      "description": "Main application SVG logo"
+    },
+    "manifest.json": {
+      "description": "PWA web app manifest"
+    },
+    "sw.js": {
+      "description": "Service worker for offline PWA functionality"
+    }
+  },
+  "directories": {
+    "icons": {
+      "description": "Application icons at various sizes for PWA",
+      "metamode": "icons/metamode.json"
+    },
+    "model": {
+      "description": "3D model assets",
+      "metamode": "model/metamode.json"
+    },
+    "splash": {
+      "description": "Splash screen images for PWA",
+      "metamode": "splash/metamode.json"
+    }
+  }
+}

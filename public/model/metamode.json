@@ -1,0 +1,5 @@
+{
+  "$schema": "../../metamode.schema.json",
+  "name": "model",
+  "description": "Directory for 3D model assets (currently empty placeholder)"
+}

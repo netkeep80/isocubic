@@ -311,8 +311,7 @@ npm run preview
 ## Документация
 
 - [API Reference](docs/API.md) — полное описание компонентов и модулей
-- [MetaMode](metamode.md) — унифицированная система метаинформации (Phase 12)
-- [MetaNet](metanet.md) — спецификация MetaNet (устаревшая, см. MetaMode)
+- [MetaMode](metamode.md) — унифицированная система метаинформации (Phase 12, TASK 70-71)
 - [ANALYSIS.md](ANALYSIS.md) — анализ подходов к реализации
 
 ## Тестирование

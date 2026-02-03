@@ -1,0 +1,26 @@
+{
+  "$schema": "../metamode.schema.json",
+  "name": "server",
+  "description": "WebSocket collaboration server for real-time multi-user editing",
+  "languages": ["typescript"],
+  "files": {
+    "package.json": {
+      "description": "Server NPM package manifest"
+    },
+    "tsconfig.json": {
+      "description": "TypeScript configuration for the server"
+    },
+    "vitest.config.ts": {
+      "description": "Vitest configuration for server tests"
+    },
+    "README.md": {
+      "description": "Server documentation and setup guide"
+    }
+  },
+  "directories": {
+    "src": {
+      "description": "Server source code",
+      "metamode": "src/metamode.json"
+    }
+  }
+}

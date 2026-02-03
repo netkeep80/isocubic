@@ -42,7 +42,7 @@ describe('god-mode types', () => {
         'search',
         'conversation',
         'issues',
-        'metanet',
+        'metamode',
       ])
     })
 
@@ -159,7 +159,7 @@ describe('god-mode types', () => {
         'search',
         'conversation',
         'issues',
-        'metanet',
+        'metamode',
       ]
       for (const tab of validTabs) {
         expect(isValidTab(tab)).toBe(true)

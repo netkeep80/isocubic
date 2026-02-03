@@ -1,0 +1,26 @@
+{
+  "$schema": "../../metamode.schema.json",
+  "name": "shaders",
+  "description": "GLSL shaders and TypeScript wrappers for parametric cube rendering",
+  "languages": ["glsl", "typescript"],
+  "files": {
+    "parametric-cube.glsl": {
+      "description": "GLSL shader for parametric cube geometry generation"
+    },
+    "parametric-cube.ts": {
+      "description": "TypeScript wrapper for the parametric cube shader"
+    },
+    "parametric-cube.test.ts": {
+      "description": "Tests for parametric cube shader wrapper"
+    },
+    "energy-cube.glsl": {
+      "description": "GLSL shader for energy-based cube rendering with FFT"
+    },
+    "energy-cube.ts": {
+      "description": "TypeScript wrapper for the energy cube shader"
+    },
+    "energy-cube.test.ts": {
+      "description": "Tests for energy cube shader wrapper"
+    }
+  }
+}

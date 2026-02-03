@@ -15,10 +15,10 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "metanet:validate": "tsx scripts/metanet-preprocessor.ts --check",
-    "metanet:validate:verbose": "tsx scripts/metanet-preprocessor.ts --check --verbose",
-    "metanet:compile": "tsx scripts/metanet-preprocessor.ts --compile",
-    "check:all": "npm run lint && npm run typecheck && npm run format:check && npm run metanet:validate && npm run test:run"
+    "metamode:validate": "tsx scripts/metamode-preprocessor.ts --check",
+    "metamode:validate:verbose": "tsx scripts/metamode-preprocessor.ts --check --verbose",
+    "metamode:compile": "tsx scripts/metamode-preprocessor.ts --compile",
+    "check:all": "npm run lint && npm run typecheck && npm run format:check && npm run metamode:validate && npm run test:run"
   },
   "dependencies": {
     "@tresjs/cientos": "^5.2.5",

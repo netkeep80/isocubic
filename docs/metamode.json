@@ -1,0 +1,47 @@
+{
+  "$schema": "../metamode.schema.json",
+  "name": "docs",
+  "description": "Phase-based development documentation and API reference",
+  "files": {
+    "API.md": {
+      "description": "API documentation and reference"
+    },
+    "phase-1.md": {
+      "description": "Phase 1: Core cube rendering and basic parameters"
+    },
+    "phase-2.md": {
+      "description": "Phase 2: Advanced parameters and FFT integration"
+    },
+    "phase-3.md": {
+      "description": "Phase 3: Texture system and material properties"
+    },
+    "phase-4.md": {
+      "description": "Phase 4: Scene management and cube collections"
+    },
+    "phase-5.md": {
+      "description": "Phase 5: Editor UI unification"
+    },
+    "phase-6.md": {
+      "description": "Phase 6: Developer experience and component metadata"
+    },
+    "phase-7.md": {
+      "description": "Phase 7: AI integration and text-to-cube generation"
+    },
+    "phase-8.md": {
+      "description": "Phase 8: Community and sharing features"
+    },
+    "phase-9.md": {
+      "description": "Phase 9: Performance optimization and LOD"
+    },
+    "phase-10.md": {
+      "description": "Phase 10: Real-time collaboration via WebSocket"
+    },
+    "phase-11.md": {
+      "description": "Phase 11: Window management and responsive design"
+    },
+    "phase-12.md": {
+      "description": "Phase 12: MetaMode - Unification of meta-information systems",
+      "status": "experimental"
+    }
+  }
+}
