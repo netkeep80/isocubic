@@ -38,6 +38,10 @@
     },
     "phase-11.md": {
       "description": "Phase 11: Window management and responsive design"
+    },
+    "phase-12.md": {
+      "description": "Phase 12: MetaMode - Unification of meta-information systems",
+      "status": "experimental"
     }
   }
 }
