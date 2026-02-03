@@ -1,38 +1,39 @@
 <!--
-  DevModeIndicator.vue — Fixed-position toggle button for Developer Mode
-  Shows current DevMode state (ON/OFF) and allows toggling with a click.
+  MetaModeIndicator.vue — Fixed-position toggle button for MetaMode
+  Shows current MetaMode state (ON/OFF) and allows toggling with a click.
 
   Phase 10: Migrated from React DevModeIndicator (ComponentInfo.tsx) to Vue 3 SFC
+  Phase 12: Renamed from DevModeIndicator to MetaModeIndicator (TASK 72)
 -->
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useDevModeStore } from '../lib/devmode'
+import { useMetaModeStore } from '../lib/metamode-store'
 
-const store = useDevModeStore()
+const store = useMetaModeStore()
 
 const isEnabled = computed(() => store.settings.enabled)
 
 function toggle() {
-  store.toggleDevMode()
+  store.toggleMetaMode()
 }
 </script>
 
 <template>
   <button
     type="button"
-    class="devmode-indicator"
-    :class="{ 'devmode-indicator--active': isEnabled }"
-    :aria-label="isEnabled ? 'Disable VueDevMode' : 'Enable VueDevMode'"
-    title="Toggle VueDevMode (Ctrl+Shift+D)"
+    class="metamode-indicator"
+    :class="{ 'metamode-indicator--active': isEnabled }"
+    :aria-label="isEnabled ? 'Disable MetaMode' : 'Enable MetaMode'"
+    title="Toggle MetaMode (Ctrl+Shift+M)"
     @click="toggle"
   >
-    <span class="devmode-indicator__icon">{{ isEnabled ? '🔧' : '👁️' }}</span>
-    <span class="devmode-indicator__label">VueDevMode {{ isEnabled ? 'ON' : 'OFF' }}</span>
+    <span class="metamode-indicator__icon">{{ isEnabled ? '🔧' : '👁️' }}</span>
+    <span class="metamode-indicator__label">MetaMode {{ isEnabled ? 'ON' : 'OFF' }}</span>
   </button>
 </template>
 
 <style scoped>
-.devmode-indicator {
+.metamode-indicator {
   position: fixed;
   bottom: 16px;
   right: 16px;
@@ -52,11 +53,11 @@ function toggle() {
   transition: background-color 0.2s;
 }
 
-.devmode-indicator--active {
+.metamode-indicator--active {
   background-color: rgba(59, 130, 246, 0.9);
 }
 
-.devmode-indicator:hover {
+.metamode-indicator:hover {
   opacity: 0.9;
 }
 </style>

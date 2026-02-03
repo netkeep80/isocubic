@@ -20,9 +20,9 @@ vi.mock('../lib/community-gallery', () => ({
   },
 }))
 
-// Mock DevMode context
-vi.mock('../lib/devmode', () => ({
-  useIsDevModeEnabled: vi.fn(() => false),
+// Mock MetaMode context
+vi.mock('../lib/metamode-store', () => ({
+  useIsMetaModeEnabled: vi.fn(() => false),
 }))
 
 // Mock data

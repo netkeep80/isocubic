@@ -3,7 +3,7 @@
  *
  * Tests for the AI conversation agent module.
  *
- * TASK 55: AI Conversation Agent (Phase 9 - GOD MODE)
+ * TASK 55: AI Conversation Agent (Phase 9 - MetaMode)
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
@@ -18,7 +18,7 @@ import {
   CONVERSATION_STORAGE_KEY,
   type ConversationSession,
   type ConversationMessage,
-} from '../types/god-mode'
+} from '../types/metamode'
 
 describe('ConversationAgent', () => {
   beforeEach(() => {

@@ -1,7 +1,8 @@
 /**
- * Comprehensive unit tests for DevModeQueryPanel Vue component
- * Migrated from DevModeQueryPanel.test.tsx (React) + existing Vue tests
+ * Comprehensive unit tests for MetaModeQueryPanel Vue component
+ * Migrated from MetaModeQueryPanel.test.tsx (React) + existing Vue tests
  * TASK 66: Vue.js 3.0 Migration
+ * TASK 72: Renamed from MetaModeQueryPanel to MetaModeQueryPanel (Phase 12)
  *
  * @vitest-environment jsdom
  */
@@ -9,17 +10,17 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { shallowMount } from '@vue/test-utils'
 import { nextTick } from 'vue'
-import DevModeQueryPanel from './DevModeQueryPanel.vue'
+import MetaModeQueryPanel from './MetaModeQueryPanel.vue'
 import { registerComponentMeta, componentMetaRegistry } from '../types/component-meta'
 import type { ComponentMeta } from '../types/component-meta'
 
-// Mock devmode composable
-const { mockDevModeEnabled } = vi.hoisted(() => {
-  const mockDevModeEnabled = { value: true }
-  return { mockDevModeEnabled }
+// Mock metamode composable
+const { mockMetaModeEnabled } = vi.hoisted(() => {
+  const mockMetaModeEnabled = { value: true }
+  return { mockMetaModeEnabled }
 })
-vi.mock('../lib/devmode', () => ({
-  useIsDevModeEnabled: vi.fn(() => mockDevModeEnabled.value),
+vi.mock('../lib/metamode-store', () => ({
+  useIsMetaModeEnabled: vi.fn(() => mockMetaModeEnabled.value),
 }))
 
 // Test component metadata
@@ -102,9 +103,9 @@ const testEditorMeta: ComponentMeta = {
   lastUpdated: '2026-01-10T12:00:00Z',
 }
 
-describe('DevModeQueryPanel Vue Component', () => {
+describe('MetaModeQueryPanel Vue Component', () => {
   beforeEach(() => {
-    mockDevModeEnabled.value = true
+    mockMetaModeEnabled.value = true
     localStorage.clear()
     vi.clearAllMocks()
 
@@ -120,15 +121,15 @@ describe('DevModeQueryPanel Vue Component', () => {
   })
 
   function mountPanel(props: Record<string, unknown> = {}) {
-    return shallowMount(DevModeQueryPanel, { props })
+    return shallowMount(MetaModeQueryPanel, { props })
   }
 
   // ========================================================================
   // Module Exports (from original Vue test)
   // ========================================================================
   describe('Module Exports', () => {
-    it('should export DevModeQueryPanel.vue as a valid Vue component', async () => {
-      const module = await import('./DevModeQueryPanel.vue')
+    it('should export MetaModeQueryPanel.vue as a valid Vue component', async () => {
+      const module = await import('./MetaModeQueryPanel.vue')
       expect(module.default).toBeDefined()
       expect(typeof module.default).toBe('object')
     })
@@ -192,12 +193,12 @@ describe('DevModeQueryPanel Vue Component', () => {
   })
 
   // ========================================================================
-  // DevMode API Integration (from original Vue test)
+  // MetaMode API Integration (from original Vue test)
   // ========================================================================
-  describe('DevMode API Integration', () => {
-    it('should import devmode module', async () => {
-      const devmodeModule = await import('../lib/devmode')
-      expect(devmodeModule).toBeDefined()
+  describe('MetaMode API Integration', () => {
+    it('should import metamode module', async () => {
+      const metamodeModule = await import('../lib/metamode')
+      expect(metamodeModule).toBeDefined()
     })
   })
 
@@ -205,19 +206,19 @@ describe('DevModeQueryPanel Vue Component', () => {
   // Rendering (from React test)
   // ========================================================================
   describe('Rendering', () => {
-    it('should not render when DevMode is disabled', async () => {
-      mockDevModeEnabled.value = false
+    it('should not render when MetaMode is disabled', async () => {
+      mockMetaModeEnabled.value = false
 
       const wrapper = mountPanel()
       await nextTick()
-      expect(wrapper.find('[data-testid="devmode-query-panel"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="metamode-query-panel"]').exists()).toBe(false)
 
-      mockDevModeEnabled.value = true
+      mockMetaModeEnabled.value = true
     })
 
-    it('should render when DevMode is enabled', () => {
+    it('should render when MetaMode is enabled', () => {
       const wrapper = mountPanel()
-      expect(wrapper.find('[data-testid="devmode-query-panel"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="metamode-query-panel"]').exists()).toBe(true)
     })
 
     it('should render with AI Query header', () => {
@@ -504,20 +505,20 @@ describe('DevModeQueryPanel Vue Component', () => {
   describe('Position and styling', () => {
     it('should apply custom styles', () => {
       const wrapper = mountPanel({ style: { opacity: 0.5 } })
-      const panel = wrapper.find('[data-testid="devmode-query-panel"]')
+      const panel = wrapper.find('[data-testid="metamode-query-panel"]')
       const style = panel.attributes('style') || ''
       expect(style).toContain('opacity')
     })
 
     it('should apply custom className', () => {
       const wrapper = mountPanel({ className: 'custom-class' })
-      const panel = wrapper.find('[data-testid="devmode-query-panel"]')
+      const panel = wrapper.find('[data-testid="metamode-query-panel"]')
       expect(panel.classes()).toContain('custom-class')
     })
 
     it('should support different positions', () => {
       const wrapper = mountPanel({ position: 'top-left' })
-      const panel = wrapper.find('[data-testid="devmode-query-panel"]')
+      const panel = wrapper.find('[data-testid="metamode-query-panel"]')
       const style = panel.attributes('style') || ''
       expect(style).toContain('top: 80px')
       expect(style).toContain('left: 20px')
@@ -529,7 +530,7 @@ describe('DevModeQueryPanel Vue Component', () => {
   // ========================================================================
   describe('Slot rendering', () => {
     it('should render slot content inside the panel', () => {
-      const wrapper = shallowMount(DevModeQueryPanel, {
+      const wrapper = shallowMount(MetaModeQueryPanel, {
         slots: {
           default: '<div data-testid="custom-child">Custom Content</div>',
         },

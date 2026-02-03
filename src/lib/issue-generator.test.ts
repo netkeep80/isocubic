@@ -4,7 +4,7 @@
  * Comprehensive test suite for issue generation functionality.
  * Tests conversation analysis, draft creation, and template processing.
  *
- * TASK 56: Issue Draft Generator (Phase 9 - GOD MODE)
+ * TASK 56: Issue Draft Generator (Phase 9 - MetaMode)
  */
 
 import { describe, it, expect, beforeEach } from 'vitest'
@@ -16,7 +16,7 @@ import {
   detectEnvironment,
   formatComponentMetaAsContext,
 } from '../lib/issue-generator'
-import type { ConversationMessage } from '../types/god-mode'
+import type { ConversationMessage } from '../types/metamode'
 import { validateIssueDraft } from '../types/issue-generator'
 import {
   registerComponentMeta,

@@ -19,13 +19,13 @@ import ComponentContextPanel, {
 import { registerComponentMeta, componentMetaRegistry } from '../types/component-meta'
 import type { ComponentMeta } from '../types/component-meta'
 
-// Mock devmode composable
-const { mockDevModeEnabled } = vi.hoisted(() => {
-  const mockDevModeEnabled = { value: true }
-  return { mockDevModeEnabled }
+// Mock metamode composable
+const { mockMetaModeEnabled } = vi.hoisted(() => {
+  const mockMetaModeEnabled = { value: true }
+  return { mockMetaModeEnabled }
 })
-vi.mock('../lib/devmode', () => ({
-  useIsDevModeEnabled: vi.fn(() => mockDevModeEnabled.value),
+vi.mock('../lib/metamode-store', () => ({
+  useIsMetaModeEnabled: vi.fn(() => mockMetaModeEnabled.value),
 }))
 
 // Test component metadata
@@ -170,7 +170,7 @@ const testPreviewMeta: ComponentMeta = {
 
 describe('ComponentContextPanel Vue Component', () => {
   beforeEach(() => {
-    mockDevModeEnabled.value = true
+    mockMetaModeEnabled.value = true
     localStorage.clear()
     vi.clearAllMocks()
 
@@ -283,13 +283,13 @@ describe('ComponentContextPanel Vue Component', () => {
   // ========================================================================
   describe('Rendering', () => {
     it('should not render when DevMode is disabled', async () => {
-      mockDevModeEnabled.value = false
+      mockMetaModeEnabled.value = false
 
       const wrapper = mountPanel()
       await nextTick()
       expect(wrapper.find('[data-testid="component-context-panel"]').exists()).toBe(false)
 
-      mockDevModeEnabled.value = true
+      mockMetaModeEnabled.value = true
     })
 
     it('should render when DevMode is enabled', () => {

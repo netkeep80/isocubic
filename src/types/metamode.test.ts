@@ -1,22 +1,23 @@
 /**
- * GOD MODE Types Tests
+ * MetaMode Types Tests
  *
- * Tests for the GOD MODE type definitions and utility functions.
+ * Tests for the MetaMode type definitions and utility functions.
  *
- * TASK 54: Unified DevMode Window (Phase 9 - GOD MODE)
+ * TASK 54: Unified DevMode Window (Phase 9 - MetaMode)
+ * TASK 72: Renamed from GOD MODE to MetaMode (Phase 12)
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import {
-  GOD_MODE_TABS,
+  METAMODE_TABS,
   DEFAULT_WINDOW_SIZE,
   DEFAULT_WINDOW_POSITION,
   DEFAULT_KEYBOARD_SHORTCUTS,
-  DEFAULT_GOD_MODE_CONFIG,
+  DEFAULT_METAMODE_CONFIG,
   DEFAULT_WINDOW_STATE,
-  GOD_MODE_STORAGE_KEY,
-  loadGodModeState,
-  saveGodModeState,
+  METAMODE_STORAGE_KEY,
+  loadMetaModeState,
+  saveMetaModeState,
   isValidTab,
   getTabInfo,
   getAvailableTabs,
@@ -25,18 +26,18 @@ import {
   constrainSize,
   parseShortcut,
   matchesShortcut,
-  type GodModeTab,
+  type MetaModeTab,
   type WindowPosition,
   type WindowSize,
-  type GodModeWindowState,
-  type GodModeConfig,
-} from './god-mode'
+  type MetaModeWindowState,
+  type MetaModeConfig,
+} from './metamode'
 
-describe('god-mode types', () => {
-  describe('GOD_MODE_TABS', () => {
+describe('metamode types', () => {
+  describe('METAMODE_TABS', () => {
     it('should have all required tabs', () => {
-      expect(GOD_MODE_TABS).toHaveLength(6)
-      expect(GOD_MODE_TABS.map((t) => t.id)).toEqual([
+      expect(METAMODE_TABS).toHaveLength(6)
+      expect(METAMODE_TABS.map((t) => t.id)).toEqual([
         'query',
         'context',
         'search',
@@ -47,7 +48,7 @@ describe('god-mode types', () => {
     })
 
     it('should have correct structure for each tab', () => {
-      for (const tab of GOD_MODE_TABS) {
+      for (const tab of METAMODE_TABS) {
         expect(tab).toHaveProperty('id')
         expect(tab).toHaveProperty('labelRu')
         expect(tab).toHaveProperty('labelEn')
@@ -59,7 +60,7 @@ describe('god-mode types', () => {
     })
 
     it('should have available tabs for existing panels', () => {
-      const availableTabs = GOD_MODE_TABS.filter((t) => t.available)
+      const availableTabs = METAMODE_TABS.filter((t) => t.available)
       expect(availableTabs.map((t) => t.id)).toContain('query')
       expect(availableTabs.map((t) => t.id)).toContain('context')
       expect(availableTabs.map((t) => t.id)).toContain('search')
@@ -70,8 +71,8 @@ describe('god-mode types', () => {
     it('should have all tabs available after TASK 56 completion', () => {
       // TASK 55 completed - conversation is available
       // TASK 56 completed - issues is available
-      const conversationTab = GOD_MODE_TABS.find((t) => t.id === 'conversation')
-      const issuesTab = GOD_MODE_TABS.find((t) => t.id === 'issues')
+      const conversationTab = METAMODE_TABS.find((t) => t.id === 'conversation')
+      const issuesTab = METAMODE_TABS.find((t) => t.id === 'issues')
       expect(conversationTab?.available).toBe(true)
       expect(issuesTab?.available).toBe(true)
     })
@@ -107,7 +108,7 @@ describe('god-mode types', () => {
 
   describe('DEFAULT_KEYBOARD_SHORTCUTS', () => {
     it('should have toggleWindow shortcut', () => {
-      expect(DEFAULT_KEYBOARD_SHORTCUTS.toggleWindow).toBe('Ctrl+Shift+G')
+      expect(DEFAULT_KEYBOARD_SHORTCUTS.toggleWindow).toBe('Ctrl+Shift+M')
     })
 
     it('should have all optional shortcuts', () => {
@@ -117,18 +118,18 @@ describe('god-mode types', () => {
     })
   })
 
-  describe('DEFAULT_GOD_MODE_CONFIG', () => {
+  describe('DEFAULT_METAMODE_CONFIG', () => {
     it('should have all required configuration', () => {
-      expect(DEFAULT_GOD_MODE_CONFIG.position).toBeDefined()
-      expect(DEFAULT_GOD_MODE_CONFIG.size).toBeDefined()
-      expect(DEFAULT_GOD_MODE_CONFIG.tabs).toBeDefined()
-      expect(DEFAULT_GOD_MODE_CONFIG.shortcuts).toBeDefined()
-      expect(DEFAULT_GOD_MODE_CONFIG.preferredLanguage).toBeDefined()
-      expect(DEFAULT_GOD_MODE_CONFIG.persistState).toBe(true)
+      expect(DEFAULT_METAMODE_CONFIG.position).toBeDefined()
+      expect(DEFAULT_METAMODE_CONFIG.size).toBeDefined()
+      expect(DEFAULT_METAMODE_CONFIG.tabs).toBeDefined()
+      expect(DEFAULT_METAMODE_CONFIG.shortcuts).toBeDefined()
+      expect(DEFAULT_METAMODE_CONFIG.preferredLanguage).toBeDefined()
+      expect(DEFAULT_METAMODE_CONFIG.persistState).toBe(true)
     })
 
     it('should only include available tabs by default', () => {
-      const tabs = DEFAULT_GOD_MODE_CONFIG.tabs
+      const tabs = DEFAULT_METAMODE_CONFIG.tabs
       expect(tabs).toContain('query')
       expect(tabs).toContain('context')
       expect(tabs).toContain('search')
@@ -153,7 +154,7 @@ describe('god-mode types', () => {
 
   describe('isValidTab', () => {
     it('should return true for valid tabs', () => {
-      const validTabs: GodModeTab[] = [
+      const validTabs: MetaModeTab[] = [
         'query',
         'context',
         'search',
@@ -182,7 +183,7 @@ describe('god-mode types', () => {
     })
 
     it('should return undefined for invalid tab', () => {
-      const info = getTabInfo('invalid' as GodModeTab)
+      const info = getTabInfo('invalid' as MetaModeTab)
       expect(info).toBeUndefined()
     })
   })
@@ -194,7 +195,7 @@ describe('god-mode types', () => {
     })
 
     it('should filter by config tabs', () => {
-      const config: GodModeConfig = {
+      const config: MetaModeConfig = {
         tabs: ['query', 'search'],
       }
       const tabs = getAvailableTabs(config)
@@ -203,7 +204,7 @@ describe('god-mode types', () => {
     })
 
     it('should include issues tab now that TASK 56 is complete', () => {
-      const config: GodModeConfig = {
+      const config: MetaModeConfig = {
         tabs: ['query', 'issues'], // issues is now available (TASK 56 complete)
       }
       const tabs = getAvailableTabs(config)
@@ -328,7 +329,7 @@ describe('god-mode types', () => {
   })
 })
 
-describe('god-mode localStorage', () => {
+describe('metamode localStorage', () => {
   beforeEach(() => {
     localStorage.clear()
   })
@@ -337,17 +338,17 @@ describe('god-mode localStorage', () => {
     localStorage.clear()
   })
 
-  describe('saveGodModeState', () => {
+  describe('saveMetaModeState', () => {
     it('should save state to localStorage', () => {
-      const state: GodModeWindowState = {
+      const state: MetaModeWindowState = {
         state: 'open',
         position: { x: 100, y: 200 },
         size: { ...DEFAULT_WINDOW_SIZE, width: 600 },
         activeTab: 'context',
         isPinned: true,
       }
-      saveGodModeState(state)
-      const stored = localStorage.getItem(GOD_MODE_STORAGE_KEY)
+      saveMetaModeState(state)
+      const stored = localStorage.getItem(METAMODE_STORAGE_KEY)
       expect(stored).toBeDefined()
       const parsed = JSON.parse(stored!)
       expect(parsed.state).toBe('open')
@@ -361,22 +362,22 @@ describe('god-mode localStorage', () => {
         throw new Error('Storage full')
       })
 
-      const state: GodModeWindowState = { ...DEFAULT_WINDOW_STATE }
+      const state: MetaModeWindowState = { ...DEFAULT_WINDOW_STATE }
       // The function should not throw when localStorage fails - it should catch the error
-      expect(() => saveGodModeState(state)).not.toThrow()
+      expect(() => saveMetaModeState(state)).not.toThrow()
 
       mockSetItem.mockRestore()
     })
   })
 
-  describe('loadGodModeState', () => {
+  describe('loadMetaModeState', () => {
     it('should return default state when no saved state', () => {
-      const state = loadGodModeState()
+      const state = loadMetaModeState()
       expect(state).toEqual(DEFAULT_WINDOW_STATE)
     })
 
     it('should load saved state', () => {
-      const savedState: GodModeWindowState = {
+      const savedState: MetaModeWindowState = {
         state: 'open',
         position: { x: 150, y: 250 },
         size: { ...DEFAULT_WINDOW_SIZE, width: 550, height: 650 },
@@ -384,9 +385,9 @@ describe('god-mode localStorage', () => {
         isPinned: true,
         lastOpened: '2024-01-01T00:00:00.000Z',
       }
-      localStorage.setItem(GOD_MODE_STORAGE_KEY, JSON.stringify(savedState))
+      localStorage.setItem(METAMODE_STORAGE_KEY, JSON.stringify(savedState))
 
-      const loaded = loadGodModeState()
+      const loaded = loadMetaModeState()
       expect(loaded.state).toBe('open')
       expect(loaded.position.x).toBe(150)
       expect(loaded.activeTab).toBe('search')
@@ -395,9 +396,9 @@ describe('god-mode localStorage', () => {
 
     it('should merge with defaults for partial state', () => {
       const partialState = { state: 'minimized', activeTab: 'context' }
-      localStorage.setItem(GOD_MODE_STORAGE_KEY, JSON.stringify(partialState))
+      localStorage.setItem(METAMODE_STORAGE_KEY, JSON.stringify(partialState))
 
-      const loaded = loadGodModeState()
+      const loaded = loadMetaModeState()
       expect(loaded.state).toBe('minimized')
       expect(loaded.activeTab).toBe('context')
       expect(loaded.position).toEqual(expect.objectContaining(DEFAULT_WINDOW_POSITION))
@@ -405,10 +406,10 @@ describe('god-mode localStorage', () => {
     })
 
     it('should handle corrupted localStorage data', () => {
-      localStorage.setItem(GOD_MODE_STORAGE_KEY, 'not valid json')
+      localStorage.setItem(METAMODE_STORAGE_KEY, 'not valid json')
       const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
-      const state = loadGodModeState()
+      const state = loadMetaModeState()
       expect(state).toEqual(DEFAULT_WINDOW_STATE)
       expect(consoleSpy).toHaveBeenCalled()
 

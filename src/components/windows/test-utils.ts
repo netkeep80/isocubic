@@ -14,10 +14,10 @@ vi.mock('../ComponentInfo.vue', () => ({
 }))
 
 // Mock Pinia stores for components that need them
-vi.mock('../lib/devmode', () => ({
-  useIsDevModeEnabled: () => false,
+vi.mock('../lib/metamode-store', () => ({
+  useIsMetaModeEnabled: () => false,
   useHoveredComponentId: () => ref(null),
-  useDevModeKeyboard: () => {},
+  useMetaModeKeyboard: () => {},
 }))
 
 vi.mock('../lib/auth', () => ({

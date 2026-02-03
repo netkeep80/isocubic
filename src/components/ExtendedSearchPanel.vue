@@ -8,7 +8,7 @@ highlighting */
 <script setup lang="ts">
 // === Imports ===
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
-import { useIsDevModeEnabled } from '../lib/devmode'
+import { useIsMetaModeEnabled } from '../lib/metamode-store'
 import type { QueryLanguage } from '../types/ai-query'
 import { detectQueryLanguage } from '../types/ai-query'
 import type { ComponentMeta } from '../types/component-meta'
@@ -462,9 +462,9 @@ const emit = defineEmits<{
   (e: 'search', query: string, results: ExtendedSearchResult[]): void
 }>()
 
-// === DevMode ===
+// === MetaMode ===
 
-const isDevModeEnabled = useIsDevModeEnabled()
+const isMetaModeEnabled = useIsMetaModeEnabled()
 
 // === State ===
 
@@ -777,7 +777,7 @@ watch(
 
 <template>
   <div
-    v-if="isDevModeEnabled"
+    v-if="isMetaModeEnabled"
     ref="panelRef"
     :class="props.className"
     :style="containerStyle"

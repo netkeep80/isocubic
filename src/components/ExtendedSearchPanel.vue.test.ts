@@ -16,14 +16,14 @@ import {
   type ComponentMeta,
 } from '../types/component-meta'
 
-// Mock devmode composable
+// Mock metamode composable
 // vi.hoisted ensures the variable is declared before vi.mock (which is hoisted)
-const { mockDevModeEnabled } = vi.hoisted(() => {
-  const mockDevModeEnabled = { value: true }
-  return { mockDevModeEnabled }
+const { mockMetaModeEnabled } = vi.hoisted(() => {
+  const mockMetaModeEnabled = { value: true }
+  return { mockMetaModeEnabled }
 })
-vi.mock('../lib/devmode', () => ({
-  useIsDevModeEnabled: vi.fn(() => mockDevModeEnabled.value),
+vi.mock('../lib/metamode-store', () => ({
+  useIsMetaModeEnabled: vi.fn(() => mockMetaModeEnabled.value),
 }))
 
 // Mock component metadata for testing
@@ -103,7 +103,7 @@ const mockComponents: ComponentMeta[] = [
 
 describe('ExtendedSearchPanel Vue Component', () => {
   beforeEach(() => {
-    mockDevModeEnabled.value = true
+    mockMetaModeEnabled.value = true
     componentMetaRegistry.clear()
     for (const comp of mockComponents) {
       registerComponentMeta(comp)
@@ -512,7 +512,7 @@ describe('ExtendedSearchPanel Vue Component', () => {
   // ========================================================================
   describe('DevMode disabled', () => {
     it('should not render when DevMode is disabled', async () => {
-      mockDevModeEnabled.value = false
+      mockMetaModeEnabled.value = false
 
       const wrapper = shallowMount(ExtendedSearchPanel, { props: {} })
       await nextTick()
@@ -520,7 +520,7 @@ describe('ExtendedSearchPanel Vue Component', () => {
       expect(wrapper.find('[data-testid="extended-search-panel"]').exists()).toBe(false)
 
       // Restore for other tests
-      mockDevModeEnabled.value = true
+      mockMetaModeEnabled.value = true
     })
   })
 })

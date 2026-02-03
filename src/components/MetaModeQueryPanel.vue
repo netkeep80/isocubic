@@ -1,16 +1,16 @@
-/** * DevModeQueryPanel Component * * Provides an AI-powered query interface for Developer Mode. *
-Users can ask natural language questions about components and metadata. * * TASK 49: AI Query
-Interface for DevMode (Phase 8 - AI + Metadata) * TASK 66: Migrated from React TSX to Vue 3 SFC
-(Phase 10 - Vue.js 3.0 Migration) * * Features: * - Natural language input field for queries * -
-Formatted response display area * - Query history with re-use capability * - Collapsible/expandable
-panel * - Keyboard shortcut for quick access (Ctrl+Shift+Q) * - Multi-language support
-(Russian/English) */
+/** * MetaModeQueryPanel Component * * Provides an AI-powered query interface for MetaMode. * Users
+can ask natural language questions about components and metadata. * * TASK 49: AI Query Interface
+for MetaMode (Phase 8 - AI + Metadata) * TASK 66: Migrated from React TSX to Vue 3 SFC (Phase 10 -
+Vue.js 3.0 Migration) * TASK 72: Renamed from DevModeQueryPanel to MetaModeQueryPanel (Phase 12) * *
+Features: * - Natural language input field for queries * - Formatted response display area * - Query
+history with re-use capability * - Collapsible/expandable panel * - Keyboard shortcut for quick
+access (Ctrl+Shift+Q) * - Multi-language support (Russian/English) */
 
 <script setup lang="ts">
 // === Types ===
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import type { CSSProperties } from 'vue'
-import { useIsDevModeEnabled } from '../lib/devmode'
+import { useIsMetaModeEnabled } from '../lib/metamode-store'
 import {
   type AIQueryRequest,
   type AIQueryResponse,
@@ -672,7 +672,7 @@ function processQuery(request: AIQueryRequest): AIQueryResponse {
 }
 
 // === State ===
-const isDevModeEnabled = useIsDevModeEnabled()
+const isMetaModeEnabled = useIsMetaModeEnabled()
 
 const isExpanded = ref(props.initialExpanded)
 const query = ref('')
@@ -854,11 +854,11 @@ watch(
 
 <template>
   <div
-    v-if="isDevModeEnabled"
+    v-if="isMetaModeEnabled"
     ref="panelRef"
     :class="className"
     :style="containerStyle"
-    data-testid="devmode-query-panel"
+    data-testid="metamode-query-panel"
   >
     <!-- Header -->
     <div :style="componentStyles.header" role="button" tabindex="0" @click="handleToggle">

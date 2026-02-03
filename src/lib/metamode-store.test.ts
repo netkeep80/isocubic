@@ -1,12 +1,18 @@
 /**
- * Tests for Developer Mode Pinia store and composables
+ * Tests for MetaMode Pinia store and composables
  *
  * TASK 61: Migrated from React testing-library to Pinia testing (Phase 10)
+ * TASK 72: Renamed from devmode to metamode-store (Phase 12)
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
-import { useDevModeStore, useDevMode, useIsDevModeEnabled, useDevModeSettings } from './devmode'
+import {
+  useMetaModeStore,
+  useMetaMode,
+  useIsMetaModeEnabled,
+  useMetaModeSettings,
+} from './metamode-store'
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -30,44 +36,44 @@ Object.defineProperty(window, 'localStorage', {
   writable: true,
 })
 
-describe('DevMode Pinia Store', () => {
+describe('MetaMode Pinia Store', () => {
   beforeEach(() => {
     localStorageMock.clear()
     vi.clearAllMocks()
     setActivePinia(createPinia())
   })
 
-  it('should provide DevMode store', () => {
-    const store = useDevModeStore()
+  it('should provide MetaMode store', () => {
+    const store = useMetaModeStore()
 
     expect(store).toBeDefined()
     expect(store.settings).toBeDefined()
-    expect(store.toggleDevMode).toBeInstanceOf(Function)
+    expect(store.toggleMetaMode).toBeInstanceOf(Function)
     expect(store.updateSettings).toBeInstanceOf(Function)
     expect(store.updateCategory).toBeInstanceOf(Function)
     expect(store.resetSettings).toBeInstanceOf(Function)
   })
 
-  it('should start with DevMode disabled by default', () => {
-    const store = useDevModeStore()
+  it('should start with MetaMode disabled by default', () => {
+    const store = useMetaModeStore()
 
     expect(store.settings.enabled).toBe(false)
   })
 
-  it('should toggle DevMode on/off', () => {
-    const store = useDevModeStore()
+  it('should toggle MetaMode on/off', () => {
+    const store = useMetaModeStore()
 
     expect(store.settings.enabled).toBe(false)
 
-    store.toggleDevMode()
+    store.toggleMetaMode()
     expect(store.settings.enabled).toBe(true)
 
-    store.toggleDevMode()
+    store.toggleMetaMode()
     expect(store.settings.enabled).toBe(false)
   })
 
   it('should update settings', () => {
-    const store = useDevModeStore()
+    const store = useMetaModeStore()
 
     expect(store.settings.verbosity).toBe('normal')
 
@@ -76,7 +82,7 @@ describe('DevMode Pinia Store', () => {
   })
 
   it('should update individual categories', () => {
-    const store = useDevModeStore()
+    const store = useMetaModeStore()
 
     expect(store.settings.categories.dependencies).toBe(false)
 
@@ -85,7 +91,7 @@ describe('DevMode Pinia Store', () => {
   })
 
   it('should reset to default settings', () => {
-    const store = useDevModeStore()
+    const store = useMetaModeStore()
 
     // Modify some settings
     store.updateSettings({ enabled: true, verbosity: 'verbose' })
@@ -103,9 +109,9 @@ describe('DevMode Pinia Store', () => {
   })
 
   it('should persist settings to localStorage', async () => {
-    const store = useDevModeStore()
+    const store = useMetaModeStore()
 
-    store.toggleDevMode()
+    store.toggleMetaMode()
 
     // Pinia uses watchers which are async, give it a tick
     await new Promise((resolve) => setTimeout(resolve, 0))
@@ -115,7 +121,7 @@ describe('DevMode Pinia Store', () => {
 
     // Find the last call to setItem for our key
     const calls = localStorageMock.setItem.mock.calls.filter(
-      (call: string[]) => call[0] === 'isocubic_devmode_settings'
+      (call: string[]) => call[0] === 'isocubic_metamode_settings'
     )
     expect(calls.length).toBeGreaterThan(0)
 
@@ -128,38 +134,38 @@ describe('DevMode Pinia Store', () => {
   it('should load settings from localStorage', () => {
     // Pre-populate localStorage
     localStorageMock.setItem(
-      'isocubic_devmode_settings',
+      'isocubic_metamode_settings',
       JSON.stringify({ enabled: true, verbosity: 'minimal' })
     )
 
-    const store = useDevModeStore()
+    const store = useMetaModeStore()
 
     expect(store.settings.enabled).toBe(true)
     expect(store.settings.verbosity).toBe('minimal')
   })
 })
 
-describe('useDevMode composable', () => {
+describe('useMetaMode composable', () => {
   beforeEach(() => {
     localStorageMock.clear()
     vi.clearAllMocks()
     setActivePinia(createPinia())
   })
 
-  it('should return DevMode context value', () => {
-    const devMode = useDevMode()
+  it('should return MetaMode context value', () => {
+    const metaMode = useMetaMode()
 
-    expect(devMode).toBeDefined()
-    expect(devMode.settings).toBeDefined()
-    expect(devMode.toggleDevMode).toBeInstanceOf(Function)
-    expect(devMode.updateSettings).toBeInstanceOf(Function)
-    expect(devMode.updateCategory).toBeInstanceOf(Function)
-    expect(devMode.resetSettings).toBeInstanceOf(Function)
-    expect(devMode.isEnabled).toBe(false)
+    expect(metaMode).toBeDefined()
+    expect(metaMode.settings).toBeDefined()
+    expect(metaMode.toggleMetaMode).toBeInstanceOf(Function)
+    expect(metaMode.updateSettings).toBeInstanceOf(Function)
+    expect(metaMode.updateCategory).toBeInstanceOf(Function)
+    expect(metaMode.resetSettings).toBeInstanceOf(Function)
+    expect(metaMode.isEnabled).toBe(false)
   })
 })
 
-describe('useIsDevModeEnabled composable', () => {
+describe('useIsMetaModeEnabled composable', () => {
   beforeEach(() => {
     localStorageMock.clear()
     vi.clearAllMocks()
@@ -167,25 +173,25 @@ describe('useIsDevModeEnabled composable', () => {
   })
 
   it('should return a ComputedRef that is false by default', () => {
-    const isEnabled = useIsDevModeEnabled()
+    const isEnabled = useIsMetaModeEnabled()
     expect(isEnabled.value).toBe(false)
   })
 
   it('should reactively update when toggling', () => {
-    const store = useDevModeStore()
-    const isEnabled = useIsDevModeEnabled()
+    const store = useMetaModeStore()
+    const isEnabled = useIsMetaModeEnabled()
 
     expect(isEnabled.value).toBe(false)
 
-    store.toggleDevMode()
+    store.toggleMetaMode()
     expect(isEnabled.value).toBe(true)
 
-    store.toggleDevMode()
+    store.toggleMetaMode()
     expect(isEnabled.value).toBe(false)
   })
 })
 
-describe('useDevModeSettings composable', () => {
+describe('useMetaModeSettings composable', () => {
   beforeEach(() => {
     localStorageMock.clear()
     vi.clearAllMocks()
@@ -193,7 +199,7 @@ describe('useDevModeSettings composable', () => {
   })
 
   it('should return a ComputedRef with default settings', () => {
-    const settings = useDevModeSettings()
+    const settings = useMetaModeSettings()
 
     expect(settings.value.enabled).toBe(false)
     expect(settings.value.verbosity).toBe('normal')
@@ -203,8 +209,8 @@ describe('useDevModeSettings composable', () => {
   })
 
   it('should reactively update after modification', () => {
-    const store = useDevModeStore()
-    const settings = useDevModeSettings()
+    const store = useMetaModeStore()
+    const settings = useMetaModeSettings()
 
     expect(settings.value.showOutline).toBe(true)
 
@@ -226,7 +232,7 @@ describe('Category settings', () => {
   })
 
   it('should have correct default categories', () => {
-    const store = useDevModeStore()
+    const store = useMetaModeStore()
 
     const { categories } = store.settings
     expect(categories.basic).toBe(true)
@@ -239,7 +245,7 @@ describe('Category settings', () => {
   })
 
   it('should update multiple categories', () => {
-    const store = useDevModeStore()
+    const store = useMetaModeStore()
 
     store.updateCategory('dependencies', true)
     store.updateCategory('props', true)

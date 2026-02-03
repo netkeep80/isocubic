@@ -8,7 +8,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useDeviceType } from './composables/useDeviceType'
 import { useCubeEditor } from './composables/useCubeEditor'
-import { useDevModeKeyboard, useHoveredComponentId } from './lib/devmode'
+import { useMetaModeKeyboard, useHoveredComponentId } from './lib/metamode-store'
 import { useAuthStore } from './lib/auth'
 import { useWindowManager } from './composables/useWindowManager'
 import type { WindowDefinition } from './composables/useWindowManager'
@@ -29,9 +29,9 @@ import SharePanel from './components/SharePanel.vue'
 import { SHARE_PANEL_META } from './components/SharePanel.vue'
 import NotificationPanel from './components/NotificationPanel.vue'
 import { NOTIFICATION_PANEL_META } from './components/NotificationPanel.vue'
-import GodModeWindow from './components/GodModeWindow.vue'
+import MetaModeWindow from './components/MetaModeWindow.vue'
 import ComponentInfo from './components/ComponentInfo.vue'
-import DevModeIndicator from './components/DevModeIndicator.vue'
+import MetaModeIndicator from './components/MetaModeIndicator.vue'
 import DraggableWindow from './components/DraggableWindow.vue'
 import CommandBar from './components/CommandBar.vue'
 import type { CommandItem } from './components/CommandBar.vue'
@@ -47,10 +47,10 @@ const { isTablet, isDesktop } = useDeviceType()
 // Cube editor state
 const { currentCube, updateCube, selectCube, loadCube } = useCubeEditor()
 
-// DevMode keyboard shortcut (Ctrl+Shift+D)
-useDevModeKeyboard()
+// MetaMode keyboard shortcut (Ctrl+Shift+M)
+useMetaModeKeyboard()
 
-// Track which component the mouse is hovering over for GodModeWindow
+// Track which component the mouse is hovering over for MetaModeWindow
 const hoveredComponentId = useHoveredComponentId()
 
 // Auth store initialization
@@ -322,7 +322,7 @@ const APP_META = {
   description:
     'App is the root component of isocubic. It provides a windowed desktop layout with draggable, ' +
     'resizable, collapsible windows and a TinyLLM command bar, plus adaptive tablet and mobile layouts. ' +
-    'Integrates all subsystems (Gallery, Editor, Preview, Export, GOD MODE) and manages the global ' +
+    'Integrates all subsystems (Gallery, Editor, Preview, Export, MetaMode) and manages the global ' +
     'cube editing state through the useCubeEditor composable.',
   phase: 11,
   taskId: 'TASK 68',
@@ -433,10 +433,10 @@ const APP_META = {
       purpose: 'AI-based cube generation',
     },
     {
-      name: 'GodModeWindow',
+      name: 'MetaModeWindow',
       type: 'component',
-      path: 'components/GodModeWindow.vue',
-      purpose: 'GOD MODE developer tools',
+      path: 'components/MetaModeWindow.vue',
+      purpose: 'MetaMode developer tools',
     },
     {
       name: 'useDeviceType',
@@ -607,8 +607,8 @@ const APP_META = {
       />
     </ComponentInfo>
 
-    <GodModeWindow :selected-component-id="hoveredComponentId" />
-    <DevModeIndicator />
+    <MetaModeWindow :selected-component-id="hoveredComponentId" />
+    <MetaModeIndicator />
   </div>
 
   <!-- Tablet Layout (Windowed with touch optimization) -->
@@ -721,8 +721,8 @@ const APP_META = {
       />
     </ComponentInfo>
 
-    <GodModeWindow :selected-component-id="hoveredComponentId" />
-    <DevModeIndicator />
+    <MetaModeWindow :selected-component-id="hoveredComponentId" />
+    <MetaModeIndicator />
   </div>
 
   <!-- Mobile Layout (Windowed with tab navigation) -->
@@ -828,6 +828,6 @@ const APP_META = {
       </div>
     </ComponentInfo>
 
-    <DevModeIndicator />
+    <MetaModeIndicator />
   </div>
 </template>

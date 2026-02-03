@@ -1,17 +1,17 @@
 /**
- * VueDevMode Store (Pinia)
+ * MetaMode Store (Pinia)
  *
- * Provides a Pinia store for enabling VueDevMode (unified Developer Mode) throughout
- * the application. When VueDevMode is enabled, components display their metadata and
- * development information via tooltips and overlays, and the VueDevMode window
- * (formerly GOD MODE) becomes available.
+ * Provides a Pinia store for enabling MetaMode (unified Developer Mode) throughout
+ * the application. When MetaMode is enabled, components display their metadata and
+ * development information via tooltips and overlays, and the MetaMode window
+ * becomes available.
  *
  * TASK 40: Developer Mode System (Phase 6 - Developer Experience)
  * TASK 61: Migrated from React Context to Pinia store (Phase 10 - Vue.js 3.0 Migration)
- * Issue #173: Unified devmode/god-mode under VueDevMode name, fixed reactivity
+ * TASK 72: Unified DevMode + GodMode → MetaMode (Phase 12)
  *
  * Features:
- * - Toggle VueDevMode on/off via UI or keyboard shortcut (Ctrl+Shift+D)
+ * - Toggle MetaMode on/off via UI or keyboard shortcut (Ctrl+Shift+M)
  * - Persist preference in localStorage
  * - Configure verbosity level (minimal, normal, verbose)
  * - Enable/disable specific metadata categories
@@ -23,12 +23,12 @@ import { defineStore } from 'pinia'
 /**
  * Verbosity level for metadata display
  */
-export type DevModeVerbosity = 'minimal' | 'normal' | 'verbose'
+export type MetaModeVerbosity = 'minimal' | 'normal' | 'verbose'
 
 /**
  * Categories of metadata that can be shown/hidden
  */
-export interface DevModeCategories {
+export interface MetaModeCategories {
   /** Show basic info (name, summary, status) */
   basic: boolean
   /** Show component history */
@@ -48,7 +48,7 @@ export interface DevModeCategories {
 /**
  * Default category settings
  */
-const DEFAULT_CATEGORIES: DevModeCategories = {
+const DEFAULT_CATEGORIES: MetaModeCategories = {
   basic: true,
   history: true,
   features: true,
@@ -59,15 +59,15 @@ const DEFAULT_CATEGORIES: DevModeCategories = {
 }
 
 /**
- * DevMode settings interface
+ * MetaMode settings interface
  */
-export interface DevModeSettings {
-  /** Whether Developer Mode is enabled */
+export interface MetaModeSettings {
+  /** Whether MetaMode is enabled */
   enabled: boolean
   /** Verbosity level */
-  verbosity: DevModeVerbosity
+  verbosity: MetaModeVerbosity
   /** Categories to display */
-  categories: DevModeCategories
+  categories: MetaModeCategories
   /** Show component outline/highlight */
   showOutline: boolean
   /** Show floating info panel on hover */
@@ -77,9 +77,9 @@ export interface DevModeSettings {
 }
 
 /**
- * Default DevMode settings
+ * Default MetaMode settings
  */
-const DEFAULT_SETTINGS: DevModeSettings = {
+const DEFAULT_SETTINGS: MetaModeSettings = {
   enabled: false,
   verbosity: 'normal',
   categories: DEFAULT_CATEGORIES,
@@ -89,16 +89,33 @@ const DEFAULT_SETTINGS: DevModeSettings = {
 }
 
 /**
- * LocalStorage key for persisting DevMode settings
+ * LocalStorage key for persisting MetaMode settings
  */
-const STORAGE_KEY = 'isocubic_devmode_settings'
+const STORAGE_KEY = 'isocubic_metamode_settings'
 
 /**
- * Load settings from localStorage
+ * Legacy storage key for migration
  */
-function loadSettings(): DevModeSettings {
+const LEGACY_STORAGE_KEY = 'isocubic_devmode_settings'
+
+/**
+ * Load settings from localStorage (with migration from legacy key)
+ */
+function loadSettings(): MetaModeSettings {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY)
+    // Try new key first
+    let stored = localStorage.getItem(STORAGE_KEY)
+
+    // Migrate from legacy key if new key not found
+    if (!stored) {
+      stored = localStorage.getItem(LEGACY_STORAGE_KEY)
+      if (stored) {
+        // Migrate to new key
+        localStorage.setItem(STORAGE_KEY, stored)
+        localStorage.removeItem(LEGACY_STORAGE_KEY)
+      }
+    }
+
     if (stored) {
       const parsed = JSON.parse(stored)
       return {
@@ -111,7 +128,7 @@ function loadSettings(): DevModeSettings {
       }
     }
   } catch (e) {
-    console.warn('Failed to load DevMode settings:', e)
+    console.warn('Failed to load MetaMode settings:', e)
   }
   return DEFAULT_SETTINGS
 }
@@ -119,42 +136,42 @@ function loadSettings(): DevModeSettings {
 /**
  * Save settings to localStorage
  */
-function saveSettings(settings: DevModeSettings): void {
+function saveSettings(settings: MetaModeSettings): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings))
   } catch (e) {
-    console.warn('Failed to save DevMode settings:', e)
+    console.warn('Failed to save MetaMode settings:', e)
   }
 }
 
 /**
- * DevMode context value interface (preserved for API compatibility)
+ * MetaMode context value interface (preserved for API compatibility)
  */
-export interface DevModeContextValue {
+export interface MetaModeContextValue {
   /** Current settings */
-  settings: DevModeSettings
-  /** Toggle DevMode on/off */
-  toggleDevMode: () => void
+  settings: MetaModeSettings
+  /** Toggle MetaMode on/off */
+  toggleMetaMode: () => void
   /** Update settings */
-  updateSettings: (updates: Partial<DevModeSettings>) => void
+  updateSettings: (updates: Partial<MetaModeSettings>) => void
   /** Update a specific category */
-  updateCategory: (category: keyof DevModeCategories, enabled: boolean) => void
+  updateCategory: (category: keyof MetaModeCategories, enabled: boolean) => void
   /** Reset to default settings */
   resetSettings: () => void
-  /** Check if DevMode is enabled */
+  /** Check if MetaMode is enabled */
   isEnabled: boolean
 }
 
 /**
- * Pinia store for DevMode
+ * Pinia store for MetaMode
  */
-export const useDevModeStore = defineStore('devMode', () => {
-  const settings = ref<DevModeSettings>(loadSettings())
+export const useMetaModeStore = defineStore('metaMode', () => {
+  const settings = ref<MetaModeSettings>(loadSettings())
 
   /** ID of the component currently hovered by the mouse pointer */
   const hoveredComponentId = ref<string | null>(null)
 
-  /** ID of the component selected by click (for VueDevMode inspection) */
+  /** ID of the component selected by click (for MetaMode inspection) */
   const selectedComponentId = ref<string | null>(null)
 
   // Persist settings changes
@@ -166,21 +183,21 @@ export const useDevModeStore = defineStore('devMode', () => {
     { deep: true }
   )
 
-  function toggleDevMode() {
+  function toggleMetaMode() {
     settings.value = {
       ...settings.value,
       enabled: !settings.value.enabled,
     }
   }
 
-  function updateSettings(updates: Partial<DevModeSettings>) {
+  function updateSettings(updates: Partial<MetaModeSettings>) {
     settings.value = {
       ...settings.value,
       ...updates,
     }
   }
 
-  function updateCategory(category: keyof DevModeCategories, enabled: boolean) {
+  function updateCategory(category: keyof MetaModeCategories, enabled: boolean) {
     settings.value = {
       ...settings.value,
       categories: {
@@ -206,7 +223,7 @@ export const useDevModeStore = defineStore('devMode', () => {
     settings,
     hoveredComponentId,
     selectedComponentId,
-    toggleDevMode,
+    toggleMetaMode,
     updateSettings,
     updateCategory,
     resetSettings,
@@ -216,17 +233,17 @@ export const useDevModeStore = defineStore('devMode', () => {
 })
 
 /**
- * Composable to set up DevMode keyboard shortcut (Ctrl+Shift+D)
+ * Composable to set up MetaMode keyboard shortcut (Ctrl+Shift+M)
  *
  * Call this in your root App.vue or layout component to enable the shortcut.
  */
-export function useDevModeKeyboard() {
-  const store = useDevModeStore()
+export function useMetaModeKeyboard() {
+  const store = useMetaModeStore()
 
   const handleKeyDown = (e: KeyboardEvent) => {
-    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'd') {
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'm') {
       e.preventDefault()
-      store.toggleDevMode()
+      store.toggleMetaMode()
     }
   }
 
@@ -242,17 +259,17 @@ export function useDevModeKeyboard() {
 }
 
 /**
- * Composable to access DevMode state (convenience wrapper)
+ * Composable to access MetaMode state (convenience wrapper)
  *
- * @returns DevMode context value compatible with the previous React API
+ * @returns MetaMode context value compatible with the previous API
  */
-export function useDevMode(): DevModeContextValue {
-  const store = useDevModeStore()
+export function useMetaMode(): MetaModeContextValue {
+  const store = useMetaModeStore()
   return {
     get settings() {
       return store.settings
     },
-    toggleDevMode: store.toggleDevMode,
+    toggleMetaMode: store.toggleMetaMode,
     updateSettings: store.updateSettings,
     updateCategory: store.updateCategory,
     resetSettings: store.resetSettings,
@@ -263,22 +280,22 @@ export function useDevMode(): DevModeContextValue {
 }
 
 /**
- * Composable to check if DevMode is enabled
+ * Composable to check if MetaMode is enabled
  *
  * Returns a ComputedRef<boolean> that reactively tracks the enabled state.
  */
-export function useIsDevModeEnabled(): ComputedRef<boolean> {
-  const store = useDevModeStore()
+export function useIsMetaModeEnabled(): ComputedRef<boolean> {
+  const store = useMetaModeStore()
   return computed(() => store.settings.enabled)
 }
 
 /**
- * Composable to get DevMode settings
+ * Composable to get MetaMode settings
  *
- * Returns a ComputedRef<DevModeSettings> that reactively tracks all settings.
+ * Returns a ComputedRef<MetaModeSettings> that reactively tracks all settings.
  */
-export function useDevModeSettings(): ComputedRef<DevModeSettings> {
-  const store = useDevModeStore()
+export function useMetaModeSettings(): ComputedRef<MetaModeSettings> {
+  const store = useMetaModeStore()
   return computed(() => store.settings)
 }
 
@@ -288,7 +305,7 @@ export function useDevModeSettings(): ComputedRef<DevModeSettings> {
  * Returns a ComputedRef<string | null> that reactively tracks the hovered component.
  */
 export function useHoveredComponentId(): ComputedRef<string | null> {
-  const store = useDevModeStore()
+  const store = useMetaModeStore()
   return computed(() => store.hoveredComponentId)
 }
 
@@ -298,8 +315,39 @@ export function useHoveredComponentId(): ComputedRef<string | null> {
  * Returns a ComputedRef<string | null> that reactively tracks the selected component.
  */
 export function useSelectedComponentId(): ComputedRef<string | null> {
-  const store = useDevModeStore()
+  const store = useMetaModeStore()
   return computed(() => store.selectedComponentId)
 }
 
-export default useDevModeStore
+// =============================================================================
+// Backward Compatibility Aliases (deprecated)
+// =============================================================================
+
+/** @deprecated Use MetaModeVerbosity instead */
+export type DevModeVerbosity = MetaModeVerbosity
+
+/** @deprecated Use MetaModeCategories instead */
+export type DevModeCategories = MetaModeCategories
+
+/** @deprecated Use MetaModeSettings instead */
+export type DevModeSettings = MetaModeSettings
+
+/** @deprecated Use MetaModeContextValue instead */
+export type DevModeContextValue = MetaModeContextValue
+
+/** @deprecated Use useMetaModeStore instead */
+export const useDevModeStore = useMetaModeStore
+
+/** @deprecated Use useMetaModeKeyboard instead */
+export const useDevModeKeyboard = useMetaModeKeyboard
+
+/** @deprecated Use useMetaMode instead */
+export const useDevMode = useMetaMode
+
+/** @deprecated Use useIsMetaModeEnabled instead */
+export const useIsDevModeEnabled = useIsMetaModeEnabled
+
+/** @deprecated Use useMetaModeSettings instead */
+export const useDevModeSettings = useMetaModeSettings
+
+export default useMetaModeStore

@@ -1,0 +1,10 @@
+{
+  "$schema": "../../../../metamode.schema.json",
+  "name": "metamode/components",
+  "description": "Vue components for the MetaMode development panel",
+  "files": {
+    "MetaModeProvider.ts": {
+      "description": "Provider component that injects MetaMode context"
+    }
+  }
+}

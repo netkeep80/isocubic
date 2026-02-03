@@ -26,9 +26,9 @@ vi.mock('../lib/share-links', () => ({
   generateQRCode: vi.fn(),
 }))
 
-// Mock devmode
-vi.mock('../lib/devmode', () => ({
-  useIsDevModeEnabled: vi.fn(() => false),
+// Mock metamode
+vi.mock('../lib/metamode-store', () => ({
+  useIsMetaModeEnabled: vi.fn(() => false),
 }))
 
 // Sample cube for testing

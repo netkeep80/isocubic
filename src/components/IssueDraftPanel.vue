@@ -1,10 +1,10 @@
 <!--
   Issue Draft Panel Component (Vue 3 SFC)
 
-  Component for creating and editing GitHub Issue drafts in GOD MODE.
+  Component for creating and editing GitHub Issue drafts in MetaMode.
   Provides interface for AI-generated drafts with manual editing capabilities.
 
-  TASK 56: Issue Draft Generator (Phase 9 - GOD MODE)
+  TASK 56: Issue Draft Generator (Phase 9 - MetaMode)
   TASK 138: Migration from React to Vue 3.0 SFC
 
   Features:
@@ -19,7 +19,7 @@
 // --- Imports ---
 import { ref, computed, shallowRef, onMounted, onUnmounted, type CSSProperties } from 'vue'
 import type { QueryLanguage } from '../types/ai-query'
-import type { ConversationMessage } from '../types/god-mode'
+import type { ConversationMessage } from '../types/metamode'
 import type {
   IssueDraft,
   IssueType,

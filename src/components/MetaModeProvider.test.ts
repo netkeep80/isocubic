@@ -1,44 +1,45 @@
 /**
- * GodModeProvider Tests
+ * MetaModeProvider Tests
  *
- * Tests for the GOD MODE Vue provide/inject provider from @isocubic/god-mode library.
+ * Tests for the MetaMode Vue provide/inject provider from @isocubic/metamode library.
  *
- * TASK 59: GOD MODE Library Extraction (Phase 9)
+ * TASK 59: MetaMode Library Extraction (Phase 9)
  * TASK 61: Migrated from React testing to Vue testing (Phase 10)
+ * TASK 72: Renamed from GodModeProvider to MetaModeProvider (Phase 12)
  */
 
 import { describe, it, expect, beforeEach } from 'vitest'
 import { defineComponent, h, inject } from 'vue'
 import { mount } from '@vue/test-utils'
 import {
-  provideGodMode,
-  useGodMode,
-  GOD_MODE_KEY,
-} from '../../packages/god-mode/src/components/GodModeProvider'
-import type { GodModeConfig, GodModeContextValue } from '../../packages/god-mode/src'
+  provideMetaMode,
+  useMetaMode,
+  METAMODE_KEY,
+} from '../../packages/metamode/src/components/MetaModeProvider'
+import type { MetaModeConfig, MetaModeContextValue } from '../../packages/metamode/src'
 
-describe('GodModeProvider', () => {
+describe('MetaModeProvider', () => {
   beforeEach(() => {
     localStorage.clear()
   })
 
   /**
-   * Helper: create a wrapper component that calls provideGodMode in setup
+   * Helper: create a wrapper component that calls provideMetaMode in setup
    * and renders a child component that uses inject to get the context
    */
-  function createTestApp(config?: GodModeConfig) {
-    let context: GodModeContextValue | undefined
+  function createTestApp(config?: MetaModeConfig) {
+    let context: MetaModeContextValue | undefined
 
     const Child = defineComponent({
       setup() {
-        context = inject<GodModeContextValue>(GOD_MODE_KEY)
+        context = inject<MetaModeContextValue>(METAMODE_KEY)
         return () => h('div', 'child')
       },
     })
 
     const Parent = defineComponent({
       setup() {
-        provideGodMode(config)
+        provideMetaMode(config)
         return () => h(Child)
       },
     })
@@ -59,11 +60,11 @@ describe('GodModeProvider', () => {
       expect(ctx.config.persistState).toBe(true)
     })
 
-    it('should throw when useGodMode is used outside provider', () => {
+    it('should throw when useMetaMode is used outside provider', () => {
       const Component = defineComponent({
         setup() {
-          expect(() => useGodMode()).toThrow(
-            'useGodMode must be used within a component that calls provideGodMode()'
+          expect(() => useMetaMode()).toThrow(
+            'useMetaMode must be used within a component that calls provideMetaMode()'
           )
           return () => h('div')
         },
@@ -183,7 +184,7 @@ describe('GodModeProvider', () => {
 
   describe('custom config', () => {
     it('should accept custom config', () => {
-      const config: GodModeConfig = {
+      const config: MetaModeConfig = {
         preferredLanguage: 'en',
         tabs: ['conversation', 'issues'],
         storageKeyPrefix: 'test_app',
@@ -201,7 +202,7 @@ describe('GodModeProvider', () => {
     })
 
     it('should merge custom shortcuts', () => {
-      const config: GodModeConfig = {
+      const config: MetaModeConfig = {
         shortcuts: { toggleWindow: 'Ctrl+Shift+D' },
       }
 
@@ -213,7 +214,7 @@ describe('GodModeProvider', () => {
     })
 
     it('should accept GitHub config', () => {
-      const config: GodModeConfig = {
+      const config: MetaModeConfig = {
         github: {
           owner: 'test-org',
           repo: 'test-repo',
@@ -232,7 +233,7 @@ describe('GodModeProvider', () => {
 
   describe('persistence with custom prefix', () => {
     it('should save state with custom storage prefix', async () => {
-      const config: GodModeConfig = {
+      const config: MetaModeConfig = {
         storageKeyPrefix: 'my_custom_prefix',
         persistState: true,
       }
@@ -253,7 +254,7 @@ describe('GodModeProvider', () => {
     })
 
     it('should not save state when persistState is false', () => {
-      const config: GodModeConfig = {
+      const config: MetaModeConfig = {
         storageKeyPrefix: 'no_persist_prefix',
         persistState: false,
       }

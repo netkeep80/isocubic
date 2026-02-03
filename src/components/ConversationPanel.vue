@@ -1,6 +1,6 @@
-/** * ConversationPanel Component * * Chat-like interface for AI conversation in GOD MODE. * Allows
+/** * ConversationPanel Component * * Chat-like interface for AI conversation in MetaMode. * Allows
 users to discuss improvements, report bugs, and formulate tasks * through natural language
-conversation with the AI assistant. * * TASK 55: AI Conversation Agent (Phase 9 - GOD MODE) * *
+conversation with the AI assistant. * * TASK 55: AI Conversation Agent (Phase 9 - MetaMode) * *
 Features: * - Chat-like message history interface * - Context-aware AI responses * - Quick
 suggestion buttons * - Message streaming indicator * - Conversation history persistence * -
 Multi-language support (Russian/English) */
@@ -13,7 +13,7 @@ import {
   type ConversationMessageContext,
   DEFAULT_CONVERSATION_SETTINGS,
   CONVERSATION_SUGGESTIONS,
-} from '../types/god-mode'
+} from '../types/metamode'
 import {
   createConversationAgent,
   type AgentResponse,

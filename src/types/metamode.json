@@ -46,11 +46,11 @@
     "auth.test.ts": {
       "description": "Tests for auth types"
     },
-    "god-mode.ts": {
-      "description": "GOD MODE types for AI-assisted development panel"
+    "metamode.ts": {
+      "description": "MetaMode types for AI-assisted development panel"
     },
-    "god-mode.test.ts": {
-      "description": "Tests for GOD MODE types"
+    "metamode.test.ts": {
+      "description": "Tests for MetaMode types"
     },
     "ai-query.ts": {
       "description": "AI query types for natural language component search"

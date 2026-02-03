@@ -12,9 +12,9 @@ import { nextTick } from 'vue'
 import ComponentInfo from './ComponentInfo.vue'
 import type { ComponentMeta } from '../types/component-meta'
 
-// Mock devmode composable
-const { mockDevModeEnabled, mockSettings } = vi.hoisted(() => {
-  const mockDevModeEnabled = { value: true }
+// Mock metamode composable
+const { mockMetaModeEnabled, mockSettings } = vi.hoisted(() => {
+  const mockMetaModeEnabled = { value: true }
   const mockSettings = {
     enabled: true,
     verbosity: 'normal' as string,
@@ -31,21 +31,21 @@ const { mockDevModeEnabled, mockSettings } = vi.hoisted(() => {
     showHoverInfo: true,
     panelPosition: 'top-right' as string,
   }
-  return { mockDevModeEnabled, mockSettings }
+  return { mockMetaModeEnabled, mockSettings }
 })
 
-const mockDevModeStore = {
+const mockMetaModeStore = {
   hoveredComponentId: null as string | null,
   setHoveredComponent: vi.fn((id: string | null) => {
-    mockDevModeStore.hoveredComponentId = id
+    mockMetaModeStore.hoveredComponentId = id
   }),
   setSelectedComponent: vi.fn(),
 }
 
-vi.mock('../lib/devmode', () => ({
-  useIsDevModeEnabled: vi.fn(() => mockDevModeEnabled),
-  useDevModeSettings: vi.fn(() => ({ value: mockSettings })),
-  useDevModeStore: vi.fn(() => mockDevModeStore),
+vi.mock('../lib/metamode-store', () => ({
+  useIsMetaModeEnabled: vi.fn(() => mockMetaModeEnabled),
+  useMetaModeSettings: vi.fn(() => ({ value: mockSettings })),
+  useMetaModeStore: vi.fn(() => mockMetaModeStore),
 }))
 
 // Test metadata
@@ -109,7 +109,7 @@ const testMeta: ComponentMeta = {
 
 describe('ComponentInfo Vue Component', () => {
   beforeEach(() => {
-    mockDevModeEnabled.value = true
+    mockMetaModeEnabled.value = true
     localStorage.clear()
     vi.clearAllMocks()
   })
@@ -179,10 +179,10 @@ describe('ComponentInfo Vue Component', () => {
   })
 
   // ========================================================================
-  // DevMode Indicator States (from original Vue test)
+  // MetaMode Indicator States (from original Vue test)
   // ========================================================================
-  describe('DevMode Indicator States', () => {
-    it('should define devmode indicator states', () => {
+  describe('MetaMode Indicator States', () => {
+    it('should define metamode indicator states', () => {
       const indicatorStates = ['active', 'inactive', 'error']
       expect(indicatorStates).toContain('active')
       expect(indicatorStates).toContain('inactive')
@@ -263,7 +263,7 @@ describe('ComponentInfo Vue Component', () => {
       expect(wrapper.text()).toContain('Child Content')
     })
 
-    // Issue #198: Inline info panel is disabled — all metadata is shown in the GodMode window only
+    // Issue #198: Inline info panel is disabled — all metadata is shown in the MetaMode window only
     it('should not display inline panel even with alwaysShow (Issue #198)', () => {
       const wrapper = mountInfo({ alwaysShow: true })
       // Panel content should not appear inline
@@ -272,8 +272,8 @@ describe('ComponentInfo Vue Component', () => {
       expect(wrapper.text()).toContain('Child Content')
     })
 
-    it('should not render overlay when DevMode is disabled', async () => {
-      mockDevModeEnabled.value = false
+    it('should not render overlay when MetaMode is disabled', async () => {
+      mockMetaModeEnabled.value = false
 
       const wrapper = mountInfo()
       // Children should still render
@@ -281,7 +281,7 @@ describe('ComponentInfo Vue Component', () => {
       // But overlay/version elements should not be present
       expect(wrapper.text()).not.toContain('v1.0.0')
 
-      mockDevModeEnabled.value = true
+      mockMetaModeEnabled.value = true
     })
   })
 
@@ -289,7 +289,7 @@ describe('ComponentInfo Vue Component', () => {
   // Hover behavior (from React test)
   // ========================================================================
   describe('Hover behavior', () => {
-    // Issue #198: Inline info panel is disabled — hover only updates store for GodMode window
+    // Issue #198: Inline info panel is disabled — hover only updates store for MetaMode window
     it('should not show inline info panel on hover (Issue #198)', async () => {
       const wrapper = mountInfo()
       const wrapperEl = wrapper.find('.component-info')

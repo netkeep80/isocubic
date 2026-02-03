@@ -1,10 +1,11 @@
 /**
- * GOD MODE Library Extraction Tests
+ * MetaMode Library Extraction Tests
  *
- * Tests verifying the extracted @isocubic/god-mode library package
+ * Tests verifying the extracted @isocubic/metamode library package
  * works correctly as a standalone unit.
  *
- * TASK 59: GOD MODE Library Extraction (Phase 9)
+ * TASK 59: MetaMode Library Extraction (Phase 9)
+ * TASK 72: Renamed from GOD MODE to MetaMode (Phase 12)
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
@@ -14,16 +15,16 @@ import {
   // Types/common
   detectLanguage,
   DEFAULT_COMPONENT_REGISTRY,
-  // Types/god-mode
-  GOD_MODE_TABS,
+  // Types/metamode
+  METAMODE_TABS,
   DEFAULT_WINDOW_SIZE,
   DEFAULT_KEYBOARD_SHORTCUTS,
-  DEFAULT_GOD_MODE_CONFIG,
+  DEFAULT_METAMODE_CONFIG,
   DEFAULT_WINDOW_STATE,
   CONVERSATION_SUGGESTIONS,
   getStorageKey,
-  loadGodModeState,
-  saveGodModeState,
+  loadMetaModeState,
+  saveMetaModeState,
   isValidTab,
   getTabInfo,
   getAvailableTabs,
@@ -52,21 +53,21 @@ import {
   getIssueDraftStorageKey,
   MAX_DRAFTS_COUNT,
   DRAFT_AUTO_SAVE_INTERVAL,
-} from '../../packages/god-mode/src'
+} from '../../packages/metamode/src'
 
 import type {
   QueryLanguage,
   ComponentMeta,
   ComponentRegistry,
-  GodModeConfig,
-  GodModeTab,
+  MetaModeConfig,
+  MetaModeTab,
   ConversationMessage,
   IssueDraft,
   IssueType,
   IssuePriority,
-} from '../../packages/god-mode/src'
+} from '../../packages/metamode/src'
 
-describe('GOD MODE Library (@isocubic/god-mode)', () => {
+describe('MetaMode Library (@isocubic/metamode)', () => {
   beforeEach(() => {
     localStorage.clear()
   })
@@ -122,19 +123,19 @@ describe('GOD MODE Library (@isocubic/god-mode)', () => {
   // ===========================================================================
   // GOD MODE Types
   // ===========================================================================
-  describe('god-mode types', () => {
-    describe('GOD_MODE_TABS', () => {
+  describe('metamode types', () => {
+    describe('METAMODE_TABS', () => {
       it('should have 5 tabs', () => {
-        expect(GOD_MODE_TABS).toHaveLength(5)
+        expect(METAMODE_TABS).toHaveLength(5)
       })
 
       it('should include all tab IDs', () => {
-        const ids = GOD_MODE_TABS.map((t) => t.id)
+        const ids = METAMODE_TABS.map((t) => t.id)
         expect(ids).toEqual(['query', 'context', 'search', 'conversation', 'issues'])
       })
 
       it('should have bilingual labels', () => {
-        for (const tab of GOD_MODE_TABS) {
+        for (const tab of METAMODE_TABS) {
           expect(tab.labelRu).toBeTruthy()
           expect(tab.labelEn).toBeTruthy()
           expect(tab.descriptionRu).toBeTruthy()
@@ -143,15 +144,15 @@ describe('GOD MODE Library (@isocubic/god-mode)', () => {
       })
 
       it('should have all tabs available', () => {
-        expect(GOD_MODE_TABS.every((t) => t.available)).toBe(true)
+        expect(METAMODE_TABS.every((t) => t.available)).toBe(true)
       })
     })
 
     describe('configurable storage keys', () => {
       it('should use default prefix', () => {
-        expect(getStorageKey()).toBe('god_mode_state')
-        expect(getConversationStorageKey()).toBe('god_mode_conversation')
-        expect(getIssueDraftStorageKey()).toBe('god_mode_issue_drafts')
+        expect(getStorageKey()).toBe('metamode_state')
+        expect(getConversationStorageKey()).toBe('metamode_conversation')
+        expect(getIssueDraftStorageKey()).toBe('metamode_issue_drafts')
       })
 
       it('should use custom prefix', () => {
@@ -161,9 +162,9 @@ describe('GOD MODE Library (@isocubic/god-mode)', () => {
       })
     })
 
-    describe('loadGodModeState', () => {
+    describe('loadMetaModeState', () => {
       it('should return default state when nothing stored', () => {
-        const state = loadGodModeState()
+        const state = loadMetaModeState()
         expect(state).toEqual(DEFAULT_WINDOW_STATE)
       })
 
@@ -171,7 +172,7 @@ describe('GOD MODE Library (@isocubic/god-mode)', () => {
         const customState = { ...DEFAULT_WINDOW_STATE, state: 'open' as const, isPinned: true }
         localStorage.setItem('my_app_state', JSON.stringify(customState))
 
-        const loaded = loadGodModeState('my_app')
+        const loaded = loadMetaModeState('my_app')
         expect(loaded.state).toBe('open')
         expect(loaded.isPinned).toBe(true)
       })
@@ -180,16 +181,16 @@ describe('GOD MODE Library (@isocubic/god-mode)', () => {
         localStorage.setItem('god_mode_state', 'invalid json')
         const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
-        const state = loadGodModeState()
+        const state = loadMetaModeState()
         expect(state).toEqual(DEFAULT_WINDOW_STATE)
 
         consoleSpy.mockRestore()
       })
     })
 
-    describe('saveGodModeState', () => {
+    describe('saveMetaModeState', () => {
       it('should save state with custom prefix', () => {
-        saveGodModeState(DEFAULT_WINDOW_STATE, 'custom')
+        saveMetaModeState(DEFAULT_WINDOW_STATE, 'custom')
         const stored = localStorage.getItem('custom_state')
         expect(stored).toBeTruthy()
         expect(JSON.parse(stored!)).toEqual(DEFAULT_WINDOW_STATE)
@@ -220,13 +221,13 @@ describe('GOD MODE Library (@isocubic/god-mode)', () => {
       })
 
       it('should return undefined for invalid tab', () => {
-        expect(getTabInfo('invalid' as GodModeTab)).toBeUndefined()
+        expect(getTabInfo('invalid' as MetaModeTab)).toBeUndefined()
       })
     })
 
     describe('getAvailableTabs', () => {
       it('should return tabs based on config', () => {
-        const config: GodModeConfig = { tabs: ['conversation', 'issues'] }
+        const config: MetaModeConfig = { tabs: ['conversation', 'issues'] }
         const tabs = getAvailableTabs(config)
         expect(tabs.map((t) => t.id)).toEqual(['conversation', 'issues'])
       })
@@ -516,21 +517,21 @@ describe('GOD MODE Library (@isocubic/god-mode)', () => {
   // ===========================================================================
   // Default Config
   // ===========================================================================
-  describe('DEFAULT_GOD_MODE_CONFIG', () => {
+  describe('DEFAULT_METAMODE_CONFIG', () => {
     it('should have configurable storageKeyPrefix', () => {
-      expect(DEFAULT_GOD_MODE_CONFIG.storageKeyPrefix).toBe('god_mode')
+      expect(DEFAULT_METAMODE_CONFIG.storageKeyPrefix).toBe('metamode')
     })
 
     it('should persist state by default', () => {
-      expect(DEFAULT_GOD_MODE_CONFIG.persistState).toBe(true)
+      expect(DEFAULT_METAMODE_CONFIG.persistState).toBe(true)
     })
 
     it('should default to Russian language', () => {
-      expect(DEFAULT_GOD_MODE_CONFIG.preferredLanguage).toBe('ru')
+      expect(DEFAULT_METAMODE_CONFIG.preferredLanguage).toBe('ru')
     })
 
     it('should have keyboard shortcuts', () => {
-      expect(DEFAULT_GOD_MODE_CONFIG.shortcuts).toEqual(DEFAULT_KEYBOARD_SHORTCUTS)
+      expect(DEFAULT_METAMODE_CONFIG.shortcuts).toEqual(DEFAULT_KEYBOARD_SHORTCUTS)
     })
   })
 
@@ -541,7 +542,7 @@ describe('GOD MODE Library (@isocubic/god-mode)', () => {
     it('should export all required types', () => {
       // Verify type imports compile (TypeScript compile-time check)
       const _lang: QueryLanguage = 'en'
-      const _tab: GodModeTab = 'conversation'
+      const _tab: MetaModeTab = 'conversation'
       const _type: IssueType = 'bug'
       const _priority: IssuePriority = 'high'
 

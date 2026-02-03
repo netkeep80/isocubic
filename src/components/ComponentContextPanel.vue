@@ -426,7 +426,7 @@ export {
 // ─── Imports ───────────────────────────────────────────────────────────────────
 
 import { ref, computed } from 'vue'
-import { useIsDevModeEnabled } from '../lib/devmode'
+import { useIsMetaModeEnabled } from '../lib/metamode-store'
 import type { ContextPanelSettings } from '../types/ai-query'
 import type { CSSProperties } from 'vue'
 import type { ComponentHistoryEntry } from '../types/component-meta'
@@ -466,9 +466,9 @@ const emit = defineEmits<{
   relatedComponentSelect: [componentId: string]
 }>()
 
-// ─── DevMode ───────────────────────────────────────────────────────────────────
+// ─── MetaMode ───────────────────────────────────────────────────────────────────
 
-const isDevModeEnabled = useIsDevModeEnabled()
+const isMetaModeEnabled = useIsMetaModeEnabled()
 
 // ─── State ─────────────────────────────────────────────────────────────────────
 
@@ -863,7 +863,7 @@ const positionStyles: Record<string, CSSProperties> = {
 
 <template>
   <div
-    v-if="isDevModeEnabled"
+    v-if="isMetaModeEnabled"
     :class="className"
     :style="containerStyle"
     data-testid="component-context-panel"
