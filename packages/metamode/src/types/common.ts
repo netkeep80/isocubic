@@ -1,9 +1,9 @@
 /**
- * Common Types for GOD MODE Library
+ * Common Types for MetaMode Library
  *
- * Provides shared types used across all GOD MODE modules.
+ * Provides shared types used across all MetaMode modules.
  * These types abstract away application-specific dependencies,
- * making the library reusable in any React project.
+ * making the library reusable in any Vue.js 3.0 project.
  */
 
 /**
@@ -45,10 +45,10 @@ export interface ComponentMeta {
 
 /**
  * Component registry interface for providing component metadata
- * to the GOD MODE library from an external application.
+ * to the MetaMode library from an external application.
  *
  * Applications implement this interface to connect their component
- * metadata system with GOD MODE's AI conversation and issue generation.
+ * metadata system with MetaMode's AI conversation and issue generation.
  */
 export interface ComponentRegistry {
   /** Get all registered component metadata */

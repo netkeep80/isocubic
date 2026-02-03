@@ -1,17 +1,17 @@
 {
   "$schema": "../../metamode.schema.json",
-  "name": "god-mode",
-  "description": "Standalone package for GOD MODE AI-assisted development panel",
+  "name": "metamode",
+  "description": "Standalone package for MetaMode AI-assisted development panel",
   "languages": ["typescript", "vue"],
   "files": {
     "package.json": {
-      "description": "NPM package manifest for god-mode"
+      "description": "NPM package manifest for metamode"
     },
     "tsconfig.json": {
-      "description": "TypeScript configuration for god-mode package"
+      "description": "TypeScript configuration for metamode package"
     },
     "README.md": {
-      "description": "GOD MODE package documentation"
+      "description": "MetaMode package documentation"
     }
   },
   "directories": {
