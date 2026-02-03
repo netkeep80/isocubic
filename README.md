@@ -366,6 +366,7 @@ npm run test:coverage
 - E2E тесты для полных workflow редактирования (мигрированы на Vue — TASK 68)
 - Тесты MetaMode AI-оптимизатора (генерация AI summary, сокращённые поля, экономия токенов — TASK 74)
 - Тесты inline metamode извлечения (JSDoc @metamode, объект const metamode, нормализация, слияние — TASK 75)
+- Тесты MetaMode терминологии (миграция DevMode/GodMode → MetaMode во всех тестах — TASK 77)
 
 ## Вклад в проект
 

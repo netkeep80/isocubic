@@ -3,8 +3,9 @@
  *
  * Tests for the MetaMode type definitions and utility functions.
  *
- * TASK 54: Unified DevMode Window (Phase 9 - MetaMode)
+ * TASK 54: Unified MetaMode Window (Phase 9 - MetaMode)
  * TASK 72: Renamed from GOD MODE to MetaMode (Phase 12)
+ * TASK 77: Migrated tests to MetaMode terminology (Phase 12)
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'

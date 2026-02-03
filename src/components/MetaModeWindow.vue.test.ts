@@ -2,7 +2,8 @@
  * Comprehensive unit tests for MetaModeWindow Vue component
  * Migrated from MetaModeWindow.test.tsx (React) + existing Vue tests
  * TASK 66: Vue.js 3.0 Migration
- * TASK 72: Renamed from MetaModeWindow to MetaModeWindow (Phase 12)
+ * TASK 72: Renamed from GodModeWindow to MetaModeWindow (Phase 12)
+ * TASK 77: Migrated tests to MetaMode terminology (Phase 12)
  *
  * @vitest-environment jsdom
  */
@@ -175,7 +176,7 @@ describe('MetaModeWindow Vue Component', () => {
   // Rendering (from React test)
   // ========================================================================
   describe('Rendering', () => {
-    it('should render when DevMode is enabled and window is open', () => {
+    it('should render when MetaMode is enabled and window is open', () => {
       const wrapper = mountWindow()
       expect(wrapper.find('[data-testid="metamode-window"]').exists()).toBe(true)
       expect(wrapper.find('[data-testid="metamode-header"]').exists()).toBe(true)
@@ -351,8 +352,8 @@ describe('MetaModeWindow Vue Component', () => {
   describe('Resize Functionality', () => {
     it('should have resize handles', () => {
       const wrapper = mountWindow()
-      const godWindow = wrapper.find('[data-testid="metamode-window"]')
-      const handles = godWindow.findAll('[style*="cursor"]')
+      const metamodeWindow = wrapper.find('[data-testid="metamode-window"]')
+      const handles = metamodeWindow.findAll('[style*="cursor"]')
       expect(handles.length).toBeGreaterThan(0)
     })
 
@@ -398,8 +399,8 @@ describe('MetaModeWindow Vue Component', () => {
       )
 
       const wrapper = mountWindow()
-      const godWindow = wrapper.find('[data-testid="metamode-window"]')
-      const style = godWindow.attributes('style') || ''
+      const metamodeWindow = wrapper.find('[data-testid="metamode-window"]')
+      const style = metamodeWindow.attributes('style') || ''
       expect(style).toContain('left: 100px')
       expect(style).toContain('top: 150px')
     })

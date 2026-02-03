@@ -2,6 +2,7 @@
  * Comprehensive unit tests for ExtendedSearchPanel Vue component
  * Migrated from ExtendedSearchPanel.test.tsx (React) + existing Vue tests
  * TASK 66: Vue.js 3.0 Migration
+ * TASK 77: Migrated tests to MetaMode terminology (Phase 12)
  *
  * @vitest-environment jsdom
  */
@@ -231,7 +232,7 @@ describe('ExtendedSearchPanel Vue Component', () => {
   // Rendering (from React test)
   // ========================================================================
   describe('Rendering', () => {
-    it('should render the panel when DevMode is enabled', () => {
+    it('should render the panel when MetaMode is enabled', () => {
       const wrapper = mountPanel()
       expect(wrapper.find('[data-testid="extended-search-panel"]').exists()).toBe(true)
     })
@@ -508,10 +509,10 @@ describe('ExtendedSearchPanel Vue Component', () => {
   })
 
   // ========================================================================
-  // DevMode disabled (from React test)
+  // MetaMode disabled (from React test)
   // ========================================================================
-  describe('DevMode disabled', () => {
-    it('should not render when DevMode is disabled', async () => {
+  describe('MetaMode disabled', () => {
+    it('should not render when MetaMode is disabled', async () => {
       mockMetaModeEnabled.value = false
 
       const wrapper = shallowMount(ExtendedSearchPanel, { props: {} })
