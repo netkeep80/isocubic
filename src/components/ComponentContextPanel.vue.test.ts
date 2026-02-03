@@ -2,6 +2,7 @@
  * Comprehensive unit tests for ComponentContextPanel Vue component
  * Migrated from ComponentContextPanel.test.tsx (React) + existing Vue tests
  * TASK 66: Vue.js 3.0 Migration
+ * TASK 77: Migrated tests to MetaMode terminology (Phase 12)
  *
  * @vitest-environment jsdom
  */
@@ -282,7 +283,7 @@ describe('ComponentContextPanel Vue Component', () => {
   // Rendering (from React test)
   // ========================================================================
   describe('Rendering', () => {
-    it('should not render when DevMode is disabled', async () => {
+    it('should not render when MetaMode is disabled', async () => {
       mockMetaModeEnabled.value = false
 
       const wrapper = mountPanel()
@@ -292,7 +293,7 @@ describe('ComponentContextPanel Vue Component', () => {
       mockMetaModeEnabled.value = true
     })
 
-    it('should render when DevMode is enabled', () => {
+    it('should render when MetaMode is enabled', () => {
       const wrapper = mountPanel()
       expect(wrapper.find('[data-testid="component-context-panel"]').exists()).toBe(true)
     })

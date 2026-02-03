@@ -5,7 +5,8 @@
  *
  * TASK 59: MetaMode Library Extraction (Phase 9)
  * TASK 61: Migrated from React testing to Vue testing (Phase 10)
- * TASK 72: Renamed from GodModeProvider to MetaModeProvider (Phase 12)
+ * TASK 72: Renamed from GodMode Provider to MetaMode Provider (Phase 12)
+ * TASK 77: Migrated tests to MetaMode terminology (Phase 12)
  */
 
 import { describe, it, expect, beforeEach } from 'vitest'

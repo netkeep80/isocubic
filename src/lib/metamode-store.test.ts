@@ -2,7 +2,8 @@
  * Tests for MetaMode Pinia store and composables
  *
  * TASK 61: Migrated from React testing-library to Pinia testing (Phase 10)
- * TASK 72: Renamed from devmode to metamode-store (Phase 12)
+ * TASK 72: Renamed from DevMode to MetaMode store (Phase 12)
+ * TASK 77: Migrated tests to MetaMode terminology (Phase 12)
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
