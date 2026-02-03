@@ -422,13 +422,100 @@ interface MetamodeTreeNode {
 
 ---
 
-## 12. Дальнейшее развитие
+## 12. Встроенная база данных (TASK 80)
 
-1. **TASK 71**: Рефакторинг именования metanet → metamode
-2. **TASK 72**: Унификация DevMode + GodMode → MetaMode
-3. **TASK 74**: Оптимизация формата для AI-агентов
-4. **TASK 75**: Реализация inline metamode атрибутов
-5. **TASK 80**: Компиляция в встроенную БД
+MetaMode поддерживает компиляцию всех метаданных в единую встроенную базу данных для использования в runtime.
+
+### 12.1 Виртуальный модуль базы данных
+
+```typescript
+import metamodeDB from 'virtual:metamode/db'
+
+// Структура базы данных:
+// - root: MetamodeTreeNode - корень дерева метаданных
+// - index: Record<string, ...> - плоский индекс для быстрого поиска по пути
+// - allTags: string[] - все уникальные теги
+// - allLanguages: string[] - все языки программирования
+// - stats: MetamodeDatabaseStats - статистика
+// - buildTimestamp: string - время сборки (ISO 8601)
+// - formatVersion: string - версия формата БД
+```
+
+### 12.2 API для запросов
+
+```typescript
+import { useMetamodeDatabase } from '@/composables/useMetamodeDatabase'
+
+const {
+  client,      // MetamodeDatabaseClient - клиент для запросов
+  search,      // (query, options?) => SearchResult[] - поиск
+  getByPath,   // (path) => Entry | undefined - получение по пути
+  getFile,     // (path) => FileEntry | undefined - получение файла
+  getDirectory,// (path) => DirEntry | undefined - получение директории
+  stats,       // ComputedRef<Stats> - статистика (реактивная)
+  allTags,     // ComputedRef<string[]> - все теги (реактивные)
+  allLanguages,// ComputedRef<string[]> - все языки (реактивные)
+} = useMetamodeDatabase()
+
+// Поиск с фильтрами
+const results = search('component', {
+  status: 'stable',       // Фильтр по статусу
+  phase: [1, 2],          // Фильтр по фазе
+  tags: ['ui', 'vue'],    // Фильтр по тегам (любой из)
+  filesOnly: true,        // Только файлы
+  limit: 10,              // Ограничение результатов
+})
+
+// Получение по пути
+const file = getFile('src/components/ParamEditor.vue')
+const dir = getDirectory('src/components')
+
+// Получение файлов по критериям
+const stableFiles = client.getFilesByStatus('stable')
+const phase2Files = client.getFilesByPhase(2)
+const uiFiles = client.getFilesByTags(['ui'])
+```
+
+### 12.3 Статистика базы данных
+
+```typescript
+const { stats } = useMetamodeDatabase()
+
+console.log(stats.value.totalFiles)       // Общее количество файлов
+console.log(stats.value.totalDirectories) // Общее количество директорий
+console.log(stats.value.filesByStatus)    // Файлы по статусам
+console.log(stats.value.filesByPhase)     // Файлы по фазам
+console.log(stats.value.sizeBytes)        // Размер БД в байтах
+```
+
+### 12.4 Обход дерева
+
+```typescript
+const { client } = useMetamodeDatabase()
+
+// Обход всех записей
+client.traverse((entry, path, type) => {
+  console.log(`${type}: ${path}`)
+  // return false для раннего прекращения
+})
+
+// Только файлы
+client.traverse(
+  (entry, path) => { /* ... */ },
+  { includeFiles: true, includeDirectories: false }
+)
+```
+
+---
+
+## 13. Дальнейшее развитие
+
+1. **TASK 71**: Рефакторинг именования metanet → metamode ✅
+2. **TASK 72**: Унификация DevMode + GodMode → MetaMode ✅
+3. **TASK 74**: Оптимизация формата для AI-агентов ✅
+4. **TASK 75**: Реализация inline metamode атрибутов ✅
+5. **TASK 80**: Компиляция в встроенную БД ✅
+6. **TASK 81**: Исследование интеграции с tinyLLM
 
 ---
 

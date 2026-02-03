@@ -6,14 +6,18 @@
  *   import metamode from 'virtual:metamode'         // flat map (Record<path, MetamodeEntry>)
  *   import metamodeTree from 'virtual:metamode/tree' // hierarchical tree (MetamodeTreeNode)
  *   import metamodeAI from 'virtual:metamode/ai'    // AI-optimized tree (TASK 74)
+ *   import metamodeDB from 'virtual:metamode/db'    // Unified database with query API (TASK 80)
  *
  * The flat map provides backward-compatible access by file path.
  * The tree provides a hierarchical view where metadata structure is primary
  * and file references are secondary information.
  * The AI module provides a token-optimized format for AI agents (TASK 74).
+ * The DB module provides a compiled database with statistics and query-ready index (TASK 80).
  *
  * TASK 75: Added inline metamode extraction support
  * Inline metadata in Vue components has higher priority than file-based metamode.json
+ *
+ * TASK 80: Added unified database compilation with index, stats, and build info
  */
 
 import * as fs from 'node:fs'
@@ -75,12 +79,35 @@ interface AIMetamodeTreeNode {
   children?: Record<string, AIMetamodeTreeNode>
 }
 
+// Database types (TASK 80)
+type MetamodeStatus = 'stable' | 'beta' | 'experimental' | 'deprecated'
+
+interface MetamodeDatabaseStats {
+  totalDirectories: number
+  totalFiles: number
+  filesByStatus: Record<MetamodeStatus | 'unknown', number>
+  filesByPhase: Record<number, number>
+  sizeBytes: number
+}
+
+interface MetamodeDatabase {
+  root: MetamodeTreeNode
+  index: Record<string, FileDescriptor | MetamodeTreeNode>
+  allTags: string[]
+  allLanguages: string[]
+  stats: MetamodeDatabaseStats
+  buildTimestamp: string
+  formatVersion: string
+}
+
 const VIRTUAL_MODULE_ID = 'virtual:metamode'
 const VIRTUAL_TREE_MODULE_ID = 'virtual:metamode/tree'
 const VIRTUAL_AI_MODULE_ID = 'virtual:metamode/ai'
+const VIRTUAL_DB_MODULE_ID = 'virtual:metamode/db'
 const RESOLVED_VIRTUAL_MODULE_ID = '\0' + VIRTUAL_MODULE_ID
 const RESOLVED_VIRTUAL_TREE_MODULE_ID = '\0' + VIRTUAL_TREE_MODULE_ID
 const RESOLVED_VIRTUAL_AI_MODULE_ID = '\0' + VIRTUAL_AI_MODULE_ID
+const RESOLVED_VIRTUAL_DB_MODULE_ID = '\0' + VIRTUAL_DB_MODULE_ID
 
 function loadJson(filePath: string): MetamodeJson | null {
   try {
@@ -387,6 +414,165 @@ function compileAIMetamodeTree(rootDir: string): AIMetamodeTreeNode | null {
   return visit(path.join(rootDir, 'metamode.json'))
 }
 
+// ============================================================================
+// Database Compilation (TASK 80)
+// ============================================================================
+
+/**
+ * Build a flat index from the tree structure for fast path-based lookups
+ */
+function buildIndex(
+  root: MetamodeTreeNode,
+  index: Record<string, FileDescriptor | MetamodeTreeNode> = {},
+  currentPath: string = ''
+): Record<string, FileDescriptor | MetamodeTreeNode> {
+  // Add current directory to index
+  index[currentPath || '/'] = root
+
+  // Add files to index
+  if (root.files) {
+    for (const [filename, file] of Object.entries(root.files)) {
+      const filePath = currentPath ? `${currentPath}/${filename}` : filename
+      index[filePath] = file
+    }
+  }
+
+  // Recursively add children
+  if (root.children) {
+    for (const [dirName, child] of Object.entries(root.children)) {
+      const childPath = currentPath ? `${currentPath}/${dirName}` : dirName
+      buildIndex(child, index, childPath)
+    }
+  }
+
+  return index
+}
+
+/**
+ * Collect all unique tags from the tree
+ */
+function collectTags(root: MetamodeTreeNode, tags: Set<string> = new Set()): string[] {
+  if (root.tags) {
+    root.tags.forEach((t) => tags.add(t))
+  }
+
+  if (root.files) {
+    for (const file of Object.values(root.files)) {
+      if (file.tags) {
+        file.tags.forEach((t) => tags.add(t))
+      }
+    }
+  }
+
+  if (root.children) {
+    for (const child of Object.values(root.children)) {
+      collectTags(child, tags)
+    }
+  }
+
+  return Array.from(tags).sort()
+}
+
+/**
+ * Collect all unique languages from the tree
+ */
+function collectLanguages(root: MetamodeTreeNode, languages: Set<string> = new Set()): string[] {
+  if (root.languages) {
+    root.languages.forEach((l) => languages.add(l))
+  }
+
+  if (root.children) {
+    for (const child of Object.values(root.children)) {
+      collectLanguages(child, languages)
+    }
+  }
+
+  return Array.from(languages).sort()
+}
+
+/**
+ * Compute database statistics
+ */
+function computeStats(root: MetamodeTreeNode): Omit<MetamodeDatabaseStats, 'sizeBytes'> {
+  let totalDirectories = 0
+  let totalFiles = 0
+  const filesByStatus: Record<string, number> = {
+    stable: 0,
+    beta: 0,
+    experimental: 0,
+    deprecated: 0,
+    unknown: 0,
+  }
+  const filesByPhase: Record<number, number> = {}
+
+  function traverse(node: MetamodeTreeNode) {
+    totalDirectories++
+
+    if (node.files) {
+      for (const file of Object.values(node.files)) {
+        totalFiles++
+
+        const status = file.status || 'unknown'
+        filesByStatus[status] = (filesByStatus[status] || 0) + 1
+
+        if (file.phase !== undefined) {
+          filesByPhase[file.phase] = (filesByPhase[file.phase] || 0) + 1
+        }
+      }
+    }
+
+    if (node.children) {
+      for (const child of Object.values(node.children)) {
+        traverse(child)
+      }
+    }
+  }
+
+  traverse(root)
+
+  return {
+    totalDirectories,
+    totalFiles,
+    filesByStatus: filesByStatus as Record<MetamodeStatus | 'unknown', number>,
+    filesByPhase,
+  }
+}
+
+/**
+ * Compile the unified MetaMode database (TASK 80)
+ * Includes: tree, flat index, tags, languages, stats, and build info
+ */
+function compileMetamodeDatabase(rootDir: string): MetamodeDatabase | null {
+  const tree = compileMetamodeTree(rootDir)
+  if (!tree) return null
+
+  const index = buildIndex(tree)
+  const allTags = collectTags(tree)
+  const allLanguages = collectLanguages(tree)
+  const statsWithoutSize = computeStats(tree)
+
+  // Build database without size first to calculate size
+  const dbWithoutSize = {
+    root: tree,
+    index,
+    allTags,
+    allLanguages,
+    stats: statsWithoutSize,
+    buildTimestamp: new Date().toISOString(),
+    formatVersion: '1.0.0',
+  }
+
+  const sizeBytes = JSON.stringify(dbWithoutSize).length
+
+  return {
+    ...dbWithoutSize,
+    stats: {
+      ...statsWithoutSize,
+      sizeBytes,
+    },
+  }
+}
+
 /**
  * Vite plugin that provides metamode data at runtime
  */
@@ -410,6 +596,9 @@ export default function metamodePlugin(): Plugin {
       if (id === VIRTUAL_AI_MODULE_ID) {
         return RESOLVED_VIRTUAL_AI_MODULE_ID
       }
+      if (id === VIRTUAL_DB_MODULE_ID) {
+        return RESOLVED_VIRTUAL_DB_MODULE_ID
+      }
     },
 
     load(id) {
@@ -424,6 +613,10 @@ export default function metamodePlugin(): Plugin {
       if (id === RESOLVED_VIRTUAL_AI_MODULE_ID) {
         const aiTree = compileAIMetamodeTree(rootDir)
         return `export default ${JSON.stringify(aiTree, null, 0)};`
+      }
+      if (id === RESOLVED_VIRTUAL_DB_MODULE_ID) {
+        const db = compileMetamodeDatabase(rootDir)
+        return `export default ${JSON.stringify(db, null, 0)};`
       }
     },
   }

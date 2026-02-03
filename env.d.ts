@@ -88,3 +88,41 @@ declare module 'virtual:metamode/ai' {
   const metamodeAI: AIMetamodeTreeNode
   export default metamodeAI
 }
+
+// Database types for unified MetaMode database (TASK 80)
+type MetamodeStatus = 'stable' | 'beta' | 'experimental' | 'deprecated'
+
+interface MetamodeDatabaseStats {
+  /** Total number of directories */
+  totalDirectories: number
+  /** Total number of files */
+  totalFiles: number
+  /** Files grouped by status */
+  filesByStatus: Record<MetamodeStatus | 'unknown', number>
+  /** Files grouped by development phase */
+  filesByPhase: Record<number, number>
+  /** Total size of the database in bytes */
+  sizeBytes: number
+}
+
+interface MetamodeDatabase {
+  /** Root of the metadata tree */
+  root: MetamodeTreeNode
+  /** Flat index for fast path-based lookups */
+  index: Record<string, MetamodeFileDescriptor | MetamodeTreeNode>
+  /** All unique tags used across the project */
+  allTags: string[]
+  /** All programming languages used */
+  allLanguages: string[]
+  /** Database statistics */
+  stats: MetamodeDatabaseStats
+  /** Build timestamp (ISO 8601) */
+  buildTimestamp: string
+  /** Database format version */
+  formatVersion: string
+}
+
+declare module 'virtual:metamode/db' {
+  const metamodeDB: MetamodeDatabase
+  export default metamodeDB
+}
