@@ -10,10 +10,12 @@
   - Shows file descriptors with tags and status
   - Supports expand all / collapse all
   - Multi-language support (Russian/English)
+  - TASK 76: AI-optimized format preview mode
 -->
 <script setup lang="ts">
 import { ref, computed, type CSSProperties } from 'vue'
 import metamodeTree from 'virtual:metamode/tree'
+import metamodeAI from 'virtual:metamode/ai'
 import MetamodeTreeNode from './MetamodeTreeNode.vue'
 
 // ============================================================================
@@ -45,12 +47,79 @@ const props = withDefaults(
 
 const expandedNodes = ref<Set<string>>(new Set(['root']))
 const isExpandAll = ref(false)
+/** TASK 76: Toggle between standard and AI-optimized format preview */
+const showAIFormat = ref(false)
 
 // ============================================================================
 // Computed
 // ============================================================================
 
 const hasTree = computed(() => metamodeTree != null)
+const hasAITree = computed(() => metamodeAI != null)
+
+/** TASK 76: Compute the active tree based on format mode */
+const activeTree = computed(() => {
+  if (showAIFormat.value && hasAITree.value) {
+    // Map AI format to standard format for display compatibility
+    return {
+      name: metamodeAI.name,
+      description: metamodeAI.desc,
+      version: metamodeAI.ver,
+      languages: metamodeAI.lang,
+      tags: metamodeAI.tags,
+      files: metamodeAI.files
+        ? Object.fromEntries(
+            Object.entries(metamodeAI.files).map(([k, v]) => [
+              k,
+              {
+                description: v.desc,
+                tags: v.tags,
+                phase: v.phase,
+                status: v.status === 'exp' ? 'experimental' : v.status === 'dep' ? 'deprecated' : v.status,
+                dependencies: v.deps,
+              },
+            ])
+          )
+        : undefined,
+      children: metamodeAI.children
+        ? Object.fromEntries(
+            Object.entries(metamodeAI.children).map(([k, child]) => [
+              k,
+              {
+                name: child.name,
+                description: child.desc,
+                version: child.ver,
+                languages: child.lang,
+                tags: child.tags,
+                files: child.files
+                  ? Object.fromEntries(
+                      Object.entries(child.files).map(([fk, fv]) => [
+                        fk,
+                        {
+                          description: fv.desc,
+                          tags: fv.tags,
+                          phase: fv.phase,
+                          status: fv.status === 'exp' ? 'experimental' : fv.status === 'dep' ? 'deprecated' : fv.status,
+                          dependencies: fv.deps,
+                        },
+                      ])
+                    )
+                  : undefined,
+                children: child.children,
+              },
+            ])
+          )
+        : undefined,
+    }
+  }
+  return metamodeTree
+})
+
+/** TASK 76: AI-optimized JSON preview for copying */
+const aiJsonPreview = computed(() => {
+  if (!hasAITree.value) return ''
+  return JSON.stringify(metamodeAI, null, 2)
+})
 
 // ============================================================================
 // Methods
@@ -75,6 +144,21 @@ function toggleExpandAll() {
   isExpandAll.value = !isExpandAll.value
   if (!isExpandAll.value) {
     expandedNodes.value = new Set(['root'])
+  }
+}
+
+/** TASK 76: Toggle AI format preview mode */
+function toggleAIFormat() {
+  showAIFormat.value = !showAIFormat.value
+}
+
+/** TASK 76: Copy AI JSON to clipboard */
+async function copyAIJson() {
+  try {
+    await navigator.clipboard.writeText(aiJsonPreview.value)
+    // Brief visual feedback could be added here
+  } catch (e) {
+    console.warn('Failed to copy AI JSON:', e)
   }
 }
 
@@ -234,6 +318,55 @@ const styles: Record<string, CSSProperties> = {
     textAlign: 'center',
     gap: '8px',
   },
+  // TASK 76: AI format preview styles
+  headerButtons: {
+    display: 'flex',
+    gap: '6px',
+    alignItems: 'center',
+  },
+  aiButton: {
+    background: 'none',
+    border: '1px solid rgba(59, 130, 246, 0.3)',
+    borderRadius: '6px',
+    color: '#60a5fa',
+    cursor: 'pointer',
+    padding: '4px 10px',
+    fontSize: '11px',
+    transition: 'all 0.15s ease',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+  },
+  aiButtonActive: {
+    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+    borderColor: 'rgba(59, 130, 246, 0.5)',
+    color: '#93c5fd',
+  },
+  aiBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '2px 8px',
+    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+    borderRadius: '4px',
+    fontSize: '10px',
+    color: '#60a5fa',
+    fontWeight: 600,
+    marginLeft: '8px',
+  },
+  copyButton: {
+    background: 'none',
+    border: '1px solid rgba(34, 197, 94, 0.3)',
+    borderRadius: '6px',
+    color: '#22c55e',
+    cursor: 'pointer',
+    padding: '4px 10px',
+    fontSize: '11px',
+    transition: 'all 0.15s ease',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+  },
 }
 </script>
 
@@ -248,18 +381,53 @@ const styles: Record<string, CSSProperties> = {
             ? '\u0414\u0435\u0440\u0435\u0432\u043E MetaMode'
             : 'MetaMode Tree'
         }}</span>
+        <!-- TASK 76: AI format indicator -->
+        <span v-if="showAIFormat" :style="styles.aiBadge">
+          <span>&#129302;</span>
+          <span>{{ props.language === 'ru' ? 'AI-\u0444\u043E\u0440\u043C\u0430\u0442' : 'AI Format' }}</span>
+        </span>
       </div>
-      <button type="button" :style="styles.expandButton" @click="toggleExpandAll">
-        {{
-          isExpandAll
-            ? props.language === 'ru'
-              ? '\u0421\u0432\u0435\u0440\u043D\u0443\u0442\u044C \u0432\u0441\u0435'
-              : 'Collapse all'
-            : props.language === 'ru'
-              ? '\u0420\u0430\u0437\u0432\u0435\u0440\u043D\u0443\u0442\u044C \u0432\u0441\u0435'
-              : 'Expand all'
-        }}
-      </button>
+      <div :style="styles.headerButtons">
+        <!-- TASK 76: AI format toggle button -->
+        <button
+          v-if="hasAITree"
+          type="button"
+          :style="{ ...styles.aiButton, ...(showAIFormat ? styles.aiButtonActive : {}) }"
+          :title="
+            props.language === 'ru'
+              ? (showAIFormat ? '\u041E\u0431\u044B\u0447\u043D\u044B\u0439 \u0444\u043E\u0440\u043C\u0430\u0442' : 'AI-\u043E\u043F\u0442\u0438\u043C\u0438\u0437\u0438\u0440\u043E\u0432\u0430\u043D\u043D\u044B\u0439 \u0444\u043E\u0440\u043C\u0430\u0442')
+              : (showAIFormat ? 'Standard format' : 'AI-optimized format')
+          "
+          data-testid="metamode-ai-toggle"
+          @click="toggleAIFormat"
+        >
+          <span>&#129302;</span>
+          <span>{{ showAIFormat ? (props.language === 'ru' ? '\u041E\u0431\u044B\u0447\u043D\u044B\u0439' : 'Standard') : 'AI' }}</span>
+        </button>
+        <!-- TASK 76: Copy AI JSON button -->
+        <button
+          v-if="showAIFormat && hasAITree"
+          type="button"
+          :style="styles.copyButton"
+          :title="props.language === 'ru' ? '\u041A\u043E\u043F\u0438\u0440\u043E\u0432\u0430\u0442\u044C JSON' : 'Copy JSON'"
+          data-testid="metamode-copy-ai-json"
+          @click="copyAIJson"
+        >
+          <span>&#128203;</span>
+          <span>{{ props.language === 'ru' ? '\u041A\u043E\u043F\u0438\u0440\u043E\u0432\u0430\u0442\u044C' : 'Copy' }}</span>
+        </button>
+        <button type="button" :style="styles.expandButton" @click="toggleExpandAll">
+          {{
+            isExpandAll
+              ? props.language === 'ru'
+                ? '\u0421\u0432\u0435\u0440\u043D\u0443\u0442\u044C \u0432\u0441\u0435'
+                : 'Collapse all'
+              : props.language === 'ru'
+                ? '\u0420\u0430\u0437\u0432\u0435\u0440\u043D\u0443\u0442\u044C \u0432\u0441\u0435'
+                : 'Expand all'
+          }}
+        </button>
+      </div>
     </div>
 
     <!-- Empty state -->
@@ -291,37 +459,37 @@ const styles: Record<string, CSSProperties> = {
             }"
             >&#9654;</span
           >
-          <span :style="styles.nodeName">{{ metamodeTree.name }}</span>
-          <span v-if="metamodeTree.version" :style="styles.tag">v{{ metamodeTree.version }}</span>
-          <span :style="styles.nodeDescription">{{ metamodeTree.description }}</span>
+          <span :style="styles.nodeName">{{ activeTree.name }}</span>
+          <span v-if="activeTree.version" :style="styles.tag">v{{ activeTree.version }}</span>
+          <span :style="styles.nodeDescription">{{ activeTree.description }}</span>
         </div>
 
         <!-- Root content (expanded) -->
         <div v-if="isExpanded('root')" :style="styles.nodeContent">
           <!-- Languages -->
-          <div v-if="metamodeTree.languages?.length" :style="styles.metaRow">
+          <div v-if="activeTree.languages?.length" :style="styles.metaRow">
             <span :style="styles.metaLabel">{{
               props.language === 'ru' ? '\u042F\u0437\u044B\u043A\u0438:' : 'Languages:'
             }}</span>
-            <span v-for="lang in metamodeTree.languages" :key="lang" :style="styles.tag">{{
+            <span v-for="lang in activeTree.languages" :key="lang" :style="styles.tag">{{
               lang
             }}</span>
           </div>
           <!-- Tags -->
-          <div v-if="metamodeTree.tags?.length" :style="styles.metaRow">
+          <div v-if="activeTree.tags?.length" :style="styles.metaRow">
             <span :style="styles.metaLabel">{{
               props.language === 'ru' ? '\u0422\u0435\u0433\u0438:' : 'Tags:'
             }}</span>
-            <span v-for="t in metamodeTree.tags" :key="t" :style="styles.tag">{{ t }}</span>
+            <span v-for="t in activeTree.tags" :key="t" :style="styles.tag">{{ t }}</span>
           </div>
           <!-- Files -->
-          <template v-if="metamodeTree.files">
+          <template v-if="activeTree.files">
             <div :style="{ ...styles.metaRow, marginTop: '4px' }">
               <span :style="styles.metaLabel">{{
                 props.language === 'ru' ? '\u0424\u0430\u0439\u043B\u044B:' : 'Files:'
               }}</span>
             </div>
-            <div v-for="(fd, fname) in metamodeTree.files" :key="fname" :style="styles.fileEntry">
+            <div v-for="(fd, fname) in activeTree.files" :key="fname" :style="styles.fileEntry">
               <span :style="styles.fileName">{{ fname }}</span>
               <span
                 v-if="fd.status"
@@ -337,9 +505,9 @@ const styles: Record<string, CSSProperties> = {
           </template>
 
           <!-- Children (recursive) -->
-          <template v-if="metamodeTree.children">
+          <template v-if="activeTree.children">
             <MetamodeTreeNode
-              v-for="(child, key) in metamodeTree.children"
+              v-for="(child, key) in activeTree.children"
               :key="key"
               :node="child"
               :path="'root/' + key"

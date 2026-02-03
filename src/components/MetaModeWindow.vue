@@ -856,7 +856,7 @@ onUnmounted(() => {
             />
 
             <MetamodeTreePanel
-              v-if="windowState.activeTab === 'metamode'"
+              v-if="windowState.activeTab === 'tree'"
               :initial-expanded="true"
               position="top-left"
               :language="language"

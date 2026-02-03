@@ -281,6 +281,41 @@ const styles: Record<string, CSSProperties> = {
   confidenceFillHigh: {
     backgroundColor: '#10b981',
   },
+  // TASK 76: Quick action buttons for common issue types
+  quickActions: {
+    display: 'flex',
+    gap: '8px',
+    flexWrap: 'wrap',
+    marginTop: '12px',
+    marginBottom: '8px',
+    paddingBottom: '12px',
+    borderBottom: '1px solid rgba(139, 92, 246, 0.15)',
+  },
+  quickActionTitle: {
+    fontSize: '11px',
+    color: '#6b7280',
+    width: '100%',
+    marginBottom: '4px',
+  },
+  quickActionButton: {
+    background: 'rgba(30, 30, 45, 0.8)',
+    border: '1px solid rgba(139, 92, 246, 0.2)',
+    borderRadius: '6px',
+    color: '#9ca3af',
+    cursor: 'pointer',
+    padding: '8px 14px',
+    fontSize: '12px',
+    fontWeight: 500,
+    transition: 'all 0.15s ease',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+  },
+  quickActionButtonHover: {
+    backgroundColor: 'rgba(139, 92, 246, 0.15)',
+    borderColor: 'rgba(139, 92, 246, 0.4)',
+    color: '#c4b5fd',
+  },
   warningsSection: {
     padding: '12px',
     backgroundColor: 'rgba(245, 158, 11, 0.1)',
@@ -643,6 +678,56 @@ function handleAuthStateChange(state: { authenticated: boolean }) {
               ? '\u0418\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u0439\u0442\u0435 \u0418\u0418 \u0434\u043B\u044F \u0441\u043E\u0437\u0434\u0430\u043D\u0438\u044F \u0447\u0435\u0440\u043D\u043E\u0432\u0438\u043A\u0430 \u043D\u0430 \u043E\u0441\u043D\u043E\u0432\u0435 \u0434\u0438\u0430\u043B\u043E\u0433\u0430 \u0438\u043B\u0438 \u0432\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0448\u0430\u0431\u043B\u043E\u043D'
               : 'Use AI to create a draft from conversation or select a template'
           }}
+        </div>
+        <!-- TASK 76: Quick action buttons for common issue types -->
+        <div :style="styles.quickActions" data-testid="quick-actions">
+          <span :style="styles.quickActionTitle">
+            {{ props.language === 'ru' ? '\u0411\u044B\u0441\u0442\u0440\u043E\u0435 \u0441\u043E\u0437\u0434\u0430\u043D\u0438\u0435:' : 'Quick create:' }}
+          </span>
+          <button
+            type="button"
+            :style="styles.quickActionButton"
+            data-testid="quick-action-bug"
+            @click="handleGenerateFromTemplate('bug')"
+            @mouseenter="($event.target as HTMLElement).style.backgroundColor = 'rgba(239, 68, 68, 0.15)'; ($event.target as HTMLElement).style.borderColor = 'rgba(239, 68, 68, 0.4)'; ($event.target as HTMLElement).style.color = '#f87171'"
+            @mouseleave="($event.target as HTMLElement).style.backgroundColor = 'rgba(30, 30, 45, 0.8)'; ($event.target as HTMLElement).style.borderColor = 'rgba(139, 92, 246, 0.2)'; ($event.target as HTMLElement).style.color = '#9ca3af'"
+          >
+            <span>&#128027;</span>
+            <span>{{ props.language === 'ru' ? '\u0411\u0430\u0433' : 'Bug' }}</span>
+          </button>
+          <button
+            type="button"
+            :style="styles.quickActionButton"
+            data-testid="quick-action-feature"
+            @click="handleGenerateFromTemplate('feature')"
+            @mouseenter="($event.target as HTMLElement).style.backgroundColor = 'rgba(34, 197, 94, 0.15)'; ($event.target as HTMLElement).style.borderColor = 'rgba(34, 197, 94, 0.4)'; ($event.target as HTMLElement).style.color = '#4ade80'"
+            @mouseleave="($event.target as HTMLElement).style.backgroundColor = 'rgba(30, 30, 45, 0.8)'; ($event.target as HTMLElement).style.borderColor = 'rgba(139, 92, 246, 0.2)'; ($event.target as HTMLElement).style.color = '#9ca3af'"
+          >
+            <span>&#128640;</span>
+            <span>{{ props.language === 'ru' ? '\u0424\u0438\u0447\u0430' : 'Feature' }}</span>
+          </button>
+          <button
+            type="button"
+            :style="styles.quickActionButton"
+            data-testid="quick-action-improvement"
+            @click="handleGenerateFromTemplate('improvement')"
+            @mouseenter="($event.target as HTMLElement).style.backgroundColor = 'rgba(139, 92, 246, 0.15)'; ($event.target as HTMLElement).style.borderColor = 'rgba(139, 92, 246, 0.4)'; ($event.target as HTMLElement).style.color = '#c4b5fd'"
+            @mouseleave="($event.target as HTMLElement).style.backgroundColor = 'rgba(30, 30, 45, 0.8)'; ($event.target as HTMLElement).style.borderColor = 'rgba(139, 92, 246, 0.2)'; ($event.target as HTMLElement).style.color = '#9ca3af'"
+          >
+            <span>&#10024;</span>
+            <span>{{ props.language === 'ru' ? '\u0423\u043B\u0443\u0447\u0448\u0435\u043D\u0438\u0435' : 'Improvement' }}</span>
+          </button>
+          <button
+            type="button"
+            :style="styles.quickActionButton"
+            data-testid="quick-action-question"
+            @click="handleGenerateFromTemplate('question')"
+            @mouseenter="($event.target as HTMLElement).style.backgroundColor = 'rgba(59, 130, 246, 0.15)'; ($event.target as HTMLElement).style.borderColor = 'rgba(59, 130, 246, 0.4)'; ($event.target as HTMLElement).style.color = '#60a5fa'"
+            @mouseleave="($event.target as HTMLElement).style.backgroundColor = 'rgba(30, 30, 45, 0.8)'; ($event.target as HTMLElement).style.borderColor = 'rgba(139, 92, 246, 0.2)'; ($event.target as HTMLElement).style.color = '#9ca3af'"
+          >
+            <span>&#10067;</span>
+            <span>{{ props.language === 'ru' ? '\u0412\u043E\u043F\u0440\u043E\u0441' : 'Question' }}</span>
+          </button>
         </div>
         <div :style="styles.generateControls">
           <select

@@ -37,13 +37,14 @@ describe('metamode types', () => {
   describe('METAMODE_TABS', () => {
     it('should have all required tabs', () => {
       expect(METAMODE_TABS).toHaveLength(6)
+      // TASK 76: Renamed 'metamode' tab to 'tree'
       expect(METAMODE_TABS.map((t) => t.id)).toEqual([
         'query',
         'context',
         'search',
         'conversation',
         'issues',
-        'metamode',
+        'tree',
       ])
     })
 
@@ -154,13 +155,14 @@ describe('metamode types', () => {
 
   describe('isValidTab', () => {
     it('should return true for valid tabs', () => {
+      // TASK 76: Updated to use 'tree' instead of 'metamode'
       const validTabs: MetaModeTab[] = [
         'query',
         'context',
         'search',
         'conversation',
         'issues',
-        'metamode',
+        'tree',
       ]
       for (const tab of validTabs) {
         expect(isValidTab(tab)).toBe(true)
