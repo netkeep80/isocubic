@@ -366,7 +366,7 @@ const file = getByPath('src/components/ParamEditor.vue')
 | 9    | [GOD MODE — Автоматизация разработки](docs/phase-9.md)          | ✅ Завершена  |
 | 10   | [Переход на Vue.js 3.0 + TypeScript](docs/phase-10.md)          | ✅ Завершена  |
 | 11   | [Новый пользовательский интерфейс isocubic](docs/phase-11.md)   | ✅ Завершена  |
-| 12   | [MetaMode — Унификация систем метаинформации](docs/phase-12.md) | 🚧 В процессе |
+| 12   | [MetaMode — Унификация систем метаинформации](docs/phase-12.md) | ✅ Завершена  |
 
 ## Деплой
 
@@ -419,7 +419,7 @@ npm run test:coverage
 
 **Текущее покрытие:**
 
-- 3444+ тестов (112 тестовых файлов, все компоненты на @vue/test-utils)
+- 3508+ тестов (113 тестовых файлов, все компоненты на @vue/test-utils)
 - Тесты 3D-компонентов Vue.js (ParametricCube, EnergyCube, CubePreview, CubeGrid, CubeStack, LODCubeGrid, LODStatisticsDisplay, MagicCubeDemo — TASK 62)
 - Тесты UI-компонентов редактора Vue.js (UnifiedEditor, ParamEditor, FFTParamEditor, FFTChannelEditor, EnergyVisualizationEditor, LODConfigEditor, StackEditor, StackPresetPicker, PromptGenerator — TASK 63)
 - Тесты компонентов галереи, экспорта и шаринга Vue.js (Gallery, CommunityGallery, ExportPanel, SharePanel, CommentsSection, SubscriptionButton, NotificationPanel, ActionHistory — TASK 64)
@@ -454,6 +454,7 @@ npm run test:coverage
 - Тесты MetaMode AI-оптимизатора (генерация AI summary, сокращённые поля, экономия токенов — TASK 74)
 - Тесты inline metamode извлечения (JSDoc @metamode, объект const metamode, нормализация, слияние — TASK 75)
 - Тесты MetaMode терминологии (миграция DevMode/GodMode → MetaMode во всех тестах — TASK 77)
+- Тесты MetaMode LLM интеграции (Ollama, llama.cpp, OpenAI-compatible бэкенды, контекст-билдер, fallback — TASK 81)
 
 ## Вклад в проект
 
