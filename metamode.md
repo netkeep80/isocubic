@@ -508,14 +508,143 @@ client.traverse(
 
 ---
 
-## 13. Дальнейшее развитие
+## 13. Интеграция с локальными LLM (TASK 81)
+
+MetaMode поддерживает интеграцию с локальными LLM для natural language запросов к метаданным проекта.
+
+### 13.1 Поддерживаемые бэкенды
+
+| Бэкенд | URL по умолчанию | Рекомендация |
+| ------ | ---------------- | ------------ |
+| **Ollama** | `http://localhost:11434` | Рекомендуется для простоты установки |
+| **llama.cpp** | `http://localhost:8080` | Для продвинутых пользователей |
+| **OpenAI-compatible** | `http://localhost:1234/v1` | Универсальный вариант |
+
+### 13.2 Использование
+
+```typescript
+import { createMetaModeLLMIntegration } from '@/lib/metamode-llm-integration'
+import metamodeDB from 'virtual:metamode/db'
+
+// Создание интеграции
+const llm = createMetaModeLLMIntegration(metamodeDB)
+
+// Проверка доступности LLM
+const available = await llm.isLLMAvailable()
+console.log('LLM available:', available)
+
+// Запрос на естественном языке
+const response = await llm.query({
+  query: 'Какие компоненты есть в проекте?',
+  language: 'ru',
+})
+
+console.log(response.answer)
+console.log('Related:', response.relatedPaths)
+console.log('Confidence:', response.confidence)
+```
+
+### 13.3 Настройка бэкендов
+
+```typescript
+import {
+  createMetaModeLLMIntegration,
+  OllamaBackend,
+  LlamaCppBackend,
+} from '@/lib/metamode-llm-integration'
+
+// С кастомной конфигурацией
+const llm = createMetaModeLLMIntegration(db, {
+  ollama: {
+    baseUrl: 'http://custom:11434',
+    model: 'llama3.2:3b',
+    temperature: 0.7,
+  },
+})
+
+// Или ручная регистрация бэкендов
+llm.registerBackends([
+  new OllamaBackend({ model: 'mistral' }),
+  new LlamaCppBackend({ baseUrl: 'http://gpu-server:8080' }),
+])
+```
+
+### 13.4 Фильтрация контекста
+
+```typescript
+// По статусу
+const response = await llm.query({
+  query: 'Show stable components',
+  language: 'en',
+  statusFilter: ['stable'],
+})
+
+// По фазе разработки
+const response = await llm.query({
+  query: 'Что реализовано в фазе 12?',
+  language: 'ru',
+  phaseFilter: [12],
+})
+
+// По тегам
+const response = await llm.query({
+  query: 'MetaMode files',
+  language: 'en',
+  tagFilter: ['metamode'],
+})
+
+// Конкретные пути
+const response = await llm.query({
+  query: 'Tell me about these',
+  language: 'en',
+  contextPaths: ['src/components', 'src/lib'],
+})
+```
+
+### 13.5 Промпт-шаблоны
+
+Интеграция использует оптимизированные промпт-шаблоны для русского и английского языков:
+
+- **System prompt** — объясняет LLM её роль как помощника по проекту
+- **Query template** — структурирует контекст и вопрос пользователя
+- **Context builder** — формирует компактное представление метаданных
+
+### 13.6 Fallback режим
+
+При недоступности LLM система автоматически переключается на fallback:
+
+- Поиск релевантных файлов по ключевым словам
+- Базовые ответы на основе метаданных
+- Информирование о необходимости LLM для детального анализа
+
+### 13.7 Установка Ollama (рекомендуется)
+
+```bash
+# macOS
+brew install ollama
+
+# Linux
+curl -fsSL https://ollama.com/install.sh | sh
+
+# Запуск сервера
+ollama serve
+
+# Загрузка модели
+ollama pull llama3.2:3b
+```
+
+После установки MetaMode автоматически подключится к Ollama.
+
+---
+
+## 14. Дальнейшее развитие
 
 1. **TASK 71**: Рефакторинг именования metanet → metamode ✅
 2. **TASK 72**: Унификация DevMode + GodMode → MetaMode ✅
 3. **TASK 74**: Оптимизация формата для AI-агентов ✅
 4. **TASK 75**: Реализация inline metamode атрибутов ✅
 5. **TASK 80**: Компиляция в встроенную БД ✅
-6. **TASK 81**: Исследование интеграции с tinyLLM
+6. **TASK 81**: Интеграция с локальными LLM ✅
 
 ---
 
