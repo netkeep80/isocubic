@@ -6,7 +6,7 @@ declare module '*.vue' {
   export default component
 }
 
-interface MetanetFileDescriptor {
+interface MetamodeFileDescriptor {
   description: string
   tags?: string[]
   phase?: number
@@ -14,37 +14,37 @@ interface MetanetFileDescriptor {
   dependencies?: string[]
 }
 
-interface MetanetDirectoryDescriptor {
+interface MetamodeDirectoryDescriptor {
   description: string
-  metanet: string
+  metamode: string
 }
 
-interface MetanetEntry {
+interface MetamodeEntry {
   name: string
   version?: string
   description: string
   languages?: string[]
   tags?: string[]
-  files?: Record<string, MetanetFileDescriptor>
-  directories?: Record<string, MetanetDirectoryDescriptor>
+  files?: Record<string, MetamodeFileDescriptor>
+  directories?: Record<string, MetamodeDirectoryDescriptor>
 }
 
-interface MetanetTreeNode {
+interface MetamodeTreeNode {
   name: string
   description: string
   version?: string
   languages?: string[]
   tags?: string[]
-  files?: Record<string, MetanetFileDescriptor>
-  children?: Record<string, MetanetTreeNode>
+  files?: Record<string, MetamodeFileDescriptor>
+  children?: Record<string, MetamodeTreeNode>
 }
 
-declare module 'virtual:metanet' {
-  const metanet: Record<string, MetanetEntry>
-  export default metanet
+declare module 'virtual:metamode' {
+  const metamode: Record<string, MetamodeEntry>
+  export default metamode
 }
 
-declare module 'virtual:metanet/tree' {
-  const metanetTree: MetanetTreeNode
-  export default metanetTree
+declare module 'virtual:metamode/tree' {
+  const metamodeTree: MetamodeTreeNode
+  export default metamodeTree
 }

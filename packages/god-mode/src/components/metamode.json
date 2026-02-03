@@ -1,0 +1,10 @@
+{
+  "$schema": "../../../../metamode.schema.json",
+  "name": "god-mode/components",
+  "description": "Vue components for the GOD MODE development panel",
+  "files": {
+    "GodModeProvider.ts": {
+      "description": "Provider component that injects GOD MODE context"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "$schema": "../metamode.schema.json",
+  "name": ".github",
+  "description": "GitHub configuration files",
+  "directories": {
+    "workflows": {
+      "description": "GitHub Actions CI/CD workflow definitions",
+      "metamode": "workflows/metamode.json"
+    }
+  }
+}

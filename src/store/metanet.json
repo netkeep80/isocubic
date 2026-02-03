@@ -1,5 +1,0 @@
-{
-  "$schema": "../../metanet.schema.json",
-  "name": "store",
-  "description": "Pinia state management stores (currently empty placeholder)"
-}

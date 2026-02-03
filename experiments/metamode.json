@@ -1,0 +1,10 @@
+{
+  "$schema": "../metamode.schema.json",
+  "name": "experiments",
+  "description": "Experimental and debug scripts for testing ideas",
+  "files": {
+    "debug-test.ts": {
+      "description": "Debug test script for experimentation"
+    }
+  }
+}

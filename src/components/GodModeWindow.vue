@@ -45,7 +45,7 @@ import ComponentContextPanel from './ComponentContextPanel.vue'
 import ExtendedSearchPanel from './ExtendedSearchPanel.vue'
 import ConversationPanel from './ConversationPanel.vue'
 import IssueDraftPanel from './IssueDraftPanel.vue'
-import MetanetTreePanel from './MetanetTreePanel.vue'
+import MetamodeTreePanel from './MetamodeTreePanel.vue'
 
 // ============================================================================
 // Types
@@ -855,8 +855,8 @@ onUnmounted(() => {
               @issue-published="handleIssuePublished"
             />
 
-            <MetanetTreePanel
-              v-if="windowState.activeTab === 'metanet'"
+            <MetamodeTreePanel
+              v-if="windowState.activeTab === 'metamode'"
               :initial-expanded="true"
               position="top-left"
               :language="language"

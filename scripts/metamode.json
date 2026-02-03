@@ -1,0 +1,16 @@
+{
+  "$schema": "../metamode.schema.json",
+  "name": "scripts",
+  "description": "Build and utility scripts for the project",
+  "files": {
+    "generate-icons.cjs": {
+      "description": "Script to generate PWA icon sets from SVG source"
+    },
+    "metamode-preprocessor.ts": {
+      "description": "MetaMode preprocessor: validates metamode.json files against schema and checks file references"
+    },
+    "vite-plugin-metamode.ts": {
+      "description": "Vite plugin that compiles all metamode.json files into a virtual module for runtime access"
+    }
+  }
+}

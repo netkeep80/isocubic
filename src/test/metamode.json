@@ -1,0 +1,10 @@
+{
+  "$schema": "../../metamode.schema.json",
+  "name": "test",
+  "description": "Test setup and configuration for Vitest",
+  "files": {
+    "setup.ts": {
+      "description": "Global test setup: JSDOM environment, test utilities, mocks"
+    }
+  }
+}

@@ -2,9 +2,9 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "metamode.schema.json",
   "title": "MetaMode Descriptor",
-  "description": "Schema for metamode.json files that describe project directories, files, and their relationships",
+  "description": "Compact schema for metamode.json files optimized for AI agents. Unified meta-information system for project directories, files, and components.",
   "type": "object",
-  "required": ["name", "description"],
+  "required": ["name", "desc"],
   "properties": {
     "$schema": {
       "type": "string",
@@ -14,16 +14,16 @@
       "type": "string",
       "description": "Name of the directory or module"
     },
-    "version": {
+    "ver": {
       "type": "string",
       "pattern": "^\\d+\\.\\d+\\.\\d+$",
       "description": "Semantic version (only for root metamode.json)"
     },
-    "description": {
+    "desc": {
       "type": "string",
       "description": "Human-readable description of this directory's purpose"
     },
-    "languages": {
+    "lang": {
       "type": "array",
       "items": { "type": "string" },
       "description": "Programming languages used in this directory"
@@ -33,28 +33,35 @@
       "items": { "type": "string" },
       "description": "Tags for categorization and search"
     },
+    "ai": {
+      "type": "string",
+      "description": "Pre-compiled AI summary for quick context (max 200 chars)"
+    },
     "files": {
       "type": "object",
       "description": "Map of file names to their metadata",
       "additionalProperties": {
-        "$ref": "#/$defs/FileDescriptor"
+        "$ref": "#/$defs/File"
       }
     },
-    "directories": {
+    "dirs": {
       "type": "object",
-      "description": "Map of subdirectory names to their metadata with references to child metamode.json",
+      "description": "Map of subdirectory names to their descriptions (metamode.json path is auto-inferred)",
       "additionalProperties": {
-        "$ref": "#/$defs/DirectoryDescriptor"
+        "oneOf": [
+          { "type": "string", "description": "Short description of the subdirectory" },
+          { "$ref": "#/$defs/Dir" }
+        ]
       }
     }
   },
   "additionalProperties": false,
   "$defs": {
-    "FileDescriptor": {
+    "File": {
       "type": "object",
-      "required": ["description"],
+      "required": ["desc"],
       "properties": {
-        "description": {
+        "desc": {
           "type": "string",
           "description": "Human-readable description of the file's purpose"
         },
@@ -70,28 +77,37 @@
         },
         "status": {
           "type": "string",
-          "enum": ["stable", "beta", "experimental", "deprecated"],
-          "description": "File/module status"
+          "enum": ["stable", "beta", "exp", "dep"],
+          "description": "File status: stable, beta, experimental (exp), deprecated (dep)"
         },
-        "dependencies": {
+        "deps": {
           "type": "array",
           "items": { "type": "string" },
-          "description": "Relative paths to files this file depends on"
+          "description": "Relative paths to file dependencies"
+        },
+        "ai": {
+          "type": "string",
+          "description": "AI summary for this file (max 100 chars)"
         }
       },
       "additionalProperties": false
     },
-    "DirectoryDescriptor": {
+    "Dir": {
       "type": "object",
-      "required": ["description", "metamode"],
+      "required": ["desc"],
       "properties": {
-        "description": {
+        "desc": {
           "type": "string",
           "description": "Human-readable description of the subdirectory"
         },
-        "metamode": {
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Tags for this directory"
+        },
+        "ai": {
           "type": "string",
-          "description": "Relative path to the subdirectory's metamode.json"
+          "description": "AI summary for this directory (max 100 chars)"
         }
       },
       "additionalProperties": false
