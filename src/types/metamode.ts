@@ -29,8 +29,9 @@ export type {
 
 /**
  * Available tabs in MetaMode window
+ * TASK 76: Renamed 'metamode' tab to 'tree' for clarity
  */
-export type MetaModeTab = 'query' | 'context' | 'search' | 'conversation' | 'issues' | 'metamode'
+export type MetaModeTab = 'query' | 'context' | 'search' | 'conversation' | 'issues' | 'tree'
 
 /**
  * Tab information for display
@@ -102,13 +103,13 @@ export const METAMODE_TABS: MetaModeTabInfo[] = [
     descriptionEn: 'GitHub Issue drafts (TASK 56)',
   },
   {
-    id: 'metamode',
-    labelRu: 'MetaMode',
-    labelEn: 'MetaMode',
+    id: 'tree',
+    labelRu: 'Дерево',
+    labelEn: 'Tree',
     icon: '🌳',
     available: true,
-    descriptionRu: 'Просмотр дерева метаинформации проекта',
-    descriptionEn: 'Browse project metadata tree',
+    descriptionRu: 'Просмотр дерева метаинформации проекта (TASK 76)',
+    descriptionEn: 'Browse project metadata tree (TASK 76)',
   },
 ]
 
@@ -373,9 +374,10 @@ export interface MetaModeContextValue {
 
 /**
  * Validates a MetaMode tab ID
+ * TASK 76: Updated to use 'tree' instead of 'metamode'
  */
 export function isValidTab(tab: string): tab is MetaModeTab {
-  return ['query', 'context', 'search', 'conversation', 'issues', 'metamode'].includes(tab)
+  return ['query', 'context', 'search', 'conversation', 'issues', 'tree'].includes(tab)
 }
 
 /**
