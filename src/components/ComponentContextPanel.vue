@@ -234,9 +234,9 @@ function generatePatterns(meta: ComponentMeta, language: QueryLanguage): string[
       }
     }
 
-    // DevMode pattern if relevant
-    if (meta.phase >= 6 || meta.tags.includes('devmode')) {
-      patterns.push(`// В DevMode панель обновляется автоматически при изменении контекста`)
+    // MetaMode pattern if relevant
+    if (meta.phase >= 6 || meta.tags.includes('metamode')) {
+      patterns.push(`// В MetaMode панель обновляется автоматически при изменении контекста`)
     }
   } else {
     // Import pattern
@@ -255,9 +255,9 @@ function generatePatterns(meta: ComponentMeta, language: QueryLanguage): string[
       }
     }
 
-    // DevMode pattern if relevant
-    if (meta.phase >= 6 || meta.tags.includes('devmode')) {
-      patterns.push(`// In DevMode, the panel auto-updates on context changes`)
+    // MetaMode pattern if relevant
+    if (meta.phase >= 6 || meta.tags.includes('metamode')) {
+      patterns.push(`// In MetaMode, the panel auto-updates on context changes`)
     }
   }
 
@@ -355,7 +355,7 @@ const COMPONENT_CONTEXT_PANEL_META: ComponentMeta = {
     },
   ],
   dependencies: [
-    { name: 'devmode', type: 'context', path: 'lib/devmode.tsx', purpose: 'DevMode context' },
+    { name: 'metamode', type: 'store', path: 'lib/metamode-store.ts', purpose: 'MetaMode store' },
     {
       name: 'component-meta',
       type: 'lib',
@@ -371,7 +371,7 @@ const COMPONENT_CONTEXT_PANEL_META: ComponentMeta = {
       description: 'Unit tests',
     },
     { path: 'types/ai-query.ts', type: 'type', description: 'Type definitions' },
-    { path: 'lib/devmode.tsx', type: 'util', description: 'DevMode context' },
+    { path: 'lib/metamode-store.ts', type: 'store', description: 'MetaMode store' },
   ],
   props: [
     {
@@ -400,7 +400,7 @@ const COMPONENT_CONTEXT_PANEL_META: ComponentMeta = {
     'Configure settings to customize what information is displayed',
     'The panel auto-updates when componentId changes',
   ],
-  tags: ['context', 'assistant', 'devmode', 'ai', 'metadata', 'phase-8'],
+  tags: ['context', 'assistant', 'metamode', 'ai', 'metadata', 'phase-8'],
   status: 'stable',
   lastUpdated: new Date().toISOString(),
 }

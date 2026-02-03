@@ -288,7 +288,7 @@ export function detectEnvironment(): Record<string, string> {
 
 /**
  * Formats component metadata as a markdown string for the Additional Context section of issues.
- * When a component is selected in VueDevMode, its metadata is auto-populated into the issue draft.
+ * When a component is selected in MetaMode, its metadata is auto-populated into the issue draft.
  */
 export function formatComponentMetaAsContext(meta: ComponentMeta): string {
   const lines: string[] = []
