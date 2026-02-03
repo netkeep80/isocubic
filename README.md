@@ -331,6 +331,22 @@ MetaMode поддерживает inline-метаданные через JSDoc `
 | `npm run metamode:compile`  | Компиляция в единое дерево            |
 | `npm run metamode:ai`       | Генерация AI-оптимизированного формата |
 
+### Встроенная база данных (TASK 80)
+
+MetaMode компилирует все метаданные в единую базу данных, доступную в runtime:
+
+```typescript
+import { useMetamodeDatabase } from '@/composables/useMetamodeDatabase'
+
+const { search, getByPath, stats, allTags } = useMetamodeDatabase()
+
+// Поиск по метаданным
+const results = search('component', { status: 'stable', limit: 10 })
+
+// Получение по пути
+const file = getByPath('src/components/ParamEditor.vue')
+```
+
 Подробная документация: [metamode.md](metamode.md)
 
 ## Roadmap
