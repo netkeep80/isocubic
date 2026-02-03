@@ -91,6 +91,9 @@
     "metamode-library.test.ts": {
       "description": "Tests for the MetaMode library integration"
     },
+    "metamode-ai-optimizer.test.ts": {
+      "description": "Tests for the MetaMode AI optimizer token-efficient format (TASK 74)"
+    },
     "issue-generator.ts": {
       "description": "Automated GitHub issue generator from application context"
     },

@@ -31,5 +31,7 @@ wasm-fft/Cargo.lock
 # Test coverage
 coverage/
 
-# MetaNet compiled artifacts
+# MetaMode compiled artifacts
 metanet.compiled.json
+metamode.compiled.json
+metamode.ai.json

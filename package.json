@@ -18,6 +18,8 @@
     "metamode:validate": "tsx scripts/metamode-preprocessor.ts --check",
     "metamode:validate:verbose": "tsx scripts/metamode-preprocessor.ts --check --verbose",
     "metamode:compile": "tsx scripts/metamode-preprocessor.ts --compile",
+    "metamode:ai": "tsx scripts/metamode-preprocessor.ts --ai",
+    "metamode:ai:analyze": "tsx scripts/metamode-ai-optimizer.ts --analyze",
     "check:all": "npm run lint && npm run typecheck && npm run format:check && npm run metamode:validate && npm run test:run"
   },
   "dependencies": {

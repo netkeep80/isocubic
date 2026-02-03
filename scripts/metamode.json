@@ -7,10 +7,13 @@
       "description": "Script to generate PWA icon sets from SVG source"
     },
     "metamode-preprocessor.ts": {
-      "description": "MetaMode preprocessor: validates metamode.json files against schema and checks file references"
+      "description": "MetaMode preprocessor: validates metamode.json files, compiles tree, and generates AI-optimized format (TASK 74)"
+    },
+    "metamode-ai-optimizer.ts": {
+      "description": "MetaMode AI Optimizer: converts metamode.json to token-efficient format for AI agents (TASK 74)"
     },
     "vite-plugin-metamode.ts": {
-      "description": "Vite plugin that compiles all metamode.json files into a virtual module for runtime access"
+      "description": "Vite plugin that compiles metamode.json into virtual modules including AI-optimized format (TASK 74)"
     }
   }
 }
