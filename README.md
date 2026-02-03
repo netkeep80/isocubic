@@ -332,7 +332,7 @@ npm run test:coverage
 
 **Текущее покрытие:**
 
-- 3391+ тестов (110 тестовых файлов, все компоненты на @vue/test-utils)
+- 3411+ тестов (111 тестовых файлов, все компоненты на @vue/test-utils)
 - Тесты 3D-компонентов Vue.js (ParametricCube, EnergyCube, CubePreview, CubeGrid, CubeStack, LODCubeGrid, LODStatisticsDisplay, MagicCubeDemo — TASK 62)
 - Тесты UI-компонентов редактора Vue.js (UnifiedEditor, ParamEditor, FFTParamEditor, FFTChannelEditor, EnergyVisualizationEditor, LODConfigEditor, StackEditor, StackPresetPicker, PromptGenerator — TASK 63)
 - Тесты компонентов галереи, экспорта и шаринга Vue.js (Gallery, CommunityGallery, ExportPanel, SharePanel, CommentsSection, SubscriptionButton, NotificationPanel, ActionHistory — TASK 64)
@@ -364,6 +364,7 @@ npm run test:coverage
 - E2E тесты оконной системы (window-manager, command-bar, responsive — TASK 78)
 - Тесты производительности и утилит (window-performance, debounce, safe storage, state validation — TASK 78)
 - E2E тесты для полных workflow редактирования (мигрированы на Vue — TASK 68)
+- Тесты MetaMode AI-оптимизатора (генерация AI summary, сокращённые поля, экономия токенов — TASK 74)
 
 ## Вклад в проект
 

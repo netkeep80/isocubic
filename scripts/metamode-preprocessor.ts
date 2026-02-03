@@ -8,12 +8,13 @@
  * 4. Files in directories are described (sync check, warnings only)
  *
  * Usage:
- *   npx tsx scripts/metamode-preprocessor.ts [--check] [--verbose] [--compile [output]]
+ *   npx tsx scripts/metamode-preprocessor.ts [--check] [--verbose] [--compile [output]] [--ai [output]]
  *
  * Options:
  *   --check            Exit with non-zero code if any errors found (for CI)
  *   --verbose          Print detailed information about each metamode.json
  *   --compile [output] Compile metamode tree to JSON file (default: metamode.compiled.json)
+ *   --ai [output]      Compile AI-optimized format (default: metamode.ai.json) (TASK 74)
  */
 
 import * as fs from 'node:fs'
@@ -332,6 +333,153 @@ export function compileMetamodeTree(rootMetamodePath: string): MetamodeTreeNode 
   return visit(rootMetamodePath)
 }
 
+// --- AI Optimization (TASK 74) ---
+
+/**
+ * AI-optimized file descriptor with shortened field names
+ */
+interface AIFileDescriptor {
+  desc: string
+  tags?: string[]
+  phase?: number
+  status?: 'stable' | 'beta' | 'exp' | 'dep'
+  deps?: string[]
+  ai?: string
+}
+
+/**
+ * AI-optimized tree node
+ */
+interface AIMetamodeTreeNode {
+  name: string
+  desc: string
+  ver?: string
+  lang?: string[]
+  tags?: string[]
+  ai?: string
+  files?: Record<string, AIFileDescriptor>
+  children?: Record<string, AIMetamodeTreeNode>
+}
+
+const STATUS_MAP: Record<string, 'stable' | 'beta' | 'exp' | 'dep'> = {
+  stable: 'stable',
+  beta: 'beta',
+  experimental: 'exp',
+  deprecated: 'dep',
+}
+
+/**
+ * Generate an AI summary from a description (max 100 chars)
+ */
+function generateAISummary(description: string, maxLength: number = 100): string {
+  let summary = description
+    .replace(/^(The |A |An |This |It )/i, '')
+    .replace(/ for the isocubic application/gi, '')
+    .replace(/ for isocubic/gi, '')
+    .replace(/ component$/gi, '')
+    .replace(/ module$/gi, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+  if (summary.length > maxLength) {
+    summary = summary.substring(0, maxLength - 3).trim() + '...'
+  }
+
+  return summary
+}
+
+/**
+ * Convert a file descriptor to AI-optimized format
+ */
+function convertFileToAI(file: FileDescriptor): AIFileDescriptor {
+  const result: AIFileDescriptor = {
+    desc: file.description,
+  }
+
+  if (file.tags && file.tags.length > 0) result.tags = file.tags
+  if (file.phase !== undefined) result.phase = file.phase
+  if (file.status)
+    result.status = STATUS_MAP[file.status] || (file.status as 'stable' | 'beta' | 'exp' | 'dep')
+  if (file.dependencies && file.dependencies.length > 0) result.deps = file.dependencies
+  if (file.description.length > 50) result.ai = generateAISummary(file.description, 80)
+
+  return result
+}
+
+/**
+ * Compile AI-optimized metamode tree (TASK 74)
+ */
+export function compileAIOptimizedTree(rootMetamodePath: string): AIMetamodeTreeNode | null {
+  const visited = new Set<string>()
+
+  function visit(metamodePath: string): AIMetamodeTreeNode | null {
+    const resolvedPath = path.resolve(metamodePath)
+    if (visited.has(resolvedPath)) return null
+    visited.add(resolvedPath)
+
+    if (!fs.existsSync(resolvedPath)) return null
+
+    const metamode = loadJson<MetamodeJson>(resolvedPath)
+    if (!metamode) return null
+
+    const node: AIMetamodeTreeNode = {
+      name: metamode.name,
+      desc: metamode.description,
+    }
+
+    if (metamode.version) node.ver = metamode.version
+    if (metamode.languages) node.lang = metamode.languages
+    if (metamode.tags) node.tags = metamode.tags
+    if (metamode.description.length > 30) node.ai = generateAISummary(metamode.description, 150)
+
+    // Convert files to AI format
+    if (metamode.files && Object.keys(metamode.files).length > 0) {
+      node.files = {}
+      for (const [filename, file] of Object.entries(metamode.files)) {
+        node.files[filename] = convertFileToAI(file)
+      }
+    }
+
+    // Recursively build children
+    if (metamode.directories) {
+      const dirPath = path.dirname(resolvedPath)
+      const children: Record<string, AIMetamodeTreeNode> = {}
+
+      for (const [dirName, dirDesc] of Object.entries(metamode.directories)) {
+        const subMetamodePath = path.join(dirPath, dirDesc.metamode)
+        const childNode = visit(subMetamodePath)
+        if (childNode) {
+          children[dirName] = childNode
+        }
+      }
+
+      if (Object.keys(children).length > 0) {
+        node.children = children
+      }
+    }
+
+    return node
+  }
+
+  return visit(rootMetamodePath)
+}
+
+/**
+ * Analyze token savings between formats
+ */
+function analyzeTokenSavings(
+  rootMetamodePath: string,
+  tree: MetamodeTreeNode,
+  aiTree: AIMetamodeTreeNode
+): { originalSize: number; optimizedSize: number; savingsPercent: number } {
+  const originalSize = JSON.stringify(tree).length
+  const optimizedSize = JSON.stringify(aiTree).length
+  const savingsPercent =
+    originalSize > 0 ? ((originalSize - optimizedSize) / originalSize) * 100 : 0
+
+  return { originalSize, optimizedSize, savingsPercent }
+}
+
 // --- Main ---
 
 function main() {
@@ -339,8 +487,39 @@ function main() {
   const checkMode = args.includes('--check')
   const verbose = args.includes('--verbose')
   const compileMode = args.includes('--compile')
+  const aiMode = args.includes('--ai')
 
   const rootMetamodePath = path.resolve('metamode.json')
+
+  // AI-optimized mode (TASK 74): build AI-optimized tree
+  if (aiMode) {
+    const aiIndex = args.indexOf('--ai')
+    const nextArg = args[aiIndex + 1]
+    const hasOutput = nextArg && !nextArg.startsWith('--')
+    const outputPath = hasOutput ? nextArg : 'metamode.ai.json'
+
+    console.log('MetaMode AI Optimizer (TASK 74)')
+    console.log('===============================')
+
+    const aiTree = compileAIOptimizedTree(rootMetamodePath)
+    if (!aiTree) {
+      console.error('ERROR: Failed to compile AI-optimized tree')
+      process.exit(1)
+    }
+
+    // Calculate savings
+    const tree = compileMetamodeTree(rootMetamodePath)
+    if (tree) {
+      const savings = analyzeTokenSavings(rootMetamodePath, tree, aiTree)
+      console.log(`\n📊 Token savings: ${savings.savingsPercent.toFixed(1)}%`)
+      console.log(`   Original: ${savings.originalSize} bytes`)
+      console.log(`   Optimized: ${savings.optimizedSize} bytes`)
+    }
+
+    fs.writeFileSync(outputPath, JSON.stringify(aiTree, null, 2) + '\n')
+    console.log(`\n✅ AI-optimized metamode tree written to ${outputPath}`)
+    return
+  }
 
   // Compile mode: build tree and write to file
   if (compileMode) {
