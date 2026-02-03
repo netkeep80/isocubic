@@ -2,7 +2,7 @@
   MetamodeTreePanel Component (Vue 3 SFC)
 
   Displays the compiled MetaMode tree in a collapsible tree view.
-  Used inside the VueDevMode (GodModeWindow) to browse project metadata hierarchy.
+  Used inside MetaMode (MetaModeWindow) to browse project metadata hierarchy.
 
   Features:
   - Collapsible/expandable tree nodes

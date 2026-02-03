@@ -1,10 +1,10 @@
 /**
  * Issue Generator Types
  *
- * TypeScript types for GitHub Issue draft generation in GOD MODE.
+ * TypeScript types for GitHub Issue draft generation in MetaMode.
  * Provides types for issue drafts, templates, and generation settings.
  *
- * TASK 56: Issue Draft Generator (Phase 9 - GOD MODE)
+ * TASK 56: Issue Draft Generator (Phase 9 - MetaMode)
  *
  * Features:
  * - Issue draft structure with GitHub compatibility
@@ -14,7 +14,7 @@
  */
 
 import type { QueryLanguage } from './ai-query'
-import type { ConversationMessage } from './god-mode'
+import type { ConversationMessage } from './metamode'
 
 /**
  * Issue type categories

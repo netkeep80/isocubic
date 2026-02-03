@@ -10,7 +10,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { shallowMount, flushPromises } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import ConversationPanel from './ConversationPanel.vue'
-import { CONVERSATION_SUGGESTIONS } from '../types/god-mode'
+import { CONVERSATION_SUGGESTIONS } from '../types/metamode'
 
 // Mock conversation-agent module
 const mockProcessMessage = vi.fn().mockResolvedValue({

@@ -3,9 +3,9 @@
   "name": "packages",
   "description": "Standalone packages extracted from the isocubic project",
   "directories": {
-    "god-mode": {
-      "description": "GOD MODE: AI-assisted development floating DevTools package",
-      "metamode": "god-mode/metamode.json"
+    "metamode": {
+      "description": "MetaMode: AI-assisted development floating DevTools package",
+      "metamode": "metamode/metamode.json"
     }
   }
 }

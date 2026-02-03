@@ -1,13 +1,13 @@
 {
   "$schema": "../../../../metamode.schema.json",
-  "name": "god-mode/types",
-  "description": "TypeScript type definitions for the GOD MODE package",
+  "name": "metamode/types",
+  "description": "TypeScript type definitions for the MetaMode package",
   "files": {
     "common.ts": {
       "description": "Common shared types"
     },
-    "god-mode.ts": {
-      "description": "GOD MODE specific types and interfaces"
+    "metamode.ts": {
+      "description": "MetaMode specific types and interfaces"
     },
     "issue-generator.ts": {
       "description": "Types for the GitHub issue generator"

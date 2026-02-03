@@ -1,11 +1,11 @@
 /**
  * Conversation Agent Module
  *
- * Provides AI-powered conversation capabilities for GOD MODE.
+ * Provides AI-powered conversation capabilities for MetaMode.
  * Enables users to have natural language discussions about app improvements,
  * bug reports, and feature requests.
  *
- * TASK 55: AI Conversation Agent (Phase 9 - GOD MODE)
+ * TASK 55: AI Conversation Agent (Phase 9 - MetaMode)
  *
  * Features:
  * - Natural language conversation with AI
@@ -20,13 +20,13 @@ import type {
   ConversationMessage,
   ConversationSession,
   ConversationMessageContext,
-} from '../types/god-mode'
+} from '../types/metamode'
 import {
   createMessage,
   createSession,
   loadConversationSession,
   saveConversationSession,
-} from '../types/god-mode'
+} from '../types/metamode'
 import { getAllComponentMeta, searchComponentMeta } from '../types/component-meta'
 import type { ComponentMeta } from '../types/component-meta'
 

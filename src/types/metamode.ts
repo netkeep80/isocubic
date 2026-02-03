@@ -1,10 +1,11 @@
 /**
- * GOD MODE Types
+ * MetaMode Types
  *
- * TypeScript types for the unified GOD MODE development window.
+ * TypeScript types for the unified MetaMode development window.
  * Provides types for window state, tabs, configuration, and component integration.
  *
- * TASK 54: Unified DevMode Window (Phase 9 - GOD MODE)
+ * TASK 54: Unified DevMode Window (Phase 9)
+ * TASK 72: Unified DevMode + GodMode → MetaMode (Phase 12)
  *
  * Features:
  * - Window position and size management
@@ -27,16 +28,16 @@ export type {
 } from './issue-generator'
 
 /**
- * Available tabs in GOD MODE window
+ * Available tabs in MetaMode window
  */
-export type GodModeTab = 'query' | 'context' | 'search' | 'conversation' | 'issues' | 'metamode'
+export type MetaModeTab = 'query' | 'context' | 'search' | 'conversation' | 'issues' | 'metamode'
 
 /**
  * Tab information for display
  */
-export interface GodModeTabInfo {
+export interface MetaModeTabInfo {
   /** Tab identifier */
-  id: GodModeTab
+  id: MetaModeTab
   /** Display label in Russian */
   labelRu: string
   /** Display label in English */
@@ -54,7 +55,7 @@ export interface GodModeTabInfo {
 /**
  * All available tabs configuration
  */
-export const GOD_MODE_TABS: GodModeTabInfo[] = [
+export const METAMODE_TABS: MetaModeTabInfo[] = [
   {
     id: 'query',
     labelRu: 'Запрос',
@@ -176,7 +177,7 @@ export type WindowState = 'open' | 'minimized' | 'closed'
  * Keyboard shortcuts configuration
  */
 export interface KeyboardShortcuts {
-  /** Shortcut to toggle GOD MODE window (default: Ctrl+Shift+G) */
+  /** Shortcut to toggle MetaMode window (default: Ctrl+Shift+M) */
   toggleWindow: string
   /** Shortcut to minimize window */
   minimizeWindow?: string
@@ -190,16 +191,16 @@ export interface KeyboardShortcuts {
  * Default keyboard shortcuts
  */
 export const DEFAULT_KEYBOARD_SHORTCUTS: KeyboardShortcuts = {
-  toggleWindow: 'Ctrl+Shift+G',
+  toggleWindow: 'Ctrl+Shift+M',
   minimizeWindow: 'Escape',
   nextTab: 'Ctrl+Tab',
   prevTab: 'Ctrl+Shift+Tab',
 }
 
 /**
- * GOD MODE window configuration
+ * MetaMode window configuration
  */
-export interface GodModeConfig {
+export interface MetaModeConfig {
   /** GitHub repository owner for issue creation (TASK 57) */
   github?: {
     owner: string
@@ -211,7 +212,7 @@ export interface GodModeConfig {
   /** Initial window size */
   size?: Partial<WindowSize>
   /** Visible tabs (default: all available) */
-  tabs?: GodModeTab[]
+  tabs?: MetaModeTab[]
   /** Keyboard shortcuts configuration */
   shortcuts?: Partial<KeyboardShortcuts>
   /** Preferred language for UI */
@@ -221,9 +222,9 @@ export interface GodModeConfig {
 }
 
 /**
- * Default GOD MODE configuration
+ * Default MetaMode configuration
  */
-export const DEFAULT_GOD_MODE_CONFIG: GodModeConfig = {
+export const DEFAULT_METAMODE_CONFIG: MetaModeConfig = {
   github: {
     owner: 'netkeep80',
     repo: 'isocubic',
@@ -237,9 +238,9 @@ export const DEFAULT_GOD_MODE_CONFIG: GodModeConfig = {
 }
 
 /**
- * GOD MODE window state (for persistence)
+ * MetaMode window state (for persistence)
  */
-export interface GodModeWindowState {
+export interface MetaModeWindowState {
   /** Current window state */
   state: WindowState
   /** Current position */
@@ -247,7 +248,7 @@ export interface GodModeWindowState {
   /** Current size */
   size: WindowSize
   /** Currently active tab */
-  activeTab: GodModeTab
+  activeTab: MetaModeTab
   /** Whether window is pinned (stays on top) */
   isPinned: boolean
   /** Last opened timestamp */
@@ -257,7 +258,7 @@ export interface GodModeWindowState {
 /**
  * Default window state
  */
-export const DEFAULT_WINDOW_STATE: GodModeWindowState = {
+export const DEFAULT_WINDOW_STATE: MetaModeWindowState = {
   state: 'closed',
   position: DEFAULT_WINDOW_POSITION,
   size: DEFAULT_WINDOW_SIZE,
@@ -266,16 +267,16 @@ export const DEFAULT_WINDOW_STATE: GodModeWindowState = {
 }
 
 /**
- * LocalStorage key for GOD MODE state
+ * LocalStorage key for MetaMode state
  */
-export const GOD_MODE_STORAGE_KEY = 'isocubic_god_mode_state'
+export const METAMODE_STORAGE_KEY = 'isocubic_metamode_state'
 
 /**
- * Loads GOD MODE state from localStorage
+ * Loads MetaMode state from localStorage
  */
-export function loadGodModeState(): GodModeWindowState {
+export function loadMetaModeState(): MetaModeWindowState {
   try {
-    const stored = localStorage.getItem(GOD_MODE_STORAGE_KEY)
+    const stored = localStorage.getItem(METAMODE_STORAGE_KEY)
     if (stored) {
       const parsed = JSON.parse(stored)
       return {
@@ -286,19 +287,19 @@ export function loadGodModeState(): GodModeWindowState {
       }
     }
   } catch (e) {
-    console.warn('Failed to load GOD MODE state:', e)
+    console.warn('Failed to load MetaMode state:', e)
   }
   return DEFAULT_WINDOW_STATE
 }
 
 /**
- * Saves GOD MODE state to localStorage
+ * Saves MetaMode state to localStorage
  */
-export function saveGodModeState(state: GodModeWindowState): void {
+export function saveMetaModeState(state: MetaModeWindowState): void {
   try {
-    localStorage.setItem(GOD_MODE_STORAGE_KEY, JSON.stringify(state))
+    localStorage.setItem(METAMODE_STORAGE_KEY, JSON.stringify(state))
   } catch (e) {
-    console.warn('Failed to save GOD MODE state:', e)
+    console.warn('Failed to save MetaMode state:', e)
   }
 }
 
@@ -341,23 +342,23 @@ export interface ResizeState {
 }
 
 /**
- * GOD MODE context value interface
+ * MetaMode context value interface
  */
-export interface GodModeContextValue {
+export interface MetaModeContextValue {
   /** Current window state */
-  windowState: GodModeWindowState
+  windowState: MetaModeWindowState
   /** Configuration */
-  config: GodModeConfig
-  /** Open the GOD MODE window */
+  config: MetaModeConfig
+  /** Open the MetaMode window */
   openWindow: () => void
-  /** Close the GOD MODE window */
+  /** Close the MetaMode window */
   closeWindow: () => void
-  /** Minimize the GOD MODE window */
+  /** Minimize the MetaMode window */
   minimizeWindow: () => void
   /** Toggle window state (open/closed) */
   toggleWindow: () => void
   /** Switch to a specific tab */
-  setActiveTab: (tab: GodModeTab) => void
+  setActiveTab: (tab: MetaModeTab) => void
   /** Update window position */
   setPosition: (position: WindowPosition) => void
   /** Update window size */
@@ -371,25 +372,25 @@ export interface GodModeContextValue {
 }
 
 /**
- * Validates a GOD MODE tab ID
+ * Validates a MetaMode tab ID
  */
-export function isValidTab(tab: string): tab is GodModeTab {
+export function isValidTab(tab: string): tab is MetaModeTab {
   return ['query', 'context', 'search', 'conversation', 'issues', 'metamode'].includes(tab)
 }
 
 /**
  * Gets tab info by ID
  */
-export function getTabInfo(tabId: GodModeTab): GodModeTabInfo | undefined {
-  return GOD_MODE_TABS.find((tab) => tab.id === tabId)
+export function getTabInfo(tabId: MetaModeTab): MetaModeTabInfo | undefined {
+  return METAMODE_TABS.find((tab) => tab.id === tabId)
 }
 
 /**
  * Gets available tabs based on config
  */
-export function getAvailableTabs(config?: GodModeConfig): GodModeTabInfo[] {
-  const configTabs = config?.tabs || DEFAULT_GOD_MODE_CONFIG.tabs
-  return GOD_MODE_TABS.filter(
+export function getAvailableTabs(config?: MetaModeConfig): MetaModeTabInfo[] {
+  const configTabs = config?.tabs || DEFAULT_METAMODE_CONFIG.tabs
+  return METAMODE_TABS.filter(
     (tab) => tab.available && (!configTabs || configTabs.includes(tab.id))
   )
 }
@@ -616,7 +617,7 @@ export const CONVERSATION_SUGGESTIONS: ConversationSuggestion[] = [
 /**
  * LocalStorage key for conversation history
  */
-export const CONVERSATION_STORAGE_KEY = 'isocubic_god_mode_conversation'
+export const CONVERSATION_STORAGE_KEY = 'isocubic_metamode_conversation'
 
 /**
  * Generates a unique message ID

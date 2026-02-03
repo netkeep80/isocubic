@@ -88,14 +88,14 @@
     "CubeStackGrid.vue": {
       "description": "Grid layout for displaying multiple cube stacks"
     },
-    "DevModeIndicator.vue": {
-      "description": "Visual indicator showing when developer mode is active"
+    "MetaModeIndicator.vue": {
+      "description": "Visual indicator showing when MetaMode is active"
     },
-    "DevModeQueryPanel.vue": {
-      "description": "Developer mode panel for querying MetaMode metadata"
+    "MetaModeQueryPanel.vue": {
+      "description": "MetaMode panel for querying metadata"
     },
-    "DevModeQueryPanel.vue.test.ts": {
-      "description": "Tests for the DevModeQueryPanel component"
+    "MetaModeQueryPanel.vue.test.ts": {
+      "description": "Tests for the MetaModeQueryPanel component"
     },
     "DraggableWindow.test.ts": {
       "description": "Tests for the DraggableWindow component (alternate test file)"
@@ -154,14 +154,14 @@
     "GitHubAuthButton.vue.test.ts": {
       "description": "Tests for the GitHubAuthButton component"
     },
-    "GodModeProvider.test.ts": {
-      "description": "Tests for the GodMode provider integration"
+    "MetaModeProvider.test.ts": {
+      "description": "Tests for the MetaMode provider integration"
     },
-    "GodModeWindow.vue": {
-      "description": "God mode AI assistant window component"
+    "MetaModeWindow.vue": {
+      "description": "MetaMode AI assistant window component"
     },
-    "GodModeWindow.vue.test.ts": {
-      "description": "Tests for the GodModeWindow component"
+    "MetaModeWindow.vue.test.ts": {
+      "description": "Tests for the MetaModeWindow component"
     },
     "IssueDraftPanel.vue": {
       "description": "Panel for drafting GitHub issues from the application"

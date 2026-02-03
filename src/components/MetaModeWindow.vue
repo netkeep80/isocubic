@@ -1,46 +1,46 @@
 <!--
-  GodModeWindow Component (Vue 3 SFC)
+  MetaModeWindow Component (Vue 3 SFC)
 
-  Unified floating window for Developer Mode features in GOD MODE.
-  Provides a tabbed interface combining DevModeQueryPanel, ComponentContextPanel,
+  Unified floating window for Developer Mode features in MetaMode.
+  Provides a tabbed interface combining MetaModeQueryPanel, ComponentContextPanel,
   and ExtendedSearchPanel in a single draggable, resizable window.
 
-  TASK 54: Unified DevMode Window (Phase 9 - GOD MODE)
+  TASK 54: Unified DevMode Window (Phase 9 - MetaMode)
 
   Features:
   - Drag-and-drop window movement
   - Resizable edges and corners
   - Tab system for DevMode panels
   - Position and size persistence in localStorage
-  - Keyboard shortcuts (Ctrl+Shift+G to toggle)
+  - Keyboard shortcuts (Ctrl+Shift+M to toggle)
   - Pin/Minimize/Close buttons
   - Vue Teleport for z-index management
 
-  Migrated from GodModeWindow.tsx to Vue 3.0 SFC
+  Migrated from MetaModeWindow.tsx to Vue 3.0 SFC
 -->
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted, type CSSProperties } from 'vue'
-import { useIsDevModeEnabled, useSelectedComponentId } from '../lib/devmode'
+import { useIsMetaModeEnabled, useSelectedComponentId } from '../lib/metamode-store'
 import {
-  type GodModeTab,
-  type GodModeConfig,
-  type GodModeWindowState,
+  type MetaModeTab,
+  type MetaModeConfig,
+  type MetaModeWindowState,
   type WindowPosition,
   type DragState,
   type ResizeState,
-  GOD_MODE_TABS,
-  DEFAULT_GOD_MODE_CONFIG,
+  METAMODE_TABS,
+  DEFAULT_METAMODE_CONFIG,
   DEFAULT_WINDOW_STATE,
-  loadGodModeState,
-  saveGodModeState,
+  loadMetaModeState,
+  saveMetaModeState,
   constrainPosition,
   constrainSize,
   matchesShortcut,
-} from '../types/god-mode'
+} from '../types/metamode'
 import type { QueryLanguage } from '../types/ai-query'
 
 // Lazy-loaded panel components for code splitting
-import DevModeQueryPanel from './DevModeQueryPanel.vue'
+import MetaModeQueryPanel from './MetaModeQueryPanel.vue'
 import ComponentContextPanel from './ComponentContextPanel.vue'
 import ExtendedSearchPanel from './ExtendedSearchPanel.vue'
 import ConversationPanel from './ConversationPanel.vue'
@@ -51,7 +51,7 @@ import MetamodeTreePanel from './MetamodeTreePanel.vue'
 // Types
 // ============================================================================
 
-// (All types imported from ../types/god-mode)
+// (All types imported from ../types/metamode)
 
 // ============================================================================
 // Props & Emits
@@ -60,7 +60,7 @@ import MetamodeTreePanel from './MetamodeTreePanel.vue'
 const props = withDefaults(
   defineProps<{
     /** Configuration options */
-    config?: GodModeConfig
+    config?: MetaModeConfig
     /** Currently selected component ID (for context panel) */
     selectedComponentId?: string | null
     /** Custom styles for the window container */
@@ -79,7 +79,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   (e: 'open'): void
   (e: 'close'): void
-  (e: 'tabChange', tab: GodModeTab): void
+  (e: 'tabChange', tab: MetaModeTab): void
   (e: 'componentSelect', componentId: string): void
 }>()
 
@@ -87,22 +87,22 @@ const emit = defineEmits<{
 // State
 // ============================================================================
 
-const isDevModeEnabled = useIsDevModeEnabled()
+const isMetaModeEnabled = useIsMetaModeEnabled()
 const clickedComponentId = useSelectedComponentId()
 
 // Merged config
-const config = computed<GodModeConfig>(() => ({
-  ...DEFAULT_GOD_MODE_CONFIG,
+const config = computed<MetaModeConfig>(() => ({
+  ...DEFAULT_METAMODE_CONFIG,
   ...props.config,
   shortcuts: {
-    ...DEFAULT_GOD_MODE_CONFIG.shortcuts,
+    ...DEFAULT_METAMODE_CONFIG.shortcuts,
     ...props.config?.shortcuts,
   },
 }))
 
 // Window state
-const windowState = ref<GodModeWindowState>(
-  config.value.persistState ? loadGodModeState() : DEFAULT_WINDOW_STATE
+const windowState = ref<MetaModeWindowState>(
+  config.value.persistState ? loadMetaModeState() : DEFAULT_WINDOW_STATE
 )
 
 // Drag state
@@ -128,7 +128,7 @@ const resizeState = ref<ResizeState>({
 
 // Hover states for buttons
 const hoveredButton = ref<string | null>(null)
-const hoveredTab = ref<GodModeTab | null>(null)
+const hoveredTab = ref<MetaModeTab | null>(null)
 
 // Template refs
 const containerRef = ref<HTMLDivElement | null>(null)
@@ -140,7 +140,7 @@ const language = computed<QueryLanguage>(() => config.value.preferredLanguage ||
 const effectiveComponentId = computed(() => clickedComponentId.value || props.selectedComponentId)
 
 // Computed visibility
-const isVisible = computed(() => isDevModeEnabled.value && windowState.value.state !== 'closed')
+const isVisible = computed(() => isMetaModeEnabled.value && windowState.value.state !== 'closed')
 const isMinimized = computed(() => windowState.value.state === 'minimized')
 
 // ============================================================================
@@ -454,7 +454,7 @@ function togglePin() {
 }
 
 /** Set active tab */
-function setActiveTab(tab: GodModeTab) {
+function setActiveTab(tab: MetaModeTab) {
   windowState.value = {
     ...windowState.value,
     activeTab: tab,
@@ -502,7 +502,7 @@ function handleResizeStart(edge: ResizeState['edge']) {
 }
 
 /** Get tab style based on state */
-function getTabStyle(tabId: GodModeTab, isAvailable: boolean): CSSProperties {
+function getTabStyle(tabId: MetaModeTab, isAvailable: boolean): CSSProperties {
   const isActive = windowState.value.activeTab === tabId
   const isHovered = hoveredTab.value === tabId
   const isDisabled = !isAvailable
@@ -565,7 +565,7 @@ function handleIssuePublished(result: unknown) {
 
 // Auto-open window and switch to context tab when a component is clicked
 watch(clickedComponentId, (newId) => {
-  if (newId && isDevModeEnabled.value) {
+  if (newId && isMetaModeEnabled.value) {
     windowState.value = {
       ...windowState.value,
       state: 'open',
@@ -580,7 +580,7 @@ watch(
   windowState,
   (newState) => {
     if (config.value.persistState) {
-      saveGodModeState(newState)
+      saveMetaModeState(newState)
     }
   },
   { deep: true }
@@ -695,7 +695,7 @@ function onMouseUp() {
 
 // Keyboard shortcut handler
 function onKeyDown(e: KeyboardEvent) {
-  const shortcut = config.value.shortcuts?.toggleWindow || 'Ctrl+Shift+G'
+  const shortcut = config.value.shortcuts?.toggleWindow || 'Ctrl+Shift+M'
   if (matchesShortcut(e, shortcut)) {
     e.preventDefault()
     toggleWindow()
@@ -722,15 +722,15 @@ onUnmounted(() => {
 
 <template>
   <Teleport to="body">
-    <div v-if="isVisible" :style="styles.overlay" data-testid="god-mode-overlay">
+    <div v-if="isVisible" :style="styles.overlay" data-testid="metamode-overlay">
       <div
         ref="containerRef"
         :class="props.className"
         :style="containerStyle"
-        data-testid="god-mode-window"
+        data-testid="metamode-window"
       >
         <!-- Header (drag handle) -->
-        <div :style="styles.header" data-testid="god-mode-header" @mousedown="handleDragStart">
+        <div :style="styles.header" data-testid="metamode-header" @mousedown="handleDragStart">
           <div :style="styles.headerTitle">
             <span :style="styles.headerIcon">&#9889;</span>
             <span>VueDevMode</span>
@@ -743,7 +743,7 @@ onUnmounted(() => {
               :title="
                 language === 'ru' ? '\u0417\u0430\u043A\u0440\u0435\u043F\u0438\u0442\u044C' : 'Pin'
               "
-              data-testid="god-mode-pin"
+              data-testid="metamode-pin"
               @click="togglePin"
               @mouseenter="hoveredButton = 'pin'"
               @mouseleave="hoveredButton = null"
@@ -763,7 +763,7 @@ onUnmounted(() => {
                     ? 'Expand'
                     : 'Minimize'
               "
-              data-testid="god-mode-minimize"
+              data-testid="metamode-minimize"
               @click="minimizeWindow"
               @mouseenter="hoveredButton = 'minimize'"
               @mouseleave="hoveredButton = null"
@@ -775,7 +775,7 @@ onUnmounted(() => {
               type="button"
               :style="getCloseButtonStyle()"
               :title="language === 'ru' ? '\u0417\u0430\u043A\u0440\u044B\u0442\u044C' : 'Close'"
-              data-testid="god-mode-close"
+              data-testid="metamode-close"
               @click="closeWindow"
               @mouseenter="hoveredButton = 'close'"
               @mouseleave="hoveredButton = null"
@@ -786,15 +786,15 @@ onUnmounted(() => {
         </div>
 
         <!-- Tab bar (hidden when minimized) -->
-        <div v-if="!isMinimized" :style="styles.tabBar" data-testid="god-mode-tabs">
+        <div v-if="!isMinimized" :style="styles.tabBar" data-testid="metamode-tabs">
           <button
-            v-for="tab in GOD_MODE_TABS"
+            v-for="tab in METAMODE_TABS"
             :key="tab.id"
             type="button"
             :style="getTabStyle(tab.id, tab.available)"
             :disabled="!tab.available"
             :title="language === 'ru' ? tab.descriptionRu : tab.descriptionEn"
-            :data-testid="`god-mode-tab-${tab.id}`"
+            :data-testid="`metamode-tab-${tab.id}`"
             @click="tab.available && setActiveTab(tab.id)"
             @mouseenter="hoveredTab = tab.id"
             @mouseleave="hoveredTab = null"
@@ -805,10 +805,10 @@ onUnmounted(() => {
         </div>
 
         <!-- Content area (hidden when minimized) -->
-        <div v-if="!isMinimized" :style="styles.content" data-testid="god-mode-content">
+        <div v-if="!isMinimized" :style="styles.content" data-testid="metamode-content">
           <div :style="styles.panelWrapper">
             <!-- Tab content -->
-            <DevModeQueryPanel
+            <MetaModeQueryPanel
               v-if="windowState.activeTab === 'query'"
               :initial-expanded="true"
               position="top-left"
@@ -868,7 +868,7 @@ onUnmounted(() => {
 
           <!-- Keyboard shortcut hint -->
           <div :style="styles.shortcutHint">
-            <span :style="styles.kbd">{{ config.shortcuts?.toggleWindow || 'Ctrl+Shift+G' }}</span>
+            <span :style="styles.kbd">{{ config.shortcuts?.toggleWindow || 'Ctrl+Shift+M' }}</span>
             <span>{{
               language === 'ru'
                 ? '\u043E\u0442\u043A\u0440\u044B\u0442\u044C/\u0437\u0430\u043A\u0440\u044B\u0442\u044C'

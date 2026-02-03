@@ -52,11 +52,11 @@
     "conversation-agent.test.ts": {
       "description": "Tests for the conversation agent"
     },
-    "devmode.ts": {
-      "description": "Developer mode utilities for debugging and MetaMode queries"
+    "metamode-store.ts": {
+      "description": "MetaMode store utilities for debugging and MetaMode queries"
     },
-    "devmode.test.ts": {
-      "description": "Tests for the developer mode module"
+    "metamode-store.test.ts": {
+      "description": "Tests for the MetaMode store module"
     },
     "energy-visualization-defaults.ts": {
       "description": "Default configuration values for energy visualization effects"
@@ -88,8 +88,8 @@
     "github-api.test.ts": {
       "description": "Tests for the GitHub API client"
     },
-    "god-mode-library.test.ts": {
-      "description": "Tests for the God Mode library integration"
+    "metamode-library.test.ts": {
+      "description": "Tests for the MetaMode library integration"
     },
     "issue-generator.ts": {
       "description": "Automated GitHub issue generator from application context"

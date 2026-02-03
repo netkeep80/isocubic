@@ -1,7 +1,8 @@
 /**
- * Comprehensive unit tests for GodModeWindow Vue component
- * Migrated from GodModeWindow.test.tsx (React) + existing Vue tests
+ * Comprehensive unit tests for MetaModeWindow Vue component
+ * Migrated from MetaModeWindow.test.tsx (React) + existing Vue tests
  * TASK 66: Vue.js 3.0 Migration
+ * TASK 72: Renamed from MetaModeWindow to MetaModeWindow (Phase 12)
  *
  * @vitest-environment jsdom
  */
@@ -9,12 +10,12 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { shallowMount } from '@vue/test-utils'
 import { nextTick, ref } from 'vue'
-import GodModeWindow from './GodModeWindow.vue'
-import { GOD_MODE_STORAGE_KEY, GOD_MODE_TABS, DEFAULT_WINDOW_STATE } from '../types/god-mode'
+import MetaModeWindow from './MetaModeWindow.vue'
+import { METAMODE_STORAGE_KEY, METAMODE_TABS, DEFAULT_WINDOW_STATE } from '../types/metamode'
 
 // Mock child components
-vi.mock('./DevModeQueryPanel.vue', () => ({
-  default: { name: 'DevModeQueryPanel', template: '<div data-testid="mock-query-panel" />' },
+vi.mock('./MetaModeQueryPanel.vue', () => ({
+  default: { name: 'MetaModeQueryPanel', template: '<div data-testid="mock-query-panel" />' },
 }))
 vi.mock('./ComponentContextPanel.vue', () => ({
   default: { name: 'ComponentContextPanel', template: '<div data-testid="mock-context-panel" />' },
@@ -29,20 +30,20 @@ vi.mock('./IssueDraftPanel.vue', () => ({
   default: { name: 'IssueDraftPanel', template: '<div data-testid="mock-issue-panel" />' },
 }))
 
-// Mock devmode composable
+// Mock metamode composable
 const mockSelectedComponentId = ref<string | null>(null)
-vi.mock('../lib/devmode', () => ({
-  useIsDevModeEnabled: vi.fn(() => ({ value: true })),
+vi.mock('../lib/metamode-store', () => ({
+  useIsMetaModeEnabled: vi.fn(() => ({ value: true })),
   useSelectedComponentId: vi.fn(() => mockSelectedComponentId),
 }))
 
-describe('GodModeWindow Vue Component', () => {
+describe('MetaModeWindow Vue Component', () => {
   beforeEach(() => {
     mockSelectedComponentId.value = null
     localStorage.clear()
     // Set up initial open state for tests
     localStorage.setItem(
-      GOD_MODE_STORAGE_KEY,
+      METAMODE_STORAGE_KEY,
       JSON.stringify({
         state: 'open',
         activeTab: 'query',
@@ -65,7 +66,7 @@ describe('GodModeWindow Vue Component', () => {
   })
 
   function mountWindow(props: Record<string, unknown> = {}) {
-    return shallowMount(GodModeWindow, {
+    return shallowMount(MetaModeWindow, {
       props,
       global: {
         stubs: {
@@ -79,8 +80,8 @@ describe('GodModeWindow Vue Component', () => {
   // Module Exports (from original Vue test)
   // ========================================================================
   describe('Module Exports', () => {
-    it('should export GodModeWindow.vue as a valid Vue component', async () => {
-      const module = await import('./GodModeWindow.vue')
+    it('should export MetaModeWindow.vue as a valid Vue component', async () => {
+      const module = await import('./MetaModeWindow.vue')
       expect(module.default).toBeDefined()
       expect(typeof module.default).toBe('object')
     })
@@ -91,7 +92,7 @@ describe('GodModeWindow Vue Component', () => {
   // ========================================================================
   describe('Tab Definitions', () => {
     it('should define all expected tabs', () => {
-      const tabIds = GOD_MODE_TABS.map((t) => t.id)
+      const tabIds = METAMODE_TABS.map((t) => t.id)
       expect(tabIds).toContain('query')
       expect(tabIds).toContain('context')
       expect(tabIds).toContain('search')
@@ -176,14 +177,14 @@ describe('GodModeWindow Vue Component', () => {
   describe('Rendering', () => {
     it('should render when DevMode is enabled and window is open', () => {
       const wrapper = mountWindow()
-      expect(wrapper.find('[data-testid="god-mode-window"]').exists()).toBe(true)
-      expect(wrapper.find('[data-testid="god-mode-header"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="metamode-window"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="metamode-header"]').exists()).toBe(true)
     })
 
     it('should not render when window state is closed', () => {
-      localStorage.setItem(GOD_MODE_STORAGE_KEY, JSON.stringify({ state: 'closed' }))
+      localStorage.setItem(METAMODE_STORAGE_KEY, JSON.stringify({ state: 'closed' }))
       const wrapper = mountWindow()
-      expect(wrapper.find('[data-testid="god-mode-window"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="metamode-window"]').exists()).toBe(false)
     })
 
     it('should render VueDevMode title in header', () => {
@@ -198,16 +199,16 @@ describe('GodModeWindow Vue Component', () => {
   describe('Tabs', () => {
     it('should render all tabs', () => {
       const wrapper = mountWindow()
-      expect(wrapper.find('[data-testid="god-mode-tab-query"]').exists()).toBe(true)
-      expect(wrapper.find('[data-testid="god-mode-tab-context"]').exists()).toBe(true)
-      expect(wrapper.find('[data-testid="god-mode-tab-search"]').exists()).toBe(true)
-      expect(wrapper.find('[data-testid="god-mode-tab-conversation"]').exists()).toBe(true)
-      expect(wrapper.find('[data-testid="god-mode-tab-issues"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="metamode-tab-query"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="metamode-tab-context"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="metamode-tab-search"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="metamode-tab-conversation"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="metamode-tab-issues"]').exists()).toBe(true)
     })
 
     it('should have query tab active by default', () => {
       const wrapper = mountWindow()
-      const queryTab = wrapper.find('[data-testid="god-mode-tab-query"]')
+      const queryTab = wrapper.find('[data-testid="metamode-tab-query"]')
       expect(queryTab.exists()).toBe(true)
       // Active tab has marginBottom: -1px style
       const style = queryTab.attributes('style') || ''
@@ -216,7 +217,7 @@ describe('GodModeWindow Vue Component', () => {
 
     it('should switch tabs when clicked', async () => {
       const wrapper = mountWindow()
-      const searchTab = wrapper.find('[data-testid="god-mode-tab-search"]')
+      const searchTab = wrapper.find('[data-testid="metamode-tab-search"]')
       await searchTab.trigger('click')
       await nextTick()
 
@@ -226,8 +227,8 @@ describe('GodModeWindow Vue Component', () => {
 
     it('should enable all implemented tabs including conversation and issues', () => {
       const wrapper = mountWindow()
-      const conversationTab = wrapper.find('[data-testid="god-mode-tab-conversation"]')
-      const issuesTab = wrapper.find('[data-testid="god-mode-tab-issues"]')
+      const conversationTab = wrapper.find('[data-testid="metamode-tab-conversation"]')
+      const issuesTab = wrapper.find('[data-testid="metamode-tab-issues"]')
 
       expect(conversationTab.attributes('disabled')).toBeUndefined()
       expect(issuesTab.attributes('disabled')).toBeUndefined()
@@ -240,42 +241,42 @@ describe('GodModeWindow Vue Component', () => {
   describe('Header Buttons', () => {
     it('should render pin, minimize, and close buttons', () => {
       const wrapper = mountWindow()
-      expect(wrapper.find('[data-testid="god-mode-pin"]').exists()).toBe(true)
-      expect(wrapper.find('[data-testid="god-mode-minimize"]').exists()).toBe(true)
-      expect(wrapper.find('[data-testid="god-mode-close"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="metamode-pin"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="metamode-minimize"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="metamode-close"]').exists()).toBe(true)
     })
 
     it('should close window when close button is clicked', async () => {
       const wrapper = mountWindow()
-      await wrapper.find('[data-testid="god-mode-close"]').trigger('click')
+      await wrapper.find('[data-testid="metamode-close"]').trigger('click')
       await nextTick()
 
       expect(wrapper.emitted('close')).toBeTruthy()
-      expect(wrapper.find('[data-testid="god-mode-window"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="metamode-window"]').exists()).toBe(false)
     })
 
     it('should toggle pin state when pin button is clicked', async () => {
       const wrapper = mountWindow()
-      await wrapper.find('[data-testid="god-mode-pin"]').trigger('click')
+      await wrapper.find('[data-testid="metamode-pin"]').trigger('click')
       await nextTick()
 
-      const state = JSON.parse(localStorage.getItem(GOD_MODE_STORAGE_KEY) || '{}')
+      const state = JSON.parse(localStorage.getItem(METAMODE_STORAGE_KEY) || '{}')
       expect(state.isPinned).toBe(true)
     })
 
     it('should minimize window when minimize button is clicked', async () => {
       const wrapper = mountWindow()
-      expect(wrapper.find('[data-testid="god-mode-tabs"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="metamode-tabs"]').exists()).toBe(true)
 
-      await wrapper.find('[data-testid="god-mode-minimize"]').trigger('click')
+      await wrapper.find('[data-testid="metamode-minimize"]').trigger('click')
       await nextTick()
 
-      expect(wrapper.find('[data-testid="god-mode-tabs"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="metamode-tabs"]').exists()).toBe(false)
     })
 
     it('should expand window when clicking minimize on minimized window', async () => {
       localStorage.setItem(
-        GOD_MODE_STORAGE_KEY,
+        METAMODE_STORAGE_KEY,
         JSON.stringify({
           state: 'minimized',
           activeTab: 'query',
@@ -293,12 +294,12 @@ describe('GodModeWindow Vue Component', () => {
       )
 
       const wrapper = mountWindow()
-      expect(wrapper.find('[data-testid="god-mode-tabs"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="metamode-tabs"]').exists()).toBe(false)
 
-      await wrapper.find('[data-testid="god-mode-minimize"]').trigger('click')
+      await wrapper.find('[data-testid="metamode-minimize"]').trigger('click')
       await nextTick()
 
-      expect(wrapper.find('[data-testid="god-mode-tabs"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="metamode-tabs"]').exists()).toBe(true)
     })
   })
 
@@ -308,27 +309,27 @@ describe('GodModeWindow Vue Component', () => {
   describe('Keyboard Shortcuts (integration)', () => {
     it('should minimize window on Escape key', async () => {
       const wrapper = mountWindow()
-      expect(wrapper.find('[data-testid="god-mode-window"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="metamode-window"]').exists()).toBe(true)
 
       window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
       await nextTick()
 
-      const state = JSON.parse(localStorage.getItem(GOD_MODE_STORAGE_KEY) || '{}')
+      const state = JSON.parse(localStorage.getItem(METAMODE_STORAGE_KEY) || '{}')
       expect(state.state).toBe('minimized')
     })
 
-    it('should toggle window on Ctrl+Shift+G', async () => {
-      localStorage.setItem(GOD_MODE_STORAGE_KEY, JSON.stringify({ state: 'closed' }))
+    it('should toggle window on Ctrl+Shift+M', async () => {
+      localStorage.setItem(METAMODE_STORAGE_KEY, JSON.stringify({ state: 'closed' }))
       const wrapper = mountWindow()
 
-      expect(wrapper.find('[data-testid="god-mode-window"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="metamode-window"]').exists()).toBe(false)
 
       window.dispatchEvent(
-        new KeyboardEvent('keydown', { key: 'g', ctrlKey: true, shiftKey: true })
+        new KeyboardEvent('keydown', { key: 'm', ctrlKey: true, shiftKey: true })
       )
       await nextTick()
 
-      expect(wrapper.find('[data-testid="god-mode-window"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="metamode-window"]').exists()).toBe(true)
     })
   })
 
@@ -338,7 +339,7 @@ describe('GodModeWindow Vue Component', () => {
   describe('Drag Functionality', () => {
     it('should have header as drag handle', () => {
       const wrapper = mountWindow()
-      const header = wrapper.find('[data-testid="god-mode-header"]')
+      const header = wrapper.find('[data-testid="metamode-header"]')
       const style = header.attributes('style') || ''
       expect(style).toContain('cursor: move')
     })
@@ -350,17 +351,17 @@ describe('GodModeWindow Vue Component', () => {
   describe('Resize Functionality', () => {
     it('should have resize handles', () => {
       const wrapper = mountWindow()
-      const godWindow = wrapper.find('[data-testid="god-mode-window"]')
+      const godWindow = wrapper.find('[data-testid="metamode-window"]')
       const handles = godWindow.findAll('[style*="cursor"]')
       expect(handles.length).toBeGreaterThan(0)
     })
 
     it('should not show resize handles when minimized', async () => {
       const wrapper = mountWindow()
-      await wrapper.find('[data-testid="god-mode-minimize"]').trigger('click')
+      await wrapper.find('[data-testid="metamode-minimize"]').trigger('click')
       await nextTick()
 
-      expect(wrapper.find('[data-testid="god-mode-content"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="metamode-content"]').exists()).toBe(false)
     })
   })
 
@@ -370,16 +371,16 @@ describe('GodModeWindow Vue Component', () => {
   describe('Persistence', () => {
     it('should save state to localStorage', async () => {
       const wrapper = mountWindow()
-      await wrapper.find('[data-testid="god-mode-tab-search"]').trigger('click')
+      await wrapper.find('[data-testid="metamode-tab-search"]').trigger('click')
       await nextTick()
 
-      const state = JSON.parse(localStorage.getItem(GOD_MODE_STORAGE_KEY) || '{}')
+      const state = JSON.parse(localStorage.getItem(METAMODE_STORAGE_KEY) || '{}')
       expect(state.activeTab).toBe('search')
     })
 
     it('should restore state from localStorage', () => {
       localStorage.setItem(
-        GOD_MODE_STORAGE_KEY,
+        METAMODE_STORAGE_KEY,
         JSON.stringify({
           state: 'open',
           activeTab: 'search',
@@ -397,7 +398,7 @@ describe('GodModeWindow Vue Component', () => {
       )
 
       const wrapper = mountWindow()
-      const godWindow = wrapper.find('[data-testid="god-mode-window"]')
+      const godWindow = wrapper.find('[data-testid="metamode-window"]')
       const style = godWindow.attributes('style') || ''
       expect(style).toContain('left: 100px')
       expect(style).toContain('top: 150px')
@@ -409,11 +410,11 @@ describe('GodModeWindow Vue Component', () => {
   // ========================================================================
   describe('Callbacks / Emits', () => {
     it('should emit open when window opens via keyboard', async () => {
-      localStorage.setItem(GOD_MODE_STORAGE_KEY, JSON.stringify({ state: 'closed' }))
+      localStorage.setItem(METAMODE_STORAGE_KEY, JSON.stringify({ state: 'closed' }))
       const wrapper = mountWindow()
 
       window.dispatchEvent(
-        new KeyboardEvent('keydown', { key: 'g', ctrlKey: true, shiftKey: true })
+        new KeyboardEvent('keydown', { key: 'm', ctrlKey: true, shiftKey: true })
       )
       await nextTick()
 
@@ -422,7 +423,7 @@ describe('GodModeWindow Vue Component', () => {
 
     it('should emit close when window closes', async () => {
       const wrapper = mountWindow()
-      await wrapper.find('[data-testid="god-mode-close"]').trigger('click')
+      await wrapper.find('[data-testid="metamode-close"]').trigger('click')
       await nextTick()
 
       expect(wrapper.emitted('close')).toBeTruthy()
@@ -430,7 +431,7 @@ describe('GodModeWindow Vue Component', () => {
 
     it('should accept selectedComponentId prop', () => {
       const wrapper = mountWindow({ selectedComponentId: 'test-component' })
-      expect(wrapper.find('[data-testid="god-mode-window"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="metamode-window"]').exists()).toBe(true)
     })
   })
 
@@ -465,7 +466,7 @@ describe('GodModeWindow Vue Component', () => {
 
     it('should have title attributes on buttons', () => {
       const wrapper = mountWindow()
-      const pinButton = wrapper.find('[data-testid="god-mode-pin"]')
+      const pinButton = wrapper.find('[data-testid="metamode-pin"]')
       expect(pinButton.attributes('title')).toBeTruthy()
     })
   })

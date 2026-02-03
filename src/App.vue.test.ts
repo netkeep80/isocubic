@@ -151,10 +151,10 @@ vi.mock('./components/PromptGenerator.vue', () => ({
   },
 }))
 
-vi.mock('./components/GodModeWindow.vue', () => ({
+vi.mock('./components/MetaModeWindow.vue', () => ({
   default: {
-    name: 'GodModeWindow',
-    template: '<div class="god-mode-mock">GodModeWindow</div>',
+    name: 'MetaModeWindow',
+    template: '<div class="metamode-mock">MetaModeWindow</div>',
   },
 }))
 
@@ -186,13 +186,13 @@ vi.mock('./composables/useCubeEditor', () => ({
   }),
 }))
 
-vi.mock('./lib/devmode', () => ({
-  useDevModeKeyboard: vi.fn(),
+vi.mock('./lib/metamode-store', () => ({
+  useMetaModeKeyboard: vi.fn(),
   useHoveredComponentId: vi.fn(() => ({ value: null })),
   useSelectedComponentId: vi.fn(() => ({ value: null })),
-  useDevModeStore: () => ({
-    isDevMode: false,
-    toggleDevMode: vi.fn(),
+  useMetaModeStore: () => ({
+    isMetaMode: false,
+    toggleMetaMode: vi.fn(),
   }),
 }))
 
@@ -285,9 +285,9 @@ describe('App', () => {
       expect(wrapper.findComponent({ name: 'UnifiedEditor' }).exists()).toBe(true)
     })
 
-    it('should include GodModeWindow component', () => {
+    it('should include MetaModeWindow component', () => {
       const wrapper = createWrapper()
-      expect(wrapper.findComponent({ name: 'GodModeWindow' }).exists()).toBe(true)
+      expect(wrapper.findComponent({ name: 'MetaModeWindow' }).exists()).toBe(true)
     })
 
     it('should include ComponentInfo component', () => {

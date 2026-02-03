@@ -197,9 +197,9 @@ import {
   type GenerationResult,
 } from '../lib/tinyLLM'
 // TODO: ComponentInfo is still a TSX component.
-// Once TASK 66 migrates ComponentInfo to Vue, import and use it for DevMode wrapping.
+// Once TASK 66 migrates ComponentInfo to Vue, import and use it for MetaMode wrapping.
 // import ComponentInfo from './ComponentInfo.vue'
-import { useIsDevModeEnabled } from '../lib/devmode'
+import { useIsMetaModeEnabled } from '../lib/metamode-store'
 
 /** Generation status states */
 type GenerationStatus = 'idle' | 'generating' | 'success' | 'error'
@@ -272,10 +272,10 @@ const feedbackRating = ref<number>(0)
 const useContextCubes = ref<boolean>(true)
 const showContextInfo = ref<boolean>(false)
 
-// Check if DevMode is enabled
+// Check if MetaMode is enabled
 // TODO: Use for ComponentInfo wrapper once migrated to Vue (TASK 66)
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const _isDevModeEnabled = useIsDevModeEnabled()
+const _isMetaModeEnabled = useIsMetaModeEnabled()
 
 // Computed
 const availableTemplates = getAvailableTemplates()

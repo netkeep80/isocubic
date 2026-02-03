@@ -164,12 +164,13 @@ isocubic/
 │   │   ├── SessionPanel.vue     # Панель сессий коллаборации (Vue SFC, TASK 65)
 │   │   ├── CollaborativeParamEditor.vue # Совместное редактирование (Vue SFC, TASK 65)
 │   │   ├── ParticipantCursor.vue # Курсоры участников (Vue SFC, TASK 65)
-│   │   ├── DevModeQueryPanel.vue # AI-запросы в режиме разработки (Vue SFC, TASK 66)
-│   │   ├── ComponentContextPanel.vue # AI-контекст для компонентов в DevMode (Vue SFC, TASK 66)
-│   │   ├── ExtendedSearchPanel.vue # Расширенный AI-поиск компонентов (Vue SFC, TASK 66)
-│   │   ├── ComponentInfo.vue    # DevMode индикатор компонентов (Vue SFC, TASK 66)
-│   │   ├── GodModeWindow.vue    # Единое окно GOD MODE (Vue SFC, TASK 66)
-│   │   ├── ConversationPanel.vue # AI-диалог для GOD MODE (Vue SFC, TASK 66)
+│   │   ├── MetaModeQueryPanel.vue # AI-запросы в MetaMode (Vue SFC, TASK 66, 72)
+│   │   ├── ComponentContextPanel.vue # AI-контекст для компонентов в MetaMode (Vue SFC, TASK 66, 72)
+│   │   ├── ExtendedSearchPanel.vue # Расширенный AI-поиск компонентов (Vue SFC, TASK 66, 72)
+│   │   ├── ComponentInfo.vue    # MetaMode индикатор компонентов (Vue SFC, TASK 66, 72)
+│   │   ├── MetaModeWindow.vue   # Единое окно MetaMode (Vue SFC, TASK 66, 72)
+│   │   ├── MetaModeIndicator.vue # Индикатор режима MetaMode (Vue SFC, TASK 72)
+│   │   ├── ConversationPanel.vue # AI-диалог для MetaMode (Vue SFC, TASK 66, 72)
 │   │   ├── IssueDraftPanel.vue  # Генератор черновиков issues (Vue SFC, TASK 66)
 │   │   ├── GitHubAuthButton.vue # Авторизация GitHub (Vue SFC, TASK 66)
 │   │   └── AnnotationCanvas.vue # Аннотирование скриншотов (Vue SFC, TASK 66)
@@ -186,7 +187,7 @@ isocubic/
 │   │   ├── energy-cube.glsl      # Энергетический шейдер
 │   │   └── energy-cube.ts        # TypeScript модуль для энергетических кубов
 │   ├── lib/               # Утилиты (framework-agnostic + Pinia stores)
-│   │   ├── devmode.ts        # DevMode Pinia store (мигрирован с React Context — Phase 10)
+│   │   ├── metamode-store.ts # MetaMode Pinia store (Phase 10, 12 — TASK 72)
 │   │   ├── auth.ts           # Auth Pinia store (мигрирован с React Context — Phase 10)
 │   │   ├── shader-utils.ts    # Утилиты для шейдеров (с поддержкой LOD)
 │   │   ├── lod-system.ts      # LOD-система для оптимизации рендеринга
@@ -220,8 +221,8 @@ isocubic/
 │   │   ├── community.ts       # Типы для галереи сообщества
 │   │   ├── share.ts           # Типы для share-ссылок
 │   │   ├── publishing-api.ts  # Типы для REST API публикации
-│   │   ├── ai-query.ts        # Типы для AI-запросов в DevMode
-│   │   ├── god-mode.ts        # Типы для GOD MODE (Phase 9)
+│   │   ├── ai-query.ts        # Типы для AI-запросов в MetaMode
+│   │   ├── metamode.ts        # Типы для MetaMode (Phase 9, 12 — TASK 72)
 │   │   └── issue-generator.ts # Типы для генератора issues (Phase 9)
 │   └── App.vue            # Корневой компонент с адаптивным layout (TASK 67)
 ├── wasm-fft/              # Rust WASM модуль для FFT
@@ -231,7 +232,7 @@ isocubic/
 ├── public/
 │   └── model/             # Модель TinyLLM
 ├── packages/              # Выделенные npm-пакеты
-│   └── god-mode/          # @isocubic/god-mode — библиотека GOD MODE (Vue.js 3.0, Phase 9-10)
+│   └── metamode/          # @isocubic/metamode — библиотека MetaMode (Vue.js 3.0, Phase 9-10, 12 — TASK 72)
 ├── examples/              # Примеры конфигов
 ├── ANALYSIS.md            # Анализ подходов
 └── README.md
@@ -331,7 +332,7 @@ npm run test:coverage
 
 **Текущее покрытие:**
 
-- 3383+ тестов (109 тестовых файлов, все компоненты на @vue/test-utils)
+- 3391+ тестов (110 тестовых файлов, все компоненты на @vue/test-utils)
 - Тесты 3D-компонентов Vue.js (ParametricCube, EnergyCube, CubePreview, CubeGrid, CubeStack, LODCubeGrid, LODStatisticsDisplay, MagicCubeDemo — TASK 62)
 - Тесты UI-компонентов редактора Vue.js (UnifiedEditor, ParamEditor, FFTParamEditor, FFTChannelEditor, EnergyVisualizationEditor, LODConfigEditor, StackEditor, StackPresetPicker, PromptGenerator — TASK 63)
 - Тесты компонентов галереи, экспорта и шаринга Vue.js (Gallery, CommunityGallery, ExportPanel, SharePanel, CommentsSection, SubscriptionButton, NotificationPanel, ActionHistory — TASK 64)
@@ -350,13 +351,13 @@ npm run test:coverage
 - Тесты AI-контекста для компонентов (ComponentContextPanel)
 - Тесты расширенного поиска компонентов (ExtendedSearchPanel, семантический поиск, автодополнение)
 - Тесты интеграции TinyLLM с метаданными (metadata query mode, кеширование, fallback)
-- Тесты GOD MODE (GodModeWindow, типы, localStorage persistence, drag/resize)
+- Тесты MetaMode (MetaModeWindow, типы, localStorage persistence, drag/resize — TASK 72)
 - Тесты AI Conversation Agent (ConversationPanel, intent detection, session management, multi-language support)
 - Тесты Issue Draft Generator (IssueDraftPanel, генерация черновиков, шаблоны, валидация)
 - Тесты GitHub Integration (GitHub API клиент, авторизация PAT/OAuth, создание issues, метки)
 - Тесты Screen Capture & Annotation (захват экрана, Canvas API, аннотации, ScreenCaptureManager)
-- Тесты библиотеки @isocubic/god-mode (типы, утилиты, хранилище, GodModeProvider, useGodMode)
-- Тесты DevMode компонентов Vue.js (DevModeQueryPanel, ComponentContextPanel, ExtendedSearchPanel, ComponentInfo, AnnotationCanvas — TASK 66)
+- Тесты библиотеки @isocubic/metamode (типы, утилиты, хранилище, MetaModeProvider, useMetaMode — TASK 72)
+- Тесты MetaMode компонентов Vue.js (MetaModeQueryPanel, ComponentContextPanel, ExtendedSearchPanel, ComponentInfo, AnnotationCanvas — TASK 66, 72)
 - Тесты компонентов оконной системы Vue.js (DraggableWindow, WindowTaskbar, CommandBar — TASK 70-73)
 - Тесты touch-жестов и адаптивного layout (useTouchGestures, useResponsiveLayout — TASK 75)
 - Тесты расширенных команд (command-registry, window-layout-manager, command-macros, command-plugins — TASK 77)

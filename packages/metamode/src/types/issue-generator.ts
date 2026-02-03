@@ -628,7 +628,7 @@ export function createIssueDraft(overrides: Partial<IssueDraft> = {}): IssueDraf
  * Gets the issue drafts storage key
  */
 export function getIssueDraftStorageKey(prefix?: string): string {
-  return `${prefix || 'god_mode'}_issue_drafts`
+  return `${prefix || 'metamode'}_issue_drafts`
 }
 
 /**

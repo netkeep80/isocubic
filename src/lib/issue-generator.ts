@@ -4,7 +4,7 @@
  * Provides AI-powered generation of GitHub Issue drafts from conversation context.
  * Analyzes dialog between user and AI to extract requirements and create structured issues.
  *
- * TASK 56: Issue Draft Generator (Phase 9 - GOD MODE)
+ * TASK 56: Issue Draft Generator (Phase 9 - MetaMode)
  *
  * Features:
  * - Conversation analysis and requirement extraction
@@ -15,7 +15,7 @@
  */
 
 import type { QueryLanguage } from '../types/ai-query'
-import type { ConversationMessage, ConversationMessageContext } from '../types/god-mode'
+import type { ConversationMessage, ConversationMessageContext } from '../types/metamode'
 import type {
   IssueDraft,
   IssueTemplate,

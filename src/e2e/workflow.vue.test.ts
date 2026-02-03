@@ -175,10 +175,10 @@ vi.mock('../components/PromptGenerator.vue', () => ({
   },
 }))
 
-vi.mock('../components/GodModeWindow.vue', () => ({
+vi.mock('../components/MetaModeWindow.vue', () => ({
   default: {
-    name: 'GodModeWindow',
-    template: '<div class="god-mode-mock">GodModeWindow</div>',
+    name: 'MetaModeWindow',
+    template: '<div class="metamode-mock">MetaModeWindow</div>',
   },
 }))
 
@@ -212,13 +212,13 @@ vi.mock('../composables/useCubeEditor', () => ({
   useCubeEditor: () => mockCubeEditor,
 }))
 
-vi.mock('../lib/devmode', () => ({
-  useDevModeKeyboard: vi.fn(),
+vi.mock('../lib/metamode-store', () => ({
+  useMetaModeKeyboard: vi.fn(),
   useHoveredComponentId: vi.fn(() => ({ value: null })),
   useSelectedComponentId: vi.fn(() => ({ value: null })),
-  useDevModeStore: () => ({
-    isDevMode: false,
-    toggleDevMode: vi.fn(),
+  useMetaModeStore: () => ({
+    isMetaMode: false,
+    toggleMetaMode: vi.fn(),
   }),
 }))
 

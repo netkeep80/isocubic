@@ -2,8 +2,8 @@
 /**
  * ComponentInfo Component (Vue 3 SFC)
  *
- * Renders component metadata as an overlay/tooltip in Developer Mode.
- * Wraps any component and displays its documentation when DevMode is enabled.
+ * Renders component metadata as an overlay/tooltip in MetaMode.
+ * Wraps any component and displays its documentation when MetaMode is enabled.
  *
  * TASK 40: Component Info Overlay (Phase 6 - Developer Experience)
  * TASK 66: Migrated from React TSX to Vue 3.0 SFC (Phase 10 - Vue.js 3.0 Migration)
@@ -24,7 +24,7 @@ import type {
   ComponentHistoryEntry,
   ComponentFeature,
 } from '../types/component-meta'
-import { useIsDevModeEnabled, useDevModeSettings, useDevModeStore } from '../lib/devmode'
+import { useIsMetaModeEnabled, useMetaModeSettings, useMetaModeStore } from '../lib/metamode-store'
 
 // --- Props ---
 interface ComponentInfoProps {
@@ -278,9 +278,9 @@ const positionStyles: Record<string, CSSProperties> = {
 }
 
 // --- State ---
-const isDevMode = useIsDevModeEnabled()
-const settings = useDevModeSettings()
-const devModeStore = useDevModeStore()
+const isMetaMode = useIsMetaModeEnabled()
+const settings = useMetaModeSettings()
+const metaModeStore = useMetaModeStore()
 const isHovered = ref(false)
 const isPinned = ref(false)
 
@@ -305,7 +305,7 @@ const actualPosition = computed(() =>
   props.position === 'auto' ? settings.value.panelPosition : props.position
 )
 
-// Info panel is disabled inline — all metadata is shown in the GodMode window (Issue #198)
+// Info panel is disabled inline — all metadata is shown in the MetaMode window (Issue #198)
 const showPanel = computed(() => false)
 
 const showOutline = computed(() => settings.value.showOutline)
@@ -339,14 +339,14 @@ const historyEntries = computed(() =>
 function handleMouseEnter(e: MouseEvent) {
   e.stopPropagation()
   isHovered.value = true
-  devModeStore.setHoveredComponent(props.meta.id)
+  metaModeStore.setHoveredComponent(props.meta.id)
 }
 
 function handleMouseLeave() {
   isHovered.value = false
   // Only clear if we are still the hovered component
-  if (devModeStore.hoveredComponentId === props.meta.id) {
-    devModeStore.setHoveredComponent(null)
+  if (metaModeStore.hoveredComponentId === props.meta.id) {
+    metaModeStore.setHoveredComponent(null)
   }
 }
 
@@ -355,9 +355,9 @@ function handleWrapperClick(e: MouseEvent) {
     e.stopPropagation()
     isPinned.value = !isPinned.value
   }
-  // When DevMode is enabled, clicking selects this component for inspection
+  // When MetaMode is enabled, clicking selects this component for inspection
   e.stopPropagation()
-  devModeStore.setSelectedComponent(props.meta.id)
+  metaModeStore.setSelectedComponent(props.meta.id)
 }
 
 function closePanel() {
@@ -367,7 +367,7 @@ function closePanel() {
 
 <template>
   <!-- When DevMode is disabled, just render the slot -->
-  <template v-if="!isDevMode">
+  <template v-if="!isMetaMode">
     <slot />
   </template>
 
