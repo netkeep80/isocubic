@@ -182,7 +182,168 @@ function captureCanvasElement(
 }
 
 /**
+ * Captures canvas element data safely, handling tainted canvases
+ * @param canvas - The canvas element to capture
+ * @param format - Image format
+ * @param quality - Image quality
+ * @returns Data URL or null if capture fails (tainted canvas)
+ */
+function safeCanvasToDataURL(
+  canvas: HTMLCanvasElement,
+  format: string = 'image/png',
+  quality: number = 0.92
+): string | null {
+  try {
+    return canvas.toDataURL(format, quality)
+  } catch {
+    // Canvas is tainted (e.g., WebGL content), cannot export
+    return null
+  }
+}
+
+/**
+ * Information about a canvas element and its position
+ */
+interface CanvasInfo {
+  element: HTMLCanvasElement
+  rect: DOMRect
+  dataUrl: string | null
+}
+
+/**
+ * Finds all canvas elements within an element and captures their content
+ * @param element - Parent element to search within
+ * @param parentRect - Bounding rect of the parent element for position calculation
+ * @returns Array of canvas info objects
+ */
+function findAndCaptureCanvases(element: HTMLElement, parentRect: DOMRect): CanvasInfo[] {
+  const canvases = element.querySelectorAll('canvas')
+  const canvasInfos: CanvasInfo[] = []
+
+  canvases.forEach((canvas) => {
+    const canvasRect = canvas.getBoundingClientRect()
+    // Calculate position relative to parent element
+    const relativeRect = new DOMRect(
+      canvasRect.x - parentRect.x,
+      canvasRect.y - parentRect.y,
+      canvasRect.width,
+      canvasRect.height
+    )
+
+    canvasInfos.push({
+      element: canvas,
+      rect: relativeRect,
+      dataUrl: safeCanvasToDataURL(canvas),
+    })
+  })
+
+  return canvasInfos
+}
+
+/**
+ * Replaces canvas elements in a cloned DOM with placeholder divs
+ * This prevents the tainted canvas issue when serializing to SVG
+ * @param clone - Cloned element to modify
+ */
+function replaceCanvasesWithPlaceholders(clone: HTMLElement): void {
+  const canvases = clone.querySelectorAll('canvas')
+  canvases.forEach((canvas) => {
+    const placeholder = document.createElement('div')
+    placeholder.style.cssText = `
+      width: ${canvas.width}px;
+      height: ${canvas.height}px;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #8b5cf6;
+      font-size: 12px;
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      border-radius: 4px;
+    `
+    placeholder.setAttribute('data-canvas-placeholder', 'true')
+    canvas.parentNode?.replaceChild(placeholder, canvas)
+  })
+}
+
+/**
+ * Sanitizes a cloned DOM element by removing elements that can cause
+ * cross-origin tainting issues when rendered in SVG foreignObject.
+ * This includes:
+ * - External stylesheets (link[rel="stylesheet"] with external href)
+ * - Script elements
+ * - External images
+ * - iframes
+ * @param clone - Cloned element to sanitize
+ */
+function sanitizeCloneForSvg(clone: HTMLElement): void {
+  // Remove script elements
+  const scripts = clone.querySelectorAll('script')
+  scripts.forEach((script) => script.remove())
+
+  // Remove link elements that reference external resources
+  const links = clone.querySelectorAll('link')
+  links.forEach((link) => {
+    const href = link.getAttribute('href') || ''
+    // Remove external stylesheets (different origin)
+    if (
+      href.startsWith('https://') ||
+      href.startsWith('http://') ||
+      link.getAttribute('rel') === 'manifest' ||
+      link.getAttribute('rel') === 'icon' ||
+      link.getAttribute('rel') === 'apple-touch-icon'
+    ) {
+      link.remove()
+    }
+  })
+
+  // Remove images with external sources (keep data URLs)
+  const images = clone.querySelectorAll('img')
+  images.forEach((img) => {
+    const src = img.getAttribute('src') || ''
+    if (src && !src.startsWith('data:')) {
+      // Replace with a placeholder
+      const placeholder = document.createElement('div')
+      placeholder.style.cssText = `
+        width: ${img.width || 100}px;
+        height: ${img.height || 100}px;
+        background: #2d2d44;
+        display: inline-block;
+      `
+      img.parentNode?.replaceChild(placeholder, img)
+    }
+  })
+
+  // Remove iframes
+  const iframes = clone.querySelectorAll('iframe')
+  iframes.forEach((iframe) => iframe.remove())
+
+  // Remove SVG use elements with external references
+  const useElements = clone.querySelectorAll('use')
+  useElements.forEach((use) => {
+    const href = use.getAttribute('href') || use.getAttribute('xlink:href') || ''
+    if (href.startsWith('http://') || href.startsWith('https://')) {
+      use.remove()
+    }
+  })
+
+  // Remove any elements with external background images in inline styles
+  const allElements = clone.querySelectorAll('*')
+  allElements.forEach((el) => {
+    if (el instanceof HTMLElement) {
+      const style = el.getAttribute('style') || ''
+      if (style.includes('url(') && (style.includes('http://') || style.includes('https://'))) {
+        // Remove the background-image property but keep the element
+        el.style.backgroundImage = 'none'
+      }
+    }
+  })
+}
+
+/**
  * Captures a DOM element using SVG foreignObject approach
+ * Handles tainted canvases (e.g., WebGL) by capturing them separately
+ * and compositing them onto the final image.
  */
 async function captureDomElement(
   element: HTMLElement,
@@ -192,12 +353,21 @@ async function captureDomElement(
   height: number
 ): Promise<CaptureResult> {
   try {
+    // Find and capture all canvases before cloning (to get their current content)
+    const canvasInfos = findAndCaptureCanvases(element, rect)
+
     // Serialize the element to XML for SVG foreignObject
     const serializer = new XMLSerializer()
     const clone = element.cloneNode(true) as HTMLElement
 
     // Apply computed styles to clone for accurate rendering
     applyComputedStyles(element, clone)
+
+    // Replace canvas elements with placeholders to avoid tainted canvas issues
+    replaceCanvasesWithPlaceholders(clone)
+
+    // Sanitize clone to remove elements that cause cross-origin tainting
+    sanitizeCloneForSvg(clone)
 
     const xhtml = serializer.serializeToString(clone)
 
@@ -209,36 +379,60 @@ async function captureDomElement(
       </svg>
     `.trim()
 
-    const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' })
-    const url = URL.createObjectURL(svgBlob)
+    // Use data URL instead of blob URL to avoid cross-origin tainting issues
+    // Blob URLs are treated as cross-origin in some browser contexts, causing
+    // "Tainted canvases may not be exported" errors when calling toDataURL()
+    const url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgString)
 
-    try {
-      const img = await loadImage(url)
+    const img = await loadImage(url)
 
-      const canvas = document.createElement('canvas')
-      canvas.width = width
-      canvas.height = height
-      const ctx = canvas.getContext('2d')
+    const canvas = document.createElement('canvas')
+    canvas.width = width
+    canvas.height = height
+    const ctx = canvas.getContext('2d')
 
-      if (!ctx) {
-        return { success: false, error: 'Failed to get canvas context' }
+    if (!ctx) {
+      return { success: false, error: 'Failed to get canvas context' }
+    }
+
+    if (config.includeBackground) {
+      ctx.fillStyle = '#ffffff'
+      ctx.fillRect(0, 0, width, height)
+    }
+
+    // Draw the main SVG content
+    ctx.drawImage(img, 0, 0, width, height)
+
+    // Calculate scale factors for compositing canvas content
+    const scaleX = width / rect.width
+    const scaleY = height / rect.height
+
+    // Overlay the captured canvas content on top of their placeholder positions
+    for (const canvasInfo of canvasInfos) {
+      if (canvasInfo.dataUrl) {
+        try {
+          const canvasImg = await loadImage(canvasInfo.dataUrl)
+          // Draw the canvas content at its relative position, scaled appropriately
+          ctx.drawImage(
+            canvasImg,
+            canvasInfo.rect.x * scaleX,
+            canvasInfo.rect.y * scaleY,
+            canvasInfo.rect.width * scaleX,
+            canvasInfo.rect.height * scaleY
+          )
+        } catch {
+          // If loading the canvas image fails, the placeholder will remain visible
+          console.warn('Failed to composite canvas content, placeholder will be shown')
+        }
       }
+      // If dataUrl is null (tainted canvas), the placeholder will be visible
+    }
 
-      if (config.includeBackground) {
-        ctx.fillStyle = '#ffffff'
-        ctx.fillRect(0, 0, width, height)
-      }
+    const imageData = canvas.toDataURL(config.format, config.quality)
 
-      ctx.drawImage(img, 0, 0, width, height)
-
-      const imageData = canvas.toDataURL(config.format, config.quality)
-
-      return {
-        success: true,
-        screenshot: createScreenshotMetadata(imageData, config, width, height),
-      }
-    } finally {
-      URL.revokeObjectURL(url)
+    return {
+      success: true,
+      screenshot: createScreenshotMetadata(imageData, config, width, height),
     }
   } catch (error) {
     return {
@@ -251,10 +445,14 @@ async function captureDomElement(
 /**
  * Loads an image from a URL
  */
-function loadImage(url: string): Promise<HTMLImageElement> {
+function loadImage(url: string, setCrossOrigin: boolean = false): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image()
-    img.crossOrigin = 'anonymous'
+    // Only set crossOrigin for actual cross-origin URLs, not blob URLs
+    // Setting crossOrigin on blob URLs can cause tainting issues
+    if (setCrossOrigin && !url.startsWith('blob:')) {
+      img.crossOrigin = 'anonymous'
+    }
     img.onload = () => resolve(img)
     img.onerror = () => reject(new Error('Failed to load image'))
     img.src = url

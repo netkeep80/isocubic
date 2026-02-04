@@ -223,12 +223,43 @@ describe('Screen Capture Library', () => {
       // Mock XMLSerializer
       vi.spyOn(XMLSerializer.prototype, 'serializeToString').mockReturnValue('<div></div>')
 
-      // captureElement will try to use canvas and SVG, which may fail in JSDOM
-      // but it should handle errors gracefully
-      const result = await captureElement(element)
-      // In JSDOM, the SVG/foreignObject approach may not work, but should not throw
-      expect(result).toBeDefined()
-      expect(typeof result.success).toBe('boolean')
+      // Mock Image to properly handle data URL loading in JSDOM
+      // JSDOM doesn't fire onload events for data URLs
+      const originalImage = globalThis.Image
+      globalThis.Image = vi.fn().mockImplementation(() => {
+        const img = {
+          onload: null as ((this: HTMLImageElement, ev: Event) => void) | null,
+          onerror: null as ((this: HTMLImageElement, ev: Event) => void) | null,
+          src: '',
+          width: 100,
+          height: 100,
+        }
+        // Simulate async load when src is set
+        Object.defineProperty(img, 'src', {
+          set(_value: string) {
+            setTimeout(() => {
+              if (img.onload) {
+                img.onload.call(img as unknown as HTMLImageElement, new Event('load'))
+              }
+            }, 0)
+          },
+          get() {
+            return ''
+          },
+        })
+        return img
+      }) as unknown as typeof Image
+
+      try {
+        // captureElement will try to use canvas and SVG, which may fail in JSDOM
+        // but it should handle errors gracefully
+        const result = await captureElement(element)
+        // In JSDOM, the SVG/foreignObject approach may not work, but should not throw
+        expect(result).toBeDefined()
+        expect(typeof result.success).toBe('boolean')
+      } finally {
+        globalThis.Image = originalImage
+      }
     })
 
     it('should handle canvas elements', async () => {
