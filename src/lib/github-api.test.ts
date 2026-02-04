@@ -16,7 +16,7 @@ import {
   GITHUB_AUTH_METHOD_KEY,
   DEFAULT_GITHUB_API_CONFIG,
 } from './github-api'
-import type { IssueDraft } from '../types/issue-generator'
+import type { IssueDraft, IssueScreenshot } from '../types/issue-generator'
 
 // Mock fetch globally
 const mockFetch = vi.fn()
@@ -503,6 +503,226 @@ describe('GitHubApiClient', () => {
 
       const callBody = JSON.parse(mockFetch.mock.calls[0][1].body as string)
       expect(callBody.assignees).toEqual(['user1', 'user2'])
+    })
+
+    it('should upload screenshots and include them in issue body', async () => {
+      localStorage.setItem(GITHUB_TOKEN_STORAGE_KEY, 'test-token')
+
+      const mockScreenshot: IssueScreenshot = {
+        id: 'screenshot-1',
+        imageData:
+          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+        timestamp: '2024-01-15T10:00:00.000Z',
+        title: 'Bug Screenshot',
+      }
+
+      // First call: upload screenshot
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            content: {
+              sha: 'abc123',
+              html_url:
+                'https://github.com/testowner/testrepo/blob/main/.github/issue-attachments/screenshot-screenshot-1-1705312800000.png',
+              download_url:
+                'https://raw.githubusercontent.com/testowner/testrepo/main/.github/issue-attachments/screenshot-screenshot-1-1705312800000.png',
+            },
+            commit: {
+              sha: 'commit123',
+            },
+          }),
+      })
+
+      // Second call: create issue
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            id: 12345,
+            number: 44,
+            html_url: 'https://github.com/testowner/testrepo/issues/44',
+          }),
+      })
+
+      const draftWithScreenshot: IssueDraft = {
+        ...mockDraft,
+        screenshots: [mockScreenshot],
+      }
+
+      const client = createGitHubClient({
+        owner: 'testowner',
+        repo: 'testrepo',
+      })
+      const result = await client.createIssue(draftWithScreenshot)
+
+      expect(result.success).toBe(true)
+      expect(result.number).toBe(44)
+
+      // Verify screenshot was uploaded first
+      expect(mockFetch).toHaveBeenCalledTimes(2)
+
+      // Verify the issue body contains the screenshot
+      const issueCallBody = JSON.parse(mockFetch.mock.calls[1][1].body as string)
+      expect(issueCallBody.body).toContain('## Screenshots')
+      expect(issueCallBody.body).toContain('![Bug Screenshot]')
+      expect(issueCallBody.body).toContain(
+        'https://raw.githubusercontent.com/testowner/testrepo/main/.github/issue-attachments/'
+      )
+    })
+
+    it('should handle screenshot upload failure gracefully', async () => {
+      localStorage.setItem(GITHUB_TOKEN_STORAGE_KEY, 'test-token')
+
+      const mockScreenshot: IssueScreenshot = {
+        id: 'screenshot-1',
+        imageData: 'data:image/png;base64,invalidbase64',
+        timestamp: '2024-01-15T10:00:00.000Z',
+      }
+
+      // First call: upload screenshot fails
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        json: () =>
+          Promise.resolve({
+            message: 'File already exists',
+          }),
+      })
+
+      // Second call: create issue (should still proceed without screenshot)
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            id: 12345,
+            number: 45,
+            html_url: 'https://github.com/testowner/testrepo/issues/45',
+          }),
+      })
+
+      const draftWithScreenshot: IssueDraft = {
+        ...mockDraft,
+        screenshots: [mockScreenshot],
+      }
+
+      const client = createGitHubClient({
+        owner: 'testowner',
+        repo: 'testrepo',
+      })
+      const result = await client.createIssue(draftWithScreenshot)
+
+      // Issue should still be created even if screenshot upload failed
+      expect(result.success).toBe(true)
+      expect(result.number).toBe(45)
+    })
+  })
+
+  describe('uploadScreenshot', () => {
+    const mockScreenshot: IssueScreenshot = {
+      id: 'test-screenshot',
+      imageData:
+        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+      timestamp: '2024-01-15T10:00:00.000Z',
+      title: 'Test Screenshot',
+    }
+
+    it('should upload screenshot successfully', async () => {
+      localStorage.setItem(GITHUB_TOKEN_STORAGE_KEY, 'test-token')
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            content: {
+              sha: 'abc123',
+              html_url:
+                'https://github.com/testowner/testrepo/blob/main/.github/issue-attachments/screenshot-test-screenshot-1705312800000.png',
+              download_url:
+                'https://raw.githubusercontent.com/testowner/testrepo/main/.github/issue-attachments/screenshot-test-screenshot-1705312800000.png',
+            },
+            commit: {
+              sha: 'commit123',
+            },
+          }),
+      })
+
+      const client = createGitHubClient({
+        owner: 'testowner',
+        repo: 'testrepo',
+      })
+      const result = await client.uploadScreenshot(mockScreenshot)
+
+      expect(result.success).toBe(true)
+      expect(result.rawUrl).toContain('raw.githubusercontent.com')
+      expect(result.sha).toBe('commit123')
+    })
+
+    it('should fail if not authenticated', async () => {
+      const client = createGitHubClient({
+        owner: 'testowner',
+        repo: 'testrepo',
+      })
+      const result = await client.uploadScreenshot(mockScreenshot)
+
+      expect(result.success).toBe(false)
+      expect(result.error).toBe('Authentication required')
+    })
+
+    it('should fail with invalid image data format', async () => {
+      localStorage.setItem(GITHUB_TOKEN_STORAGE_KEY, 'test-token')
+
+      const invalidScreenshot: IssueScreenshot = {
+        ...mockScreenshot,
+        imageData: 'not-a-valid-data-url',
+      }
+
+      const client = createGitHubClient({
+        owner: 'testowner',
+        repo: 'testrepo',
+      })
+      const result = await client.uploadScreenshot(invalidScreenshot)
+
+      expect(result.success).toBe(false)
+      expect(result.error).toContain('Invalid screenshot data format')
+    })
+
+    it('should handle JPEG images', async () => {
+      localStorage.setItem(GITHUB_TOKEN_STORAGE_KEY, 'test-token')
+
+      const jpegScreenshot: IssueScreenshot = {
+        ...mockScreenshot,
+        imageData: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAA==',
+      }
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            content: {
+              sha: 'abc123',
+              html_url:
+                'https://github.com/testowner/testrepo/blob/main/.github/issue-attachments/screenshot-test-screenshot-1705312800000.jpg',
+              download_url:
+                'https://raw.githubusercontent.com/testowner/testrepo/main/.github/issue-attachments/screenshot-test-screenshot-1705312800000.jpg',
+            },
+            commit: {
+              sha: 'commit123',
+            },
+          }),
+      })
+
+      const client = createGitHubClient({
+        owner: 'testowner',
+        repo: 'testrepo',
+      })
+      const result = await client.uploadScreenshot(jpegScreenshot)
+
+      expect(result.success).toBe(true)
+
+      // Verify the PUT request was made to the correct path with .jpg extension
+      const callUrl = mockFetch.mock.calls[0][0]
+      expect(callUrl).toContain('.github/issue-attachments/')
+      expect(callUrl).toContain('.jpg')
     })
   })
 

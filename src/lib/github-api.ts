@@ -16,7 +16,7 @@
  * - Token secure storage (localStorage with prefix)
  */
 
-import type { IssueDraft } from '../types/issue-generator'
+import type { IssueDraft, IssueScreenshot } from '../types/issue-generator'
 
 /**
  * GitHub authentication method
@@ -118,6 +118,22 @@ export interface GitHubIssueResult {
   /** Created issue ID */
   id?: number
   /** Error message if creation failed */
+  error?: string
+}
+
+/**
+ * Result of uploading a screenshot to GitHub repository
+ */
+export interface GitHubScreenshotUploadResult {
+  /** Whether the upload was successful */
+  success: boolean
+  /** Raw URL of the uploaded image (for markdown embedding) */
+  rawUrl?: string
+  /** HTML URL of the file in the repository */
+  htmlUrl?: string
+  /** SHA of the created commit */
+  sha?: string
+  /** Error message if upload failed */
   error?: string
 }
 
@@ -608,10 +624,128 @@ export class GitHubApiClient {
     }
   }
 
+  // --- Screenshot Upload ---
+
+  /**
+   * Uploads a screenshot to the repository using the Contents API.
+   * Screenshots are stored in .github/issue-attachments/ folder.
+   *
+   * @param screenshot - The screenshot to upload
+   * @returns Upload result with raw URL for markdown embedding
+   */
+  async uploadScreenshot(screenshot: IssueScreenshot): Promise<GitHubScreenshotUploadResult> {
+    const o = this.config.owner
+    const r = this.config.repo
+
+    if (!o || !r) {
+      return {
+        success: false,
+        error: 'Repository owner and name are required',
+      }
+    }
+
+    if (!this.isAuthenticated()) {
+      return {
+        success: false,
+        error: 'Authentication required',
+      }
+    }
+
+    try {
+      // Extract base64 content from data URL
+      // Format: data:image/png;base64,iVBORw0KGgo...
+      const dataUrlMatch = screenshot.imageData.match(/^data:([^;]+);base64,(.+)$/)
+      if (!dataUrlMatch) {
+        return {
+          success: false,
+          error: 'Invalid screenshot data format. Expected base64 data URL.',
+        }
+      }
+
+      const mimeType = dataUrlMatch[1]
+      const base64Content = dataUrlMatch[2]
+
+      // Determine file extension from MIME type
+      const extMap: Record<string, string> = {
+        'image/png': 'png',
+        'image/jpeg': 'jpg',
+        'image/jpg': 'jpg',
+        'image/gif': 'gif',
+        'image/webp': 'webp',
+      }
+      const ext = extMap[mimeType] || 'png'
+
+      // Generate unique filename using screenshot ID and timestamp
+      const timestamp = new Date(screenshot.timestamp).getTime()
+      const filename = `screenshot-${screenshot.id}-${timestamp}.${ext}`
+      const path = `.github/issue-attachments/${filename}`
+
+      interface GitHubContentResponse {
+        content: {
+          sha: string
+          html_url: string
+          download_url: string
+        }
+        commit: {
+          sha: string
+        }
+      }
+
+      const data = await this.apiRequest<GitHubContentResponse>(
+        `/repos/${o}/${r}/contents/${path}`,
+        {
+          method: 'PUT',
+          body: JSON.stringify({
+            message: `Add screenshot for issue: ${filename}`,
+            content: base64Content,
+          }),
+        }
+      )
+
+      // Construct raw URL for markdown embedding
+      // Format: https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{path}
+      // We use 'main' as default branch, but the download_url from response is more reliable
+      const rawUrl =
+        data.content.download_url || `https://raw.githubusercontent.com/${o}/${r}/main/${path}`
+
+      return {
+        success: true,
+        rawUrl,
+        htmlUrl: data.content.html_url,
+        sha: data.commit.sha,
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to upload screenshot',
+      }
+    }
+  }
+
+  /**
+   * Uploads multiple screenshots and returns their raw URLs.
+   *
+   * @param screenshots - Array of screenshots to upload
+   * @returns Array of upload results (includes both successful and failed uploads)
+   */
+  async uploadScreenshots(screenshots: IssueScreenshot[]): Promise<GitHubScreenshotUploadResult[]> {
+    const results: GitHubScreenshotUploadResult[] = []
+
+    // Upload screenshots sequentially to avoid rate limiting
+    for (const screenshot of screenshots) {
+      const result = await this.uploadScreenshot(screenshot)
+      results.push(result)
+    }
+
+    return results
+  }
+
   // --- Issues ---
 
   /**
-   * Creates a GitHub issue from an IssueDraft
+   * Creates a GitHub issue from an IssueDraft.
+   * If the draft contains screenshots, they are uploaded to the repository
+   * and embedded in the issue body as markdown images.
    */
   async createIssue(draft: IssueDraft): Promise<GitHubIssueResult> {
     const o = this.config.owner
@@ -638,9 +772,41 @@ export class GitHubApiClient {
         html_url: string
       }
 
+      // Build issue body, including screenshots if present
+      let issueBody = draft.body
+
+      // Upload screenshots and append to body if present
+      if (draft.screenshots && draft.screenshots.length > 0) {
+        const uploadResults = await this.uploadScreenshots(draft.screenshots)
+        const successfulUploads = uploadResults.filter((r) => r.success && r.rawUrl)
+
+        if (successfulUploads.length > 0) {
+          // Append screenshots section to the body
+          const screenshotsMarkdown = successfulUploads
+            .map((result, index) => {
+              const screenshot = draft.screenshots![index]
+              const title = screenshot?.title || `Screenshot ${index + 1}`
+              return `![${title}](${result.rawUrl})`
+            })
+            .join('\n\n')
+
+          // Check if body already has a Screenshots section
+          if (issueBody.includes('## Screenshots')) {
+            // Replace empty screenshots placeholder or append after section header
+            issueBody = issueBody.replace(
+              /## Screenshots\s*\n*/,
+              `## Screenshots\n\n${screenshotsMarkdown}\n\n`
+            )
+          } else {
+            // Append screenshots section at the end
+            issueBody = `${issueBody}\n\n## Screenshots\n\n${screenshotsMarkdown}`
+          }
+        }
+      }
+
       const body: Record<string, unknown> = {
         title: draft.title,
-        body: draft.body,
+        body: issueBody,
       }
 
       // Only include labels if they exist
