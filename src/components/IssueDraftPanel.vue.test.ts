@@ -109,7 +109,32 @@ vi.mock('../lib/github-api', () => ({
 
 // Mock screen-capture module
 vi.mock('../lib/screen-capture', () => ({
-  captureScreenshot: vi.fn(),
+  captureByTestId: vi.fn().mockResolvedValue({
+    success: true,
+    screenshot: {
+      id: 'test-screenshot-1',
+      imageData: 'data:image/png;base64,test',
+      filename: 'screenshot_test.png',
+      mimeType: 'image/png',
+      timestamp: new Date().toISOString(),
+      resolution: { width: 800, height: 600 },
+      viewport: { width: 1920, height: 1080 },
+      annotations: [],
+    },
+  }),
+  captureViewport: vi.fn().mockResolvedValue({
+    success: true,
+    screenshot: {
+      id: 'test-viewport-1',
+      imageData: 'data:image/png;base64,test',
+      filename: 'viewport_test.png',
+      mimeType: 'image/png',
+      timestamp: new Date().toISOString(),
+      resolution: { width: 1920, height: 1080 },
+      viewport: { width: 1920, height: 1080 },
+      annotations: [],
+    },
+  }),
   renderAnnotationsOnImage: vi.fn(),
   drawAnnotation: vi.fn(),
 }))
