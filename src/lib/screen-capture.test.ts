@@ -236,7 +236,7 @@ describe('Screen Capture Library', () => {
         }
         // Simulate async load when src is set
         Object.defineProperty(img, 'src', {
-          set(_value: string) {
+          set() {
             setTimeout(() => {
               if (img.onload) {
                 img.onload.call(img as unknown as HTMLImageElement, new Event('load'))
