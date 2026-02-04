@@ -807,16 +807,20 @@ onUnmounted(() => {
         <!-- Content area (hidden when minimized) -->
         <div v-if="!isMinimized" :style="styles.content" data-testid="metamode-content">
           <div :style="styles.panelWrapper">
-            <!-- Tab content -->
+            <!--
+              Tab content: Using v-show instead of v-if to preserve component state
+              when switching between tabs. This prevents loss of draft data, form inputs,
+              and other local state (fixes issue #258).
+            -->
             <MetaModeQueryPanel
-              v-if="windowState.activeTab === 'query'"
+              v-show="windowState.activeTab === 'query'"
               :initial-expanded="true"
               position="top-left"
               :style="styles.embeddedPanel"
             />
 
             <ComponentContextPanel
-              v-if="windowState.activeTab === 'context'"
+              v-show="windowState.activeTab === 'context'"
               :component-id="effectiveComponentId"
               :on-related-component-select="handleComponentSelect"
               :initial-expanded="true"
@@ -825,7 +829,7 @@ onUnmounted(() => {
             />
 
             <ExtendedSearchPanel
-              v-if="windowState.activeTab === 'search'"
+              v-show="windowState.activeTab === 'search'"
               :initial-expanded="true"
               position="top-left"
               :on-component-select="(comp: { id: string }) => handleComponentSelect(comp.id)"
@@ -833,7 +837,7 @@ onUnmounted(() => {
             />
 
             <ConversationPanel
-              v-if="windowState.activeTab === 'conversation'"
+              v-show="windowState.activeTab === 'conversation'"
               :selected-component-id="effectiveComponentId"
               :on-component-select="handleComponentSelect"
               :settings="{ preferredLanguage: language }"
@@ -841,7 +845,7 @@ onUnmounted(() => {
             />
 
             <IssueDraftPanel
-              v-if="windowState.activeTab === 'issues'"
+              v-show="windowState.activeTab === 'issues'"
               :conversation-messages="[]"
               :language="language"
               :show-advanced-options="true"
@@ -856,7 +860,7 @@ onUnmounted(() => {
             />
 
             <MetamodeTreePanel
-              v-if="windowState.activeTab === 'tree'"
+              v-show="windowState.activeTab === 'tree'"
               :initial-expanded="true"
               position="top-left"
               :language="language"

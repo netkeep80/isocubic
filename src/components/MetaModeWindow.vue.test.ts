@@ -471,4 +471,53 @@ describe('MetaModeWindow Vue Component', () => {
       expect(pinButton.attributes('title')).toBeTruthy()
     })
   })
+
+  // ========================================================================
+  // Tab State Preservation (Issue #258)
+  // ========================================================================
+  describe('Tab State Preservation (Issue #258)', () => {
+    it('should use v-show for tab panels to preserve component state', () => {
+      // This test verifies that tab panels use v-show (display: none) instead of v-if
+      // v-show keeps components mounted but hidden, preserving their internal state
+      const wrapper = mountWindow()
+
+      // Query panel should be visible (active tab)
+      const queryPanel = wrapper.findComponent({ name: 'MetaModeQueryPanel' })
+      expect(queryPanel.exists()).toBe(true)
+
+      // Other panels should also exist (mounted) but be hidden via v-show
+      // With shallowMount, we can check that all panel components are present
+      const contextPanel = wrapper.findComponent({ name: 'ComponentContextPanel' })
+      const searchPanel = wrapper.findComponent({ name: 'ExtendedSearchPanel' })
+      const conversationPanel = wrapper.findComponent({ name: 'ConversationPanel' })
+      const issuePanel = wrapper.findComponent({ name: 'IssueDraftPanel' })
+
+      // All panels should be mounted (v-show keeps them in DOM)
+      expect(contextPanel.exists()).toBe(true)
+      expect(searchPanel.exists()).toBe(true)
+      expect(conversationPanel.exists()).toBe(true)
+      expect(issuePanel.exists()).toBe(true)
+    })
+
+    it('should keep all panels mounted when switching tabs', async () => {
+      const wrapper = mountWindow()
+
+      // Initially on query tab - check all panels exist
+      expect(wrapper.findComponent({ name: 'IssueDraftPanel' }).exists()).toBe(true)
+
+      // Switch to issues tab
+      await wrapper.find('[data-testid="metamode-tab-issues"]').trigger('click')
+      await nextTick()
+
+      // Query panel should still be mounted (not destroyed) after switching away
+      expect(wrapper.findComponent({ name: 'MetaModeQueryPanel' }).exists()).toBe(true)
+
+      // Switch to search tab
+      await wrapper.find('[data-testid="metamode-tab-search"]').trigger('click')
+      await nextTick()
+
+      // Issues panel should still be mounted after switching away
+      expect(wrapper.findComponent({ name: 'IssueDraftPanel' }).exists()).toBe(true)
+    })
+  })
 })
