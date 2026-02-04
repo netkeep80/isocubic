@@ -30,7 +30,7 @@ import type {
 import { createIssueGenerator, type IssueGenerationResult } from '../lib/issue-generator'
 import { validateIssueDraft } from '../types/issue-generator'
 import { createGitHubClient, type GitHubApiClient, type GitHubIssueResult } from '../lib/github-api'
-import { captureViewport, type CaptureResult } from '../lib/screen-capture'
+import { captureByTestId, captureViewport, type CaptureResult } from '../lib/screen-capture'
 import GitHubAuthButton from './GitHubAuthButton.vue'
 import AnnotationCanvas from './AnnotationCanvas.vue'
 
@@ -561,10 +561,24 @@ async function handlePublishToGitHub() {
 }
 
 // Handle screenshot capture
+// Captures only the 3D cube preview element (data-testid="cube-preview") instead of the full viewport.
+// This prevents capturing the MetaMode window overlay and other UI elements in the screenshot.
+// Falls back to viewport capture if the cube preview element is not found.
 async function handleCaptureScreenshot() {
   isCapturing.value = true
   try {
-    const result: CaptureResult = await captureViewport()
+    // Try to capture the cube preview element first (preferred)
+    let result: CaptureResult = await captureByTestId('cube-preview')
+
+    // Fall back to viewport capture if cube preview not found
+    if (!result.success) {
+      console.warn(
+        'Cube preview element not found, falling back to viewport capture:',
+        result.error
+      )
+      result = await captureViewport()
+    }
+
     if (result.success && result.screenshot) {
       screenshots.value = [...screenshots.value, result.screenshot]
       // Attach to draft if exists
