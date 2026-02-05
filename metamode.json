@@ -29,9 +29,6 @@
     "env.d.ts": {
       "description": "Environment type declarations for Vite"
     },
-    "metanet.md": {
-      "description": "Legacy MetaNet specification (deprecated, see metamode.md)"
-    },
     "metamode.json": {
       "description": "Root metamode descriptor for the isocubic project"
     },

@@ -262,26 +262,6 @@ detectLanguage(text: string): QueryLanguage
 | `MAX_DRAFTS_COUNT`             | Maximum stored drafts                |
 | `DRAFT_AUTO_SAVE_INTERVAL`     | Auto-save interval (ms)              |
 
-## Migration from @isocubic/god-mode
-
-If you were using the previous `@isocubic/god-mode` package:
-
-```typescript
-// Before (deprecated)
-import { provideGodMode, useGodMode, GodModeConfig } from '@isocubic/god-mode'
-
-// After
-import { provideMetaMode, useMetaMode, MetaModeConfig } from '@isocubic/metamode'
-```
-
-Backward compatibility aliases are provided for a smooth transition, but they will be removed in a future version:
-- `provideGodMode` → use `provideMetaMode`
-- `useGodMode` → use `useMetaMode`
-- `GOD_MODE_KEY` → use `METAMODE_KEY`
-- `GodModeConfig` → use `MetaModeConfig`
-- `GodModeTab` → use `MetaModeTab`
-- `GodModeWindowState` → use `MetaModeWindowState`
-
 ## Examples
 
 See the `examples/` directory for complete usage examples:
