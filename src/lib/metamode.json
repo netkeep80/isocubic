@@ -94,6 +94,21 @@
     "metamode-ai-optimizer.test.ts": {
       "description": "Tests for the MetaMode AI optimizer token-efficient format (TASK 74)"
     },
+    "metamode-database.ts": {
+      "description": "Runtime database client for compiled MetaMode metadata (TASK 80)"
+    },
+    "metamode-database.test.ts": {
+      "description": "Tests for the MetaMode database client"
+    },
+    "metamode-inline-extractor.test.ts": {
+      "description": "Tests for the MetaMode inline extractor (TASK 75)"
+    },
+    "metamode-llm-integration.ts": {
+      "description": "Integration with local LLM for natural language queries (TASK 81)"
+    },
+    "metamode-llm-integration.test.ts": {
+      "description": "Tests for the MetaMode LLM integration"
+    },
     "issue-generator.ts": {
       "description": "Automated GitHub issue generator from application context"
     },

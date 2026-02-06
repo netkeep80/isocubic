@@ -83,7 +83,7 @@
     },
     "DirectoryDescriptor": {
       "type": "object",
-      "required": ["description", "metamode"],
+      "required": ["description"],
       "properties": {
         "description": {
           "type": "string",
@@ -91,7 +91,7 @@
         },
         "metamode": {
           "type": "string",
-          "description": "Relative path to the subdirectory's metamode.json"
+          "description": "Relative path to the subdirectory's metamode.json (auto-inferred as {dirname}/metamode.json if omitted)"
         }
       },
       "additionalProperties": false

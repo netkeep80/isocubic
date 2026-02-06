@@ -35,7 +35,7 @@ interface FileDescriptor {
 
 interface DirectoryDescriptor {
   description: string
-  metamode: string
+  metamode?: string
 }
 
 interface MetamodeJson {
@@ -361,8 +361,10 @@ export function collectAIOptimizedTree(rootMetamodePath: string): Record<string,
     // Recurse into subdirectories
     if (metamode.directories) {
       const dirPath = path.dirname(resolvedPath)
-      for (const dirDesc of Object.values(metamode.directories)) {
-        const subMetamodePath = path.join(dirPath, dirDesc.metamode)
+      for (const [dirName, dirDesc] of Object.entries(metamode.directories)) {
+        // Auto-infer metamode path if not specified
+        const metamodePath = dirDesc.metamode || `${dirName}/metamode.json`
+        const subMetamodePath = path.join(dirPath, metamodePath)
         visit(subMetamodePath)
       }
     }
@@ -406,7 +408,9 @@ export function compileAIOptimizedTree(rootMetamodePath: string): AIMetamodeTree
       const children: Record<string, AIMetamodeTreeNode> = {}
 
       for (const [dirName, dirDesc] of Object.entries(metamode.directories)) {
-        const subMetamodePath = path.join(dirPath, dirDesc.metamode)
+        // Auto-infer metamode path if not specified
+        const metamodePath = dirDesc.metamode || `${dirName}/metamode.json`
+        const subMetamodePath = path.join(dirPath, metamodePath)
         const childNode = visit(subMetamodePath)
         if (childNode) {
           children[dirName] = childNode
@@ -476,8 +480,10 @@ export function analyzeTokenUsage(rootMetamodePath: string): TokenAnalysis {
     // Recurse into subdirectories
     if (metamode.directories) {
       const dirPath = path.dirname(resolvedPath)
-      for (const dirDesc of Object.values(metamode.directories)) {
-        const subMetamodePath = path.join(dirPath, dirDesc.metamode)
+      for (const [dirName, dirDesc] of Object.entries(metamode.directories)) {
+        // Auto-infer metamode path if not specified
+        const metamodePath = dirDesc.metamode || `${dirName}/metamode.json`
+        const subMetamodePath = path.join(dirPath, metamodePath)
         visit(subMetamodePath)
       }
     }

@@ -1,0 +1,5 @@
+{
+  "$schema": "../../metamode.schema.json",
+  "name": "issue-attachments",
+  "description": "Screenshots and attachments for GitHub issues"
+}

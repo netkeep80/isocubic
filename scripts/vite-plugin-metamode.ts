@@ -45,7 +45,7 @@ interface MetamodeJson {
   languages?: string[]
   tags?: string[]
   files?: Record<string, FileDescriptor>
-  directories?: Record<string, { description: string; metamode: string }>
+  directories?: Record<string, { description: string; metamode?: string }>
 }
 
 interface MetamodeTreeNode {
@@ -238,8 +238,10 @@ function collectMetamodeFlat(rootDir: string): Record<string, MetamodeJson> {
     tree[relPath] = data as MetamodeJson
 
     if (metamode.directories) {
-      for (const dirDesc of Object.values(metamode.directories)) {
-        const subMetamodePath = path.join(dirPath, dirDesc.metamode)
+      for (const [dirName, dirDesc] of Object.entries(metamode.directories)) {
+        // Auto-infer metamode path if not specified
+        const metamodePath = dirDesc.metamode || `${dirName}/metamode.json`
+        const subMetamodePath = path.join(dirPath, metamodePath)
         visit(subMetamodePath)
       }
     }
@@ -286,7 +288,9 @@ function compileMetamodeTree(rootDir: string): MetamodeTreeNode | null {
       const children: Record<string, MetamodeTreeNode> = {}
 
       for (const [dirName, dirDesc] of Object.entries(metamode.directories)) {
-        const subMetamodePath = path.join(dirPath, dirDesc.metamode)
+        // Auto-infer metamode path if not specified
+        const metamodePath = dirDesc.metamode || `${dirName}/metamode.json`
+        const subMetamodePath = path.join(dirPath, metamodePath)
         const childNode = visit(subMetamodePath)
         if (childNode) {
           children[dirName] = childNode
@@ -396,7 +400,9 @@ function compileAIMetamodeTree(rootDir: string): AIMetamodeTreeNode | null {
       const children: Record<string, AIMetamodeTreeNode> = {}
 
       for (const [dirName, dirDesc] of Object.entries(metamode.directories)) {
-        const subMetamodePath = path.join(dirPath, dirDesc.metamode)
+        // Auto-infer metamode path if not specified
+        const metamodePath = dirDesc.metamode || `${dirName}/metamode.json`
+        const subMetamodePath = path.join(dirPath, metamodePath)
         const childNode = visit(subMetamodePath)
         if (childNode) {
           children[dirName] = childNode

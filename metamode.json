@@ -35,6 +35,9 @@
     "metamode.schema.json": {
       "description": "JSON Schema for validating metamode.json files"
     },
+    "metamode-compact.schema.json": {
+      "description": "Compact JSON Schema for AI-optimized metamode format"
+    },
     "metamode.md": {
       "description": "MetaMode specification - unified meta-information system"
     },
