@@ -550,7 +550,7 @@ const APP_META = {
 
           <template v-else-if="win.id === 'editor'">
             <ComponentInfo :meta="UNIFIED_EDITOR_META">
-              <UnifiedEditor :cube="currentCube" @update:cube="updateCube" />
+              <UnifiedEditor :current-cube="currentCube" @update:cube="updateCube" />
             </ComponentInfo>
           </template>
 
@@ -664,7 +664,7 @@ const APP_META = {
 
           <template v-else-if="win.id === 'editor'">
             <ComponentInfo :meta="UNIFIED_EDITOR_META">
-              <UnifiedEditor :cube="currentCube" @update:cube="updateCube" />
+              <UnifiedEditor :current-cube="currentCube" @update:cube="updateCube" />
             </ComponentInfo>
           </template>
 
@@ -785,7 +785,7 @@ const APP_META = {
 
         <!-- Editor Tab -->
         <div v-if="activeMobileTab === 'editor'" class="app__mobile-panel">
-          <UnifiedEditor :cube="currentCube" @update:cube="updateCube" />
+          <UnifiedEditor :current-cube="currentCube" @update:cube="updateCube" />
 
           <PromptGenerator
             @cube-generated="selectCube"
