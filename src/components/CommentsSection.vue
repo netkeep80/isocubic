@@ -491,7 +491,7 @@ function isOwnComment(comment: Comment): boolean {
               :aria-label="comment.isLiked ? 'Unlike comment' : 'Like comment'"
               @click="handleLike(comment.id)"
             >
-              {{ comment.isLiked ? '\u2764\uFE0F' : '\U0001F90D' }}
+              {{ comment.isLiked ? '❤️' : '🤍' }}
               <template v-if="comment.likes > 0"> {{ comment.likes }}</template>
             </button>
 
@@ -502,7 +502,7 @@ function isOwnComment(comment: Comment): boolean {
               aria-label="Reply to comment"
               @click="handleReply(comment.id)"
             >
-              \uD83D\uDCAC Reply
+              💬 Reply
             </button>
 
             <template v-if="isOwnComment(comment)">
@@ -512,7 +512,7 @@ function isOwnComment(comment: Comment): boolean {
                 aria-label="Edit comment"
                 @click="handleEdit(comment)"
               >
-                \u270F\uFE0F Edit
+                ✏️ Edit
               </button>
               <button
                 type="button"
@@ -520,7 +520,7 @@ function isOwnComment(comment: Comment): boolean {
                 aria-label="Delete comment"
                 @click="handleDelete(comment.id)"
               >
-                \uD83D\uDDD1\uFE0F Delete
+                🗑️ Delete
               </button>
             </template>
           </div>
@@ -561,7 +561,7 @@ function isOwnComment(comment: Comment): boolean {
                   :aria-label="reply.isLiked ? 'Unlike comment' : 'Like comment'"
                   @click="handleLike(reply.id)"
                 >
-                  {{ reply.isLiked ? '\u2764\uFE0F' : '\U0001F90D' }}
+                  {{ reply.isLiked ? '❤️' : '🤍' }}
                   <template v-if="reply.likes > 0"> {{ reply.likes }}</template>
                 </button>
                 <button
@@ -571,7 +571,7 @@ function isOwnComment(comment: Comment): boolean {
                   aria-label="Reply to comment"
                   @click="handleReply(comment.id)"
                 >
-                  \uD83D\uDCAC Reply
+                  💬 Reply
                 </button>
                 <template v-if="isOwnComment(reply)">
                   <button
@@ -580,7 +580,7 @@ function isOwnComment(comment: Comment): boolean {
                     aria-label="Edit comment"
                     @click="handleEdit(reply)"
                   >
-                    \u270F\uFE0F Edit
+                    ✏️ Edit
                   </button>
                   <button
                     type="button"
@@ -588,7 +588,7 @@ function isOwnComment(comment: Comment): boolean {
                     aria-label="Delete comment"
                     @click="handleDelete(reply.id)"
                   >
-                    \uD83D\uDDD1\uFE0F Delete
+                    🗑️ Delete
                   </button>
                 </template>
               </div>
