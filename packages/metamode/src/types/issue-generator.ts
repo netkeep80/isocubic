@@ -1,7 +1,7 @@
 /**
  * Issue Generator Types
  *
- * TypeScript types for GitHub Issue draft generation in GOD MODE.
+ * TypeScript types for GitHub Issue draft generation in MetaMode.
  * Provides types for issue drafts, templates, and generation settings.
  *
  * Features:
@@ -12,7 +12,7 @@
  */
 
 import type { QueryLanguage } from './common'
-import type { ConversationMessage } from './god-mode'
+import type { ConversationMessage } from './metamode'
 
 /**
  * Issue type categories

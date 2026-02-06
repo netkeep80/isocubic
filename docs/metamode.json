@@ -40,11 +40,13 @@
       "description": "Phase 11: Window management and responsive design"
     },
     "phase-12.md": {
-      "description": "Phase 12: MetaMode - Unification of meta-information systems",
-      "status": "experimental"
+      "description": "Phase 12: MetaMode - Unification of meta-information systems"
     },
     "metamode-analysis.md": {
       "description": "Analysis of current MetaMode implementation and improvement plan"
+    },
+    "phase-13.md": {
+      "description": "Phase 13: Extracting @isocubic/metamode as standalone NPM package"
     }
   }
 }
