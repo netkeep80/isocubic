@@ -528,16 +528,12 @@ const paginationPages = computed(() => {
               :aria-label="pub.isLiked ? 'Unlike' : 'Like'"
               @click="handleLikeToggle($event, pub.id)"
             >
-              <span class="community-gallery__like-icon">{{
-                pub.isLiked ? '\u2764\uFE0F' : '\U0001F90D'
-              }}</span>
+              <span class="community-gallery__like-icon">{{ pub.isLiked ? '❤️' : '🤍' }}</span>
               <span class="community-gallery__like-count">{{ formatCount(pub.stats.likes) }}</span>
             </button>
-            <span class="community-gallery__views">
-              \uD83D\uDC41 {{ formatCount(pub.stats.views) }}
-            </span>
+            <span class="community-gallery__views"> 👁 {{ formatCount(pub.stats.views) }} </span>
             <span class="community-gallery__downloads">
-              \u2B07 {{ formatCount(pub.stats.downloads) }}
+              ⬇ {{ formatCount(pub.stats.downloads) }}
             </span>
           </div>
 
