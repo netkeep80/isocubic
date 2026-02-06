@@ -231,19 +231,23 @@ Inline-метаданные извлекаются автоматически в
 
 ## 7. Валидация
 
-### 7.1 JSON Schema
+### 7.1 Два формата MetaMode
 
-Проект содержит две JSON Schema (draft-07):
+MetaMode использует **два формата** для разных целей:
 
-**Стандартная схема** (`metamode.schema.json`):
+**Стандартный формат** (хранимые файлы `metamode.json`):
 - Используется для файлов `metamode.json` в репозитории
 - Полные имена полей: `name`, `description`, `directories`, `dependencies`
 - Обязательные поля: `name`, `description`
+- Валидируется схемой `metamode.schema.json`
+- Поле `metamode` в `directories` опционально — путь инферируется как `{dirname}/metamode.json`
 
-**Компактная схема** (`metamode-compact.schema.json`):
-- Используется для AI-оптимизированного вывода
-- Сокращённые имена полей: `name`, `desc`, `dirs`, `deps`, `ai`
+**Компактный формат** (AI-оптимизированный вывод):
 - Генерируется автоматически при сборке через `virtual:metamode/ai`
+- Сокращённые имена полей: `name`, `desc`, `dirs`, `deps`, `ai`
+- Валидируется схемой `metamode-compact.schema.json`
+- Используется для runtime-запросов AI-агентов
+- Экономит ~14% токенов по сравнению со стандартным форматом
 
 Обе схемы включают:
 - Проверку типов и enum-значений
@@ -269,11 +273,14 @@ npm run metamode:compile
 
 ### 8.1 Автоматическая конвертация
 
-Утилита `scripts/metamode-converter.ts` конвертирует metanet.json → metamode.json:
+Утилита `scripts/metamode-ai-optimizer.ts` конвертирует стандартный формат в компактный AI-формат:
 
 ```bash
-npx tsx scripts/metamode-converter.ts --input metanet.json --output metamode.json
+npx tsx scripts/metamode-ai-optimizer.ts --output metamode.ai.json
+npx tsx scripts/metamode-ai-optimizer.ts --analyze
 ```
+
+Конвертация MetaNet → MetaMode выполнялась на ранних этапах проекта. Текущие файлы уже используют формат MetaMode.
 
 ### 8.2 Маппинг полей
 

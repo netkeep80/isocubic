@@ -17,6 +17,9 @@
     },
     "vite-plugin-metamode.ts": {
       "description": "Vite plugin that compiles metamode.json into virtual modules with inline extraction support (TASK 74, 75)"
+    },
+    "metamode-shared.ts": {
+      "description": "Shared types and utility functions used across MetaMode scripts"
     }
   }
 }

@@ -33,7 +33,7 @@ interface FileDescriptor {
 
 interface DirectoryDescriptor {
   description: string
-  metamode: string
+  metamode?: string
 }
 
 interface MetamodeJson {
@@ -157,11 +157,11 @@ function validateMetamodeFile(
         result.errors.push(`${relPath}: Referenced directory does not exist: ${dirName}`)
         continue
       }
-      const subMetamodePath = path.join(dirPath, dirDesc.metamode)
+      // Auto-infer metamode path if not specified
+      const metamodePath = dirDesc.metamode || `${dirName}/metamode.json`
+      const subMetamodePath = path.join(dirPath, metamodePath)
       if (!fs.existsSync(subMetamodePath)) {
-        result.errors.push(
-          `${relPath}: Referenced metamode.json does not exist: ${dirDesc.metamode}`
-        )
+        result.errors.push(`${relPath}: Referenced metamode.json does not exist: ${metamodePath}`)
       }
     }
   }
@@ -221,8 +221,10 @@ function walkAndValidate(
     // Recurse into subdirectories
     if (metamode.directories) {
       const dirPath = path.dirname(resolvedPath)
-      for (const dirDesc of Object.values(metamode.directories)) {
-        const subMetamodePath = path.join(dirPath, dirDesc.metamode)
+      for (const [dirName, dirDesc] of Object.entries(metamode.directories)) {
+        // Auto-infer metamode path if not specified
+        const metamodePath = dirDesc.metamode || `${dirName}/metamode.json`
+        const subMetamodePath = path.join(dirPath, metamodePath)
         visit(subMetamodePath)
       }
     }
@@ -255,8 +257,10 @@ export function collectMetamodeTree(rootMetamodePath: string): Record<string, Me
     // Recurse into subdirectories
     if (metamode.directories) {
       const dirPath = path.dirname(resolvedPath)
-      for (const dirDesc of Object.values(metamode.directories)) {
-        const subMetamodePath = path.join(dirPath, dirDesc.metamode)
+      for (const [dirName, dirDesc] of Object.entries(metamode.directories)) {
+        // Auto-infer metamode path if not specified
+        const metamodePath = dirDesc.metamode || `${dirName}/metamode.json`
+        const subMetamodePath = path.join(dirPath, metamodePath)
         visit(subMetamodePath)
       }
     }
@@ -315,7 +319,9 @@ export function compileMetamodeTree(rootMetamodePath: string): MetamodeTreeNode 
       const children: Record<string, MetamodeTreeNode> = {}
 
       for (const [dirName, dirDesc] of Object.entries(metamode.directories)) {
-        const subMetamodePath = path.join(dirPath, dirDesc.metamode)
+        // Auto-infer metamode path if not specified
+        const metamodePath = dirDesc.metamode || `${dirName}/metamode.json`
+        const subMetamodePath = path.join(dirPath, metamodePath)
         const childNode = visit(subMetamodePath)
         if (childNode) {
           children[dirName] = childNode
@@ -446,7 +452,9 @@ export function compileAIOptimizedTree(rootMetamodePath: string): AIMetamodeTree
       const children: Record<string, AIMetamodeTreeNode> = {}
 
       for (const [dirName, dirDesc] of Object.entries(metamode.directories)) {
-        const subMetamodePath = path.join(dirPath, dirDesc.metamode)
+        // Auto-infer metamode path if not specified
+        const metamodePath = dirDesc.metamode || `${dirName}/metamode.json`
+        const subMetamodePath = path.join(dirPath, metamodePath)
         const childNode = visit(subMetamodePath)
         if (childNode) {
           children[dirName] = childNode

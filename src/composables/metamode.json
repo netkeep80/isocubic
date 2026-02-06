@@ -29,6 +29,9 @@
     },
     "useWindowManager.test.ts": {
       "description": "Tests for window manager composable"
+    },
+    "useMetamodeDatabase.ts": {
+      "description": "Composable for accessing compiled MetaMode database at runtime"
     }
   }
 }

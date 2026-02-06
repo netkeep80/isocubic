@@ -6,6 +6,10 @@
     "workflows": {
       "description": "GitHub Actions CI/CD workflow definitions",
       "metamode": "workflows/metamode.json"
+    },
+    "issue-attachments": {
+      "description": "Screenshots and attachments for GitHub issues",
+      "metamode": "issue-attachments/metamode.json"
     }
   }
 }
