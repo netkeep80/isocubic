@@ -374,6 +374,37 @@ const context = mm.exportForLLM({ scope: ['ui'], format: 'compact' })
 | `npm run metamode:migrate:apply`  | Применить миграцию metamode.json → @mm:       |
 | `npm run metamode:db:compile`     | Компиляция v2.0 БД со статистикой             |
 | `npm run metamode:db:graph`       | Экспорт графа зависимостей (v2.0)            |
+| `npm run metamode:generate-tests` | Генерация тестов для аннотированных модулей (v2.0, Phase 2) |
+| `npm run metamode:generate-tests:dry` | Предпросмотр генерации тестов (без записи файлов) |
+
+### MetaMode v2.0: Валидация схемы и генерация тестов (Phase 2)
+
+MetaMode v2.0 Phase 2 добавляет расширенную валидацию аннотаций и автоматическую генерацию тестов.
+
+#### JSON Schema для аннотаций
+
+Файл `schemas/mm-annotation.schema.json` описывает полный формат `@mm:` аннотаций. Правило `schema-validates` проверяет соответствие при каждой сборке.
+
+#### Генератор тестов
+
+Инструмент `scripts/metamode-test-generator.ts` генерирует Vitest-тесты для всех модулей с `@mm:id`:
+
+```bash
+# Сгенерировать тесты для всех аннотированных модулей
+npm run metamode:generate-tests
+
+# Предпросмотр без записи файлов
+npm run metamode:generate-tests:dry
+
+# Генерация для конкретного модуля
+npx tsx scripts/metamode-test-generator.ts --module param_editor
+```
+
+Для каждого аннотированного модуля генерируются тесты:
+1. **Полнота аннотации** — проверка наличия обязательных полей `@mm:id`, `@mm:desc`
+2. **Соответствие схеме** — проверка всех полей на соответствие JSON Schema
+3. **Существование зависимостей** — проверка, что все `@mm:deps` указывают на реальные `@mm:id`
+4. **Контракт видимости** — проверка, что публичные модули не зависят от внутренних
 
 ### Встроенная база данных (TASK 80)
 
