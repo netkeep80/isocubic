@@ -32,10 +32,7 @@ import {
 // ============================================================================
 
 /** Create a minimal MmDbEntry */
-function makeEntry(
-  id: string,
-  overrides: Partial<MmDbEntry> = {}
-): MmDbEntry {
+function makeEntry(id: string, overrides: Partial<MmDbEntry> = {}): MmDbEntry {
   return {
     id,
     desc: `Description of ${id}`,
@@ -564,18 +561,14 @@ describe('MmRuntimeApi.validate', () => {
   })
 
   it('should warn for orphaned dependencies', () => {
-    const entries = [
-      makeEntry('x', { deps: { runtime: ['missing_dep'] } }),
-    ]
+    const entries = [makeEntry('x', { deps: { runtime: ['missing_dep'] } })]
     const mm = createMmApi(makeDb(entries))
     const result = mm.validate()
     expect(result.warnings.some((w) => w.includes('missing_dep'))).toBe(true)
   })
 
   it('should warn for missing desc field', () => {
-    const entries = [
-      makeEntry('no_desc', { desc: undefined }),
-    ]
+    const entries = [makeEntry('no_desc', { desc: undefined })]
     const mm = createMmApi(makeDb(entries))
     const result = mm.validate()
     expect(result.warnings.some((w) => w.includes('no_desc') && w.includes('desc'))).toBe(true)
@@ -731,19 +724,14 @@ describe('MmRuntimeApi.exportGraph', () => {
   })
 
   it('should include edge labels in DOT output', () => {
-    const entries = [
-      makeEntry('a', { deps: { runtime: ['b'] } }),
-      makeEntry('b'),
-    ]
+    const entries = [makeEntry('a', { deps: { runtime: ['b'] } }), makeEntry('b')]
     const mm = createMmApi(makeDb(entries))
     const dot = mm.exportGraph({ format: 'dot' })
     expect(dot).toContain('"a" -> "b"')
   })
 
   it('should use ellipse shape for internal nodes in DOT', () => {
-    const entries = [
-      makeEntry('internal_mod', { visibility: 'internal' }),
-    ]
+    const entries = [makeEntry('internal_mod', { visibility: 'internal' })]
     const mm = createMmApi(makeDb(entries))
     const dot = mm.exportGraph({ format: 'dot' })
     expect(dot).toContain('ellipse')
@@ -792,9 +780,7 @@ describe('MmRuntimeApi.stats', () => {
   })
 
   it('should list orphaned dependencies', () => {
-    const entries = [
-      makeEntry('x', { deps: { runtime: ['orphan_dep'] } }),
-    ]
+    const entries = [makeEntry('x', { deps: { runtime: ['orphan_dep'] } })]
     const mm = createMmApi(makeDb(entries))
     expect(mm.stats.orphanedDependencies).toContain('orphan_dep')
   })
@@ -822,9 +808,7 @@ describe('MmRuntimeApi.buildInfo', () => {
 
 describe('Edge cases', () => {
   it('should handle entry with string ai field', () => {
-    const entries = [
-      makeEntry('x', { ai: 'plain string summary' }),
-    ]
+    const entries = [makeEntry('x', { ai: 'plain string summary' })]
     const mm = createMmApi(makeDb(entries))
     const result = mm.exportForLLM({ format: 'compact' }) as Array<Record<string, unknown>>
     const entry = result.find((e) => e.id === 'x')
@@ -838,10 +822,7 @@ describe('Edge cases', () => {
   })
 
   it('should handle entry with only optional deps', () => {
-    const entries = [
-      makeEntry('a', { deps: { optional: ['b'] } }),
-      makeEntry('b'),
-    ]
+    const entries = [makeEntry('a', { deps: { optional: ['b'] } }), makeEntry('b')]
     const mm = createMmApi(makeDb(entries))
     const allDeps = mm.getDependencies('a', { type: 'all' })
     expect(allDeps).toContain('b')

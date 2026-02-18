@@ -152,13 +152,16 @@ interface MmDbEntry {
 }
 
 interface MmGraph {
-  nodes: Record<string, {
-    id: string
-    runtimeDeps: string[]
-    buildDeps: string[]
-    optionalDeps: string[]
-    dependents: string[]
-  }>
+  nodes: Record<
+    string,
+    {
+      id: string
+      runtimeDeps: string[]
+      buildDeps: string[]
+      optionalDeps: string[]
+      dependents: string[]
+    }
+  >
   edges: Array<{ from: string; to: string; type: 'runtime' | 'build' | 'optional' }>
 }
 
@@ -183,14 +186,25 @@ interface MmRuntimeApiInterface {
   findById(id: string): MmDbEntry | undefined
   findAll(options?: MmFindAllOptions): MmDbEntry[]
   findByTag(tag: string, options?: Omit<MmFindAllOptions, 'tags'>): MmDbEntry[]
-  getDependencies(id: string, options?: { type?: 'runtime' | 'build' | 'optional' | 'all'; recursive?: boolean }): string[]
+  getDependencies(
+    id: string,
+    options?: { type?: 'runtime' | 'build' | 'optional' | 'all'; recursive?: boolean }
+  ): string[]
   getDependents(id: string): string[]
   detectCycle(id: string): string[] | null
   findAllCycles(): string[][]
   validate(): { valid: boolean; errors: string[]; warnings: string[] }
-  exportForLLM(options?: { scope?: string[]; fields?: (keyof MmDbEntry)[]; format?: 'compact' | 'full'; limit?: number }): object
+  exportForLLM(options?: {
+    scope?: string[]
+    fields?: (keyof MmDbEntry)[]
+    format?: 'compact' | 'full'
+    limit?: number
+  }): object
   getGraph(): MmGraph
-  exportGraph(options: { format: 'json' | 'dot'; edgeType?: 'runtime' | 'build' | 'optional' | 'all' }): string
+  exportGraph(options: {
+    format: 'json' | 'dot'
+    edgeType?: 'runtime' | 'build' | 'optional' | 'all'
+  }): string
   readonly stats: MmDbStats
   readonly buildInfo: { timestamp: string; version: string; sourceFiles: number; format: string }
 }

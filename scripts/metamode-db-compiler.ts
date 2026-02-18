@@ -757,9 +757,7 @@ export class MmRuntimeApi {
     const { format, edgeType = 'all' } = options
     const graph = this.db.graph
 
-    const filteredEdges = graph.edges.filter(
-      (e) => edgeType === 'all' || e.type === edgeType
-    )
+    const filteredEdges = graph.edges.filter((e) => edgeType === 'all' || e.type === edgeType)
 
     if (format === 'json') {
       return JSON.stringify({ nodes: Object.keys(graph.nodes), edges: filteredEdges }, null, 2)
@@ -840,7 +838,9 @@ if (process.argv[1] && path.basename(process.argv[1]) === 'metamode-db-compiler.
   const db = compileV2Database(targetDir)
   const mm = createMmApi(db)
 
-  console.log(`✅ Compiled ${db.stats.totalAnnotations} annotations from ${db.buildInfo.sourceFiles} file(s)`)
+  console.log(
+    `✅ Compiled ${db.stats.totalAnnotations} annotations from ${db.buildInfo.sourceFiles} file(s)`
+  )
   console.log(`   Build timestamp: ${db.buildInfo.timestamp}`)
   console.log('')
 
