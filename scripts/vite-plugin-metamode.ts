@@ -3,10 +3,11 @@
  *
  * Compiles all metamode.json files into artifacts available at runtime:
  *
- *   import metamode from 'virtual:metamode'         // flat map (Record<path, MetamodeEntry>)
- *   import metamodeTree from 'virtual:metamode/tree' // hierarchical tree (MetamodeTreeNode)
- *   import metamodeAI from 'virtual:metamode/ai'    // AI-optimized tree (TASK 74)
- *   import metamodeDB from 'virtual:metamode/db'    // Unified database with query API (TASK 80)
+ *   import metamode from 'virtual:metamode'              // flat map (Record<path, MetamodeEntry>)
+ *   import metamodeTree from 'virtual:metamode/tree'     // hierarchical tree (MetamodeTreeNode)
+ *   import metamodeAI from 'virtual:metamode/ai'         // AI-optimized tree (TASK 74)
+ *   import metamodeDB from 'virtual:metamode/db'         // Unified database with query API (TASK 80)
+ *   import metamodeAnns from 'virtual:metamode/annotations' // @mm: annotation index (v2.0)
  *
  * The flat map provides backward-compatible access by file path.
  * The tree provides a hierarchical view where metadata structure is primary
@@ -18,6 +19,9 @@
  * Inline metadata in Vue components has higher priority than file-based metamode.json
  *
  * TASK 80: Added unified database compilation with index, stats, and build info
+ *
+ * MetaMode v2.0: Added @mm: annotation parsing via virtual:metamode/annotations
+ * Supports dual-read mode: both metamode.json (v1.x) and @mm: annotations (v2.0)
  */
 
 import * as fs from 'node:fs'
@@ -28,6 +32,11 @@ import {
   normalizeInlineMetamode,
   type InlineMetamode,
 } from './metamode-inline-extractor'
+import {
+  scanDirectoryForAnnotations,
+  buildAnnotationIndex,
+  type ParsedAnnotation,
+} from './metamode-annotation-parser'
 
 interface FileDescriptor {
   description: string
@@ -104,10 +113,12 @@ const VIRTUAL_MODULE_ID = 'virtual:metamode'
 const VIRTUAL_TREE_MODULE_ID = 'virtual:metamode/tree'
 const VIRTUAL_AI_MODULE_ID = 'virtual:metamode/ai'
 const VIRTUAL_DB_MODULE_ID = 'virtual:metamode/db'
+const VIRTUAL_ANNOTATIONS_MODULE_ID = 'virtual:metamode/annotations'
 const RESOLVED_VIRTUAL_MODULE_ID = '\0' + VIRTUAL_MODULE_ID
 const RESOLVED_VIRTUAL_TREE_MODULE_ID = '\0' + VIRTUAL_TREE_MODULE_ID
 const RESOLVED_VIRTUAL_AI_MODULE_ID = '\0' + VIRTUAL_AI_MODULE_ID
 const RESOLVED_VIRTUAL_DB_MODULE_ID = '\0' + VIRTUAL_DB_MODULE_ID
+const RESOLVED_VIRTUAL_ANNOTATIONS_MODULE_ID = '\0' + VIRTUAL_ANNOTATIONS_MODULE_ID
 
 function loadJson(filePath: string): MetamodeJson | null {
   try {
@@ -579,6 +590,34 @@ function compileMetamodeDatabase(rootDir: string): MetamodeDatabase | null {
   }
 }
 
+// ============================================================================
+// Annotation Compilation (MetaMode v2.0)
+// ============================================================================
+
+/**
+ * Compile the @mm: annotation index for the virtual:metamode/annotations module.
+ * Scans all TypeScript, JavaScript, and Vue source files for @mm: annotations.
+ * Returns a serializable map of id -> annotation data.
+ */
+function compileAnnotationIndex(rootDir: string): Record<string, ParsedAnnotation> {
+  const srcDir = path.join(rootDir, 'src')
+  const scanDir = fs.existsSync(srcDir) ? srcDir : rootDir
+
+  const results = scanDirectoryForAnnotations(scanDir, {
+    extensions: ['.ts', '.js', '.vue'],
+    recursive: true,
+    exclude: ['node_modules', 'dist', '.git', 'coverage'],
+  })
+
+  const index = buildAnnotationIndex(results)
+  const plain: Record<string, ParsedAnnotation> = {}
+  for (const [key, value] of index.entries()) {
+    plain[key] = value
+  }
+
+  return plain
+}
+
 /**
  * Vite plugin that provides metamode data at runtime
  */
@@ -605,6 +644,9 @@ export default function metamodePlugin(): Plugin {
       if (id === VIRTUAL_DB_MODULE_ID) {
         return RESOLVED_VIRTUAL_DB_MODULE_ID
       }
+      if (id === VIRTUAL_ANNOTATIONS_MODULE_ID) {
+        return RESOLVED_VIRTUAL_ANNOTATIONS_MODULE_ID
+      }
     },
 
     load(id) {
@@ -623,6 +665,11 @@ export default function metamodePlugin(): Plugin {
       if (id === RESOLVED_VIRTUAL_DB_MODULE_ID) {
         const db = compileMetamodeDatabase(rootDir)
         return `export default ${JSON.stringify(db, null, 0)};`
+      }
+      if (id === RESOLVED_VIRTUAL_ANNOTATIONS_MODULE_ID) {
+        // MetaMode v2.0: @mm: annotation index
+        const annotations = compileAnnotationIndex(rootDir)
+        return `export default ${JSON.stringify(annotations, null, 0)};`
       }
     },
   }
