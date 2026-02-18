@@ -323,13 +323,57 @@ MetaMode поддерживает inline-метаданные через JSDoc `
 </script>
 ```
 
+### MetaMode v2.0: Inline-аннотации (Phase 13)
+
+MetaMode v2.0 вводит новый формат метаданных — `@mm:` аннотации прямо в исходном коде:
+
+```typescript
+/**
+ * @mm:id=param_editor
+ * @mm:name=ParametricEditor
+ * @mm:desc=Visual editor for parametric cube properties
+ * @mm:tags=ui,stable
+ * @mm:deps=runtime:lib/shader-utils,build:types/cube
+ * @mm:visibility=public
+ * @mm:phase=5
+ */
+export function ParametricEditor() { ... }
+```
+
+Runtime API доступен через `virtual:metamode/v2/db`:
+
+```typescript
+import mm from 'virtual:metamode/v2/db'
+
+// Поиск
+const editor = mm.findById('param_editor')
+const stableUI = mm.findAll({ tags: ['ui'], status: 'stable' })
+
+// Зависимости
+const deps = mm.getDependencies('param_editor', { type: 'runtime' })
+const dependents = mm.getDependents('shader_utils')
+
+// Граф
+const cycles = mm.findAllCycles()
+const dotGraph = mm.exportGraph({ format: 'dot' })
+
+// Для AI-агентов
+const context = mm.exportForLLM({ scope: ['ui'], format: 'compact' })
+```
+
 ### Команды MetaMode
 
-| Команда                    | Описание                               |
-| -------------------------- | -------------------------------------- |
-| `npm run metamode:validate` | Валидация всех metamode.json файлов   |
-| `npm run metamode:compile`  | Компиляция в единое дерево            |
-| `npm run metamode:ai`       | Генерация AI-оптимизированного формата |
+| Команда                          | Описание                                      |
+| -------------------------------- | --------------------------------------------- |
+| `npm run metamode:validate`       | Валидация всех metamode.json файлов           |
+| `npm run metamode:compile`        | Компиляция в единое дерево                    |
+| `npm run metamode:ai`             | Генерация AI-оптимизированного формата        |
+| `npm run metamode:parse`          | Парсинг @mm: аннотаций (v2.0)                |
+| `npm run metamode:validate:semantic` | Семантическая валидация аннотаций (v2.0)  |
+| `npm run metamode:migrate`        | Предпросмотр миграции metamode.json → @mm:    |
+| `npm run metamode:migrate:apply`  | Применить миграцию metamode.json → @mm:       |
+| `npm run metamode:db:compile`     | Компиляция v2.0 БД со статистикой             |
+| `npm run metamode:db:graph`       | Экспорт графа зависимостей (v2.0)            |
 
 ### Встроенная база данных (TASK 80)
 
@@ -367,6 +411,7 @@ const file = getByPath('src/components/ParamEditor.vue')
 | 10   | [Переход на Vue.js 3.0 + TypeScript](docs/phase-10.md)          | ✅ Завершена  |
 | 11   | [Новый пользовательский интерфейс isocubic](docs/phase-11.md)   | ✅ Завершена  |
 | 12   | [MetaMode — Унификация систем метаинформации](docs/phase-12.md) | ✅ Завершена  |
+| 13   | [MetaMode v2.0 — Семантические метаданные с встроенным AI](docs/phase-13.md) | 🔄 В процессе |
 
 ## Деплой
 
@@ -419,7 +464,7 @@ npm run test:coverage
 
 **Текущее покрытие:**
 
-- 3508+ тестов (113 тестовых файлов, все компоненты на @vue/test-utils)
+- 3583+ тестов (114 тестовых файлов, все компоненты на @vue/test-utils)
 - Тесты 3D-компонентов Vue.js (ParametricCube, EnergyCube, CubePreview, CubeGrid, CubeStack, LODCubeGrid, LODStatisticsDisplay, MagicCubeDemo — TASK 62)
 - Тесты UI-компонентов редактора Vue.js (UnifiedEditor, ParamEditor, FFTParamEditor, FFTChannelEditor, EnergyVisualizationEditor, LODConfigEditor, StackEditor, StackPresetPicker, PromptGenerator — TASK 63)
 - Тесты компонентов галереи, экспорта и шаринга Vue.js (Gallery, CommunityGallery, ExportPanel, SharePanel, CommentsSection, SubscriptionButton, NotificationPanel, ActionHistory — TASK 64)
@@ -455,6 +500,7 @@ npm run test:coverage
 - Тесты inline metamode извлечения (JSDoc @metamode, объект const metamode, нормализация, слияние — TASK 75)
 - Тесты MetaMode терминологии (миграция DevMode/GodMode → MetaMode во всех тестах — TASK 77)
 - Тесты MetaMode LLM интеграции (Ollama, llama.cpp, OpenAI-compatible бэкенды, контекст-билдер, fallback — TASK 81)
+- Тесты MetaMode v2.0 DB Compiler (findById, findAll, findByTag, getDependencies, getDependents, detectCycle, findAllCycles, validate, exportForLLM, exportGraph — TASK 82)
 
 ## Вклад в проект
 

@@ -37,6 +37,7 @@ import {
   buildAnnotationIndex,
   type ParsedAnnotation,
 } from './metamode-annotation-parser'
+import { compileV2Database } from './metamode-db-compiler'
 
 interface FileDescriptor {
   description: string
@@ -114,11 +115,13 @@ const VIRTUAL_TREE_MODULE_ID = 'virtual:metamode/tree'
 const VIRTUAL_AI_MODULE_ID = 'virtual:metamode/ai'
 const VIRTUAL_DB_MODULE_ID = 'virtual:metamode/db'
 const VIRTUAL_ANNOTATIONS_MODULE_ID = 'virtual:metamode/annotations'
+const VIRTUAL_V2_DB_MODULE_ID = 'virtual:metamode/v2/db'
 const RESOLVED_VIRTUAL_MODULE_ID = '\0' + VIRTUAL_MODULE_ID
 const RESOLVED_VIRTUAL_TREE_MODULE_ID = '\0' + VIRTUAL_TREE_MODULE_ID
 const RESOLVED_VIRTUAL_AI_MODULE_ID = '\0' + VIRTUAL_AI_MODULE_ID
 const RESOLVED_VIRTUAL_DB_MODULE_ID = '\0' + VIRTUAL_DB_MODULE_ID
 const RESOLVED_VIRTUAL_ANNOTATIONS_MODULE_ID = '\0' + VIRTUAL_ANNOTATIONS_MODULE_ID
+const RESOLVED_VIRTUAL_V2_DB_MODULE_ID = '\0' + VIRTUAL_V2_DB_MODULE_ID
 
 function loadJson(filePath: string): MetamodeJson | null {
   try {
@@ -647,6 +650,9 @@ export default function metamodePlugin(): Plugin {
       if (id === VIRTUAL_ANNOTATIONS_MODULE_ID) {
         return RESOLVED_VIRTUAL_ANNOTATIONS_MODULE_ID
       }
+      if (id === VIRTUAL_V2_DB_MODULE_ID) {
+        return RESOLVED_VIRTUAL_V2_DB_MODULE_ID
+      }
     },
 
     load(id) {
@@ -670,6 +676,17 @@ export default function metamodePlugin(): Plugin {
         // MetaMode v2.0: @mm: annotation index
         const annotations = compileAnnotationIndex(rootDir)
         return `export default ${JSON.stringify(annotations, null, 0)};`
+      }
+      if (id === RESOLVED_VIRTUAL_V2_DB_MODULE_ID) {
+        // MetaMode v2.0, Phase 1: full annotation-based database with runtime API
+        const v2db = compileV2Database(rootDir)
+        return [
+          `import { MmRuntimeApi } from '../../scripts/metamode-db-compiler';`,
+          `const _db = ${JSON.stringify(v2db, null, 0)};`,
+          `const mm = new MmRuntimeApi(_db);`,
+          `export default mm;`,
+          `export { mm };`,
+        ].join('\n')
       }
     },
   }
