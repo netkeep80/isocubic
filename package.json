@@ -20,6 +20,10 @@
     "metamode:compile": "tsx scripts/metamode-preprocessor.ts --compile",
     "metamode:ai": "tsx scripts/metamode-preprocessor.ts --ai",
     "metamode:ai:analyze": "tsx scripts/metamode-ai-optimizer.ts --analyze",
+    "metamode:parse": "tsx scripts/metamode-annotation-parser.ts",
+    "metamode:validate:semantic": "tsx scripts/metamode-semantic-validator.ts",
+    "metamode:migrate": "tsx scripts/metamode-migrate.ts",
+    "metamode:migrate:apply": "tsx scripts/metamode-migrate.ts --apply",
     "check:all": "npm run lint && npm run typecheck && npm run format:check && npm run metamode:validate && npm run test:run"
   },
   "dependencies": {
