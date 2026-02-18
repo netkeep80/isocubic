@@ -126,3 +126,91 @@ declare module 'virtual:metamode/db' {
   const metamodeDB: MetamodeDatabase
   export default metamodeDB
 }
+
+// MetaMode v2.0 annotation-based database types (Phase 1)
+interface MmDbDeps {
+  runtime?: string[]
+  build?: string[]
+  optional?: string[]
+}
+
+interface MmDbEntry {
+  id: string
+  name?: string
+  desc?: string
+  tags?: string[]
+  deps?: MmDbDeps
+  ai?: { summary?: string; usage?: string; examples?: string[] } | string
+  visibility?: 'public' | 'internal'
+  version?: string
+  phase?: number
+  status?: string
+  filePath: string
+  line: number
+  source: 'jsdoc' | 'runtime'
+  entityName?: string
+}
+
+interface MmGraph {
+  nodes: Record<
+    string,
+    {
+      id: string
+      runtimeDeps: string[]
+      buildDeps: string[]
+      optionalDeps: string[]
+      dependents: string[]
+    }
+  >
+  edges: Array<{ from: string; to: string; type: 'runtime' | 'build' | 'optional' }>
+}
+
+interface MmDbStats {
+  totalAnnotations: number
+  byStatus: Record<string, number>
+  byVisibility: Record<string, number>
+  byPhase: Record<number, number>
+  byTag: Record<string, number>
+  topDependencies: Array<{ id: string; dependentCount: number }>
+  orphanedDependencies: string[]
+}
+
+interface MmFindAllOptions {
+  tags?: string[]
+  status?: string | string[]
+  visibility?: 'public' | 'internal'
+  phase?: number | number[]
+}
+
+interface MmRuntimeApiInterface {
+  findById(id: string): MmDbEntry | undefined
+  findAll(options?: MmFindAllOptions): MmDbEntry[]
+  findByTag(tag: string, options?: Omit<MmFindAllOptions, 'tags'>): MmDbEntry[]
+  getDependencies(
+    id: string,
+    options?: { type?: 'runtime' | 'build' | 'optional' | 'all'; recursive?: boolean }
+  ): string[]
+  getDependents(id: string): string[]
+  detectCycle(id: string): string[] | null
+  findAllCycles(): string[][]
+  validate(): { valid: boolean; errors: string[]; warnings: string[] }
+  exportForLLM(options?: {
+    scope?: string[]
+    fields?: (keyof MmDbEntry)[]
+    format?: 'compact' | 'full'
+    limit?: number
+  }): object
+  getGraph(): MmGraph
+  exportGraph(options: {
+    format: 'json' | 'dot'
+    edgeType?: 'runtime' | 'build' | 'optional' | 'all'
+  }): string
+  readonly stats: MmDbStats
+  readonly buildInfo: { timestamp: string; version: string; sourceFiles: number; format: string }
+}
+
+declare module 'virtual:metamode/v2/db' {
+  const mm: MmRuntimeApiInterface
+  export default mm
+  export { mm }
+}
