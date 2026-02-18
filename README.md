@@ -376,6 +376,8 @@ const context = mm.exportForLLM({ scope: ['ui'], format: 'compact' })
 | `npm run metamode:db:graph`       | Экспорт графа зависимостей (v2.0)            |
 | `npm run metamode:generate-tests` | Генерация тестов для аннотированных модулей (v2.0, Phase 2) |
 | `npm run metamode:generate-tests:dry` | Предпросмотр генерации тестов (без записи файлов) |
+| `npm run metamode:context`        | Сборка AI-контекста из v2.0 БД (Phase 3)      |
+| `npm run metamode:ai:context`     | AI-контекст для codegen-агента (Phase 3)       |
 
 ### MetaMode v2.0: Валидация схемы и генерация тестов (Phase 2)
 
@@ -405,6 +407,77 @@ npx tsx scripts/metamode-test-generator.ts --module param_editor
 2. **Соответствие схеме** — проверка всех полей на соответствие JSON Schema
 3. **Существование зависимостей** — проверка, что все `@mm:deps` указывают на реальные `@mm:id`
 4. **Контракт видимости** — проверка, что публичные модули не зависят от внутренних
+
+### MetaMode v2.0: Контекст-билдер для AI-агентов (Phase 3)
+
+MetaMode v2.0 Phase 3 добавляет специализированный контекст-билдер, который формирует точные, токен-эффективные промпты для AI-агентов из v2.0 БД.
+
+#### Типы AI-агентов
+
+Контекст-билдер поддерживает 5 типов агентов с настраиваемыми промпт-шаблонами:
+- **codegen** — генерация кода с учётом зависимостей и AI-подсказок
+- **refactor** — рефакторинг с сохранением контрактов видимости
+- **docgen** — генерация документации на основе `@mm:desc` и `@mm:ai`
+- **review** — ревью кода на нарушения архитектурных контрактов
+- **generic** — общий AI-помощник
+
+#### Использование
+
+```typescript
+import { buildContext, buildContextForAgent, suggestAnnotation, runPreCommitCheck } from './scripts/metamode-context-builder'
+import { compileV2Database } from './scripts/metamode-db-compiler'
+
+const db = compileV2Database(process.cwd())
+
+// Собрать контекст для codegen-агента
+const ctx = buildContext(db, {
+  agentType: 'codegen',
+  scope: ['ui', 'lib'],    // фильтр по тегам
+  format: 'markdown',       // 'markdown' | 'json' | 'text'
+  tokenBudget: 4000,        // лимит токенов (авто-обрезка)
+  includeDeps: true,        // включить транзитивные зависимости
+})
+console.log(ctx.prompt)     // готовый промпт для LLM
+
+// Convenience обёртка
+const refactorCtx = buildContextForAgent('refactor', db, { ids: ['param_editor'] })
+```
+
+#### CLI использование
+
+```bash
+# Сборка контекста для generic-агента (все аннотации)
+npm run metamode:context
+
+# Codegen-агент
+npm run metamode:ai:context
+
+# С фильтром по тегам
+npx tsx scripts/metamode-context-builder.ts --agent docgen --scope ui lib
+
+# Сохранить в файл
+npx tsx scripts/metamode-context-builder.ts --agent review --output context.md
+
+# Pre-commit проверка
+npx tsx scripts/metamode-context-builder.ts --pre-commit src/lib/new-module.ts
+```
+
+#### Pre-commit поддержка
+
+```typescript
+// Предложить @mm: аннотацию для нового файла
+const suggestion = suggestAnnotation('/project/src/lib/new-module.ts', db)
+// /**
+//  * @mm:id new_module
+//  * @mm:desc TODO: Add description
+//  * @mm:tags lib
+//  * @mm:status draft
+//  */
+
+// Проверить все staged файлы
+const missing = runPreCommitCheck(stagedFiles, db)
+// Возвращает файлы без @mm:id + предложения аннотаций
+```
 
 ### Встроенная база данных (TASK 80)
 
