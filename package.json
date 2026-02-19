@@ -36,6 +36,7 @@
     "metamode:status": "tsx scripts/metamode-cli.ts status",
     "metamode:cli": "tsx scripts/metamode-cli.ts",
     "package:build": "cd packages/metamode && npm install && npm run build",
+    "package:test": "cd packages/metamode && npm run test",
     "check:all": "npm run lint && npm run typecheck && npm run format:check && npm run metamode:validate && npm run test:run"
   },
   "dependencies": {

@@ -671,7 +671,7 @@ npm run test:coverage
 
 **Текущее покрытие:**
 
-- 3939+ тестов (116+ тестовых файлов, все компоненты на @vue/test-utils)
+- 4069+ тестов (116+ тестовых файлов основного проекта + 130 тестов пакета @isocubic/metamode, все компоненты на @vue/test-utils)
 - Тесты 3D-компонентов Vue.js (ParametricCube, EnergyCube, CubePreview, CubeGrid, CubeStack, LODCubeGrid, LODStatisticsDisplay, MagicCubeDemo — TASK 62)
 - Тесты UI-компонентов редактора Vue.js (UnifiedEditor, ParamEditor, FFTParamEditor, FFTChannelEditor, EnergyVisualizationEditor, LODConfigEditor, StackEditor, StackPresetPicker, PromptGenerator — TASK 63)
 - Тесты компонентов галереи, экспорта и шаринга Vue.js (Gallery, CommunityGallery, ExportPanel, SharePanel, CommentsSection, SubscriptionButton, NotificationPanel, ActionHistory — TASK 64)
@@ -696,6 +696,7 @@ npm run test:coverage
 - Тесты GitHub Integration (GitHub API клиент, авторизация PAT/OAuth, создание issues, метки)
 - Тесты Screen Capture & Annotation (захват экрана, Canvas API, аннотации, ScreenCaptureManager)
 - Тесты библиотеки @isocubic/metamode (типы, утилиты, хранилище, MetaModeProvider, useMetaMode — TASK 72)
+- Собственные тесты пакета @isocubic/metamode (Vitest + @vue/test-utils, 130 тестов независимо от основного проекта — TASK 90)
 - Тесты MetaMode компонентов Vue.js (MetaModeQueryPanel, ComponentContextPanel, ExtendedSearchPanel, ComponentInfo, AnnotationCanvas — TASK 66, 72)
 - Тесты компонентов оконной системы Vue.js (DraggableWindow, WindowTaskbar, CommandBar — TASK 70-73)
 - Тесты touch-жестов и адаптивного layout (useTouchGestures, useResponsiveLayout — TASK 75)
