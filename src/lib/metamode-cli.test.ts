@@ -12,7 +12,7 @@
  * - status: project status overview
  */
 
-import { describe, it, expect, beforeAll, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import * as path from 'node:path'
 import * as fs from 'node:fs'
 
@@ -29,22 +29,13 @@ const PROJECT_ROOT = path.resolve(process.cwd())
 import {
   scanDirectoryForAnnotations,
   parseAnnotationsFromFile,
-  buildAnnotationIndex,
 } from '../../scripts/metamode-annotation-parser'
 
-import {
-  validateAnnotations,
-} from '../../scripts/metamode-semantic-validator'
+import { validateAnnotations } from '../../scripts/metamode-semantic-validator'
 
-import {
-  analyzeMigration,
-  formatMigrationReport,
-} from '../../scripts/metamode-migrate'
+import { analyzeMigration, formatMigrationReport } from '../../scripts/metamode-migrate'
 
-import {
-  compileV2Database,
-  createMmApi,
-} from '../../scripts/metamode-db-compiler'
+import { compileV2Database, createMmApi } from '../../scripts/metamode-db-compiler'
 
 import {
   buildContext,
@@ -58,10 +49,7 @@ import {
   serializeCompact,
 } from '../../scripts/metamode-prod-optimizer'
 
-import {
-  generateTestSuites,
-  renderTestFile,
-} from '../../scripts/metamode-test-generator'
+import { generateTestSuites, renderTestFile } from '../../scripts/metamode-test-generator'
 
 // ============================================================================
 // CLI integration tests via underlying APIs
@@ -83,10 +71,7 @@ describe('MetaMode CLI Integration (TASK 86)', () => {
     })
 
     it('should parse a single annotated file', () => {
-      const testFile = path.join(
-        PROJECT_ROOT,
-        'src/lib/metamode-annotation-parser.test.ts'
-      )
+      const testFile = path.join(PROJECT_ROOT, 'src/lib/metamode-annotation-parser.test.ts')
       if (!fs.existsSync(testFile)) return
 
       const result = parseAnnotationsFromFile(testFile)
@@ -124,10 +109,7 @@ describe('MetaMode CLI Integration (TASK 86)', () => {
 
     it('should report errors for annotations missing required fields', () => {
       // The annotation-parser test file has some incomplete annotations
-      const testFile = path.join(
-        PROJECT_ROOT,
-        'src/lib/metamode-annotation-parser.test.ts'
-      )
+      const testFile = path.join(PROJECT_ROOT, 'src/lib/metamode-annotation-parser.test.ts')
       if (!fs.existsSync(testFile)) return
 
       const results = scanDirectoryForAnnotations(path.dirname(testFile))

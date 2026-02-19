@@ -26,18 +26,16 @@
 
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import {
-  scanDirectoryForAnnotations,
-  parseAnnotationsFromFile,
-  buildAnnotationIndex,
-} from './metamode-annotation-parser'
-import {
-  validateAnnotations,
-} from './metamode-semantic-validator'
+import { scanDirectoryForAnnotations, parseAnnotationsFromFile } from './metamode-annotation-parser'
+import { validateAnnotations } from './metamode-semantic-validator'
 import { analyzeMigration, formatMigrationReport } from './metamode-migrate'
 import { compileV2Database, createMmApi } from './metamode-db-compiler'
-import { buildContext, buildContextForAgent, runPreCommitCheck, type AgentType } from './metamode-context-builder'
-import { optimizeForProduction, analyzeBundleSize, serializeCompact } from './metamode-prod-optimizer'
+import { buildContext, runPreCommitCheck, type AgentType } from './metamode-context-builder'
+import {
+  optimizeForProduction,
+  analyzeBundleSize,
+  serializeCompact,
+} from './metamode-prod-optimizer'
 import { generateTestSuites, renderTestFile } from './metamode-test-generator'
 
 // ============================================================================
@@ -241,7 +239,6 @@ function cmdParse(args: string[], rootDir: string) {
 
 function cmdValidate(args: string[], rootDir: string) {
   printHeader('MetaMode Annotation Validator (v2.0)')
-  const semanticOnly = args.includes('--semantic')
   const schemaOnly = args.includes('--schema')
   const verbose = args.includes('--verbose')
 
@@ -257,9 +254,6 @@ function cmdValidate(args: string[], rootDir: string) {
     printWarning('No @mm: annotations found. Add annotations to benefit from validation.')
     return
   }
-
-  // Build index for validation
-  const index = buildAnnotationIndex(results)
 
   // Semantic validation
   if (!schemaOnly) {
@@ -287,7 +281,9 @@ function cmdValidate(args: string[], rootDir: string) {
     }
 
     if (errorCount === 0) {
-      printSuccess(`Semantic validation passed (${totalAnnotations} annotations, ${warningCount} warnings)`)
+      printSuccess(
+        `Semantic validation passed (${totalAnnotations} annotations, ${warningCount} warnings)`
+      )
     } else {
       process.exitCode = 1
     }
@@ -419,7 +415,9 @@ function cmdContext(args: string[], rootDir: string) {
   console.log('')
 
   const db = compileV2Database(rootDir)
-  printSuccess(`Compiled ${db.stats.totalAnnotations} annotation(s) from ${db.buildInfo.sourceFiles} file(s)`)
+  printSuccess(
+    `Compiled ${db.stats.totalAnnotations} annotation(s) from ${db.buildInfo.sourceFiles} file(s)`
+  )
   console.log('')
 
   if (preCommitFlag) {
@@ -660,7 +658,9 @@ function cmdStatus(rootDir: string) {
     if (validationErrors > 0) {
       printError(`Validation: ${validationErrors} error(s), ${validationWarnings} warning(s)`)
     } else if (validationWarnings > 0) {
-      printWarning(`Validation: ${validationWarnings} warning(s) (run 'metamode validate' for details)`)
+      printWarning(
+        `Validation: ${validationWarnings} warning(s) (run 'metamode validate' for details)`
+      )
     } else {
       printSuccess('Validation: All annotations valid')
     }
@@ -674,7 +674,9 @@ function cmdStatus(rootDir: string) {
   if (dbStats) {
     console.log(`   Compiled entries:  ${dbStats.totalAnnotations}`)
     console.log(`   By status:         ${JSON.stringify(dbStats.byStatus)}`)
-    console.log(`   Graph edges:       ${Object.values(dbStats.byPhase).reduce((a, b) => a + b, 0)}`)
+    console.log(
+      `   Graph edges:       ${Object.values(dbStats.byPhase).reduce((a, b) => a + b, 0)}`
+    )
     printSuccess('Database compiled successfully')
   } else {
     printWarning('Database compilation failed (run compile for details)')
@@ -707,7 +709,9 @@ function cmdStatus(rootDir: string) {
     console.log('   • Fix validation errors:   npx tsx scripts/metamode-cli.ts validate')
   }
   if (v2AnnotationCount > 0) {
-    console.log('   • View AI context:         npx tsx scripts/metamode-cli.ts context --agent codegen')
+    console.log(
+      '   • View AI context:         npx tsx scripts/metamode-cli.ts context --agent codegen'
+    )
     console.log('   • Analyze prod bundle:     npx tsx scripts/metamode-cli.ts optimize --stats')
   }
   console.log('   • Full documentation:      docs/metamode-v2-migration.md')
