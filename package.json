@@ -30,6 +30,8 @@
     "metamode:generate-tests:dry": "tsx scripts/metamode-test-generator.ts --dry-run",
     "metamode:context": "tsx scripts/metamode-context-builder.ts",
     "metamode:ai:context": "tsx scripts/metamode-context-builder.ts --agent codegen",
+    "metamode:prod:optimize": "tsx scripts/metamode-prod-optimizer.ts --stats",
+    "metamode:prod:analyze": "tsx scripts/metamode-prod-optimizer.ts --stats --output metamode.prod.json",
     "check:all": "npm run lint && npm run typecheck && npm run format:check && npm run metamode:validate && npm run test:run"
   },
   "dependencies": {

@@ -2,7 +2,7 @@
 
 Данный документ описывает планируемые задачи по реализации MetaMode v2.0 — системы семантических метаданных нового поколения с полноценным встроенным AI.
 
-**Статус**: 🔄 В процессе (TASK 82, 83, 84 завершены)
+**Статус**: 🔄 В процессе (TASK 82, 83, 84, 85 завершены)
 
 ---
 
@@ -46,7 +46,7 @@
 | **Phase 1: Компилятор БД** | Неделя 2-3 | Компилятор `virtual:metamode/v2/db`, полный runtime API | ✅ Завершена (TASK 82) |
 | **Phase 2: Валидация и тесты** | Неделя 4 | Схема + расширенные правила + генерация тестов | ✅ Завершена (TASK 83) |
 | **Phase 3: AI-интеграция** | Неделя 5 | Промпты, контекст-билдер, pre-commit hook | ✅ Завершена (TASK 84) |
-| **Phase 4: Prod-оптимизация** | Неделя 6 | Tree-shaking, условные импорты | 📋 Запланирована |
+| **Phase 4: Prod-оптимизация** | Неделя 6 | Tree-shaking, условные импорты | ✅ Завершена (TASK 85) |
 | **Phase 5: CLI и миграция** | Неделя 7 | Полный набор CLI, конвертер v1→v2 | 📋 Запланирована |
 | **Phase 6: Документация** | Неделя 8 | Гайды, примеры, migration guide | 📋 Запланирована |
 
@@ -59,7 +59,8 @@ scripts/
 ├── metamode-migrate.ts              # Phase 0: Инструмент миграции v1→v2
 ├── metamode-db-compiler.ts          # Phase 1: Компилятор и runtime API ✅
 ├── metamode-test-generator.ts       # Phase 2: AI-генерация тестов аннотаций ✅
-└── metamode-context-builder.ts      # Phase 3: Контекст-билдер для AI-агентов ✅
+├── metamode-context-builder.ts      # Phase 3: Контекст-билдер для AI-агентов ✅
+└── metamode-prod-optimizer.ts       # Phase 4: Production оптимизатор (tree-shaking) ✅
 schemas/
 └── mm-annotation.schema.json        # Phase 2: JSON Schema для @mm: аннотаций ✅
 ```
@@ -73,7 +74,8 @@ schemas/
 | `virtual:metamode/ai` | AI-оптимизированный формат (v1.x) | v1 |
 | `virtual:metamode/db` | Единая БД (v1.x, TASK 80) | v1 |
 | `virtual:metamode/annotations` | Индекс @mm: аннотаций (v2.0, Phase 0) | v2 |
-| `virtual:metamode/v2/db` | Полная v2.0 БД с runtime API (Phase 1) | **v2** ✅ |
+| `virtual:metamode/v2/db` | Полная v2.0 БД с runtime API (Phase 1, dev); stripped в prod (Phase 4) | **v2** ✅ |
+| `virtual:metamode/v2/db/prod` | Всегда production-stripped БД без internal записей (Phase 4) | **v2** ✅ |
 
 ---
 
@@ -275,23 +277,69 @@ const missing = runPreCommitCheck(stagedFiles, db)
 
 ---
 
-### TASK 85: Production оптимизация (Phase 4)
+### TASK 85: Production оптимизация (Phase 4) ✅
 
 **Заголовок**: `MetaMode v2.0 Phase 4 — Tree-shaking и production-оптимизация`
 
 **Приоритет**: Средний
 
-**Статус**: 📋 Запланирована
+**Статус**: ✅ Завершена
 
 **Описание**:
-Оптимизировать production-сборку: удалять `internal`-поля, добавить условный импорт, минимизировать размер бандла.
+Реализована production-оптимизация: удаление `internal`-записей, условный импорт, компактная сериализация, новый virtual module.
 
 **Задачи**:
 
-- [ ] Добавить tree-shaking для `visibility: 'internal'` в production
-- [ ] Реализовать условный импорт (dev vs prod database)
-- [ ] Оптимизировать JSON сериализацию для минимального размера
-- [ ] Убедиться, что оверхед бандла ≤ +2%
+- [x] Добавить tree-shaking для `visibility: 'internal'` в production
+- [x] Реализовать условный импорт (dev vs prod database)
+- [x] Оптимизировать JSON сериализацию для минимального размера
+- [x] Убедиться, что оверхед бандла ≤ +2%
+
+**Созданные файлы**:
+
+- `scripts/metamode-prod-optimizer.ts` — production оптимизатор с tree-shaking (stripEntry, rebuildGraph, optimizeForProduction, analyzeBundleSize)
+- `src/lib/metamode-prod-optimizer.test.ts` — 39 тестов
+
+**Изменённые файлы**:
+
+- `scripts/vite-plugin-metamode.ts` — автоматическое применение оптимизатора в production (`isProduction`); добавлен `virtual:metamode/v2/db/prod`
+- `env.d.ts` — TypeScript типы для `virtual:metamode/v2/db/prod` и `MmProdEntry`
+- `package.json` — npm скрипты `metamode:prod:optimize`, `metamode:prod:analyze`
+
+**API**:
+
+```typescript
+import { optimizeForProduction, analyzeBundleSize } from './scripts/metamode-prod-optimizer'
+import { compileV2Database } from './scripts/metamode-db-compiler'
+
+const devDb = compileV2Database(process.cwd())
+const prodDb = optimizeForProduction(devDb)
+// prodDb: internal entries removed, dev-only fields stripped, AI objects collapsed
+
+const report = analyzeBundleSize(devDb, prodDb)
+console.log(`Saved ${report.savedBytes} bytes (${report.reductionPercent.toFixed(1)}%)`)
+console.log(`Removed ${report.internalEntriesRemoved} internal entries`)
+```
+
+```typescript
+// In application code:
+// Dev builds — includes ALL entries (full metadata for devtools)
+import mm from 'virtual:metamode/v2/db'
+
+// Always production-stripped (safe for any build mode):
+import mmProd from 'virtual:metamode/v2/db/prod'
+```
+
+**Критерии приёмки**:
+
+- ✅ `visibility: 'internal'` записи удаляются из production бандла
+- ✅ Dev-only поля (filePath, line, source, entityName) не попадают в prod
+- ✅ AI objects (.summary) коллапсируются до строк в prod
+- ✅ `virtual:metamode/v2/db` автоматически stripped в production build
+- ✅ `virtual:metamode/v2/db/prod` всегда возвращает stripped базу
+- ✅ Граф зависимостей обновляется (рёбра к internal записям удаляются)
+- ✅ 39 тестов проходят
+- ✅ CLI: `npm run metamode:prod:optimize` и `npm run metamode:prod:analyze`
 
 **Метки**: `metamode`, `v2.0`, `optimization`, `production`, `medium`
 
@@ -346,7 +394,7 @@ const missing = runPreCommitCheck(stagedFiles, db)
 1. **TASK 82**: Компилятор DB ✅
 2. **TASK 83**: Валидация и тесты (Phase 2) ✅
 3. **TASK 84**: AI-интеграция (Phase 3) ✅
-4. **TASK 85**: Production оптимизация (Phase 4)
+4. **TASK 85**: Production оптимизация (Phase 4) ✅
 5. **TASK 86**: CLI и миграция (Phase 5)
 6. **TASK 87**: Документация и релиз (Phase 6)
 
@@ -359,7 +407,7 @@ const missing = runPreCommitCheck(stagedFiles, db)
 | 82. Компилятор DB (Phase 1) | Высокая | Критический | ✅ Завершена |
 | 83. Валидация и тесты (Phase 2) | Средняя | Высокий | ✅ Завершена |
 | 84. AI-интеграция (Phase 3) | Средняя | Высокий | ✅ Завершена |
-| 85. Production оптимизация (Phase 4) | Средняя | Средний | 📋 Запланирована |
+| 85. Production оптимизация (Phase 4) | Средняя | Средний | ✅ Завершена |
 | 86. CLI и миграция (Phase 5) | Средняя | Средний | 📋 Запланирована |
 | 87. Документация (Phase 6) | Низкая | Низкий | 📋 Запланирована |
 

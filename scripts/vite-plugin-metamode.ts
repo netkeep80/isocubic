@@ -8,6 +8,8 @@
  *   import metamodeAI from 'virtual:metamode/ai'         // AI-optimized tree (TASK 74)
  *   import metamodeDB from 'virtual:metamode/db'         // Unified database with query API (TASK 80)
  *   import metamodeAnns from 'virtual:metamode/annotations' // @mm: annotation index (v2.0)
+ *   import mm from 'virtual:metamode/v2/db'              // Full v2.0 DB (dev: all entries; prod: public-only)
+ *   import mmProd from 'virtual:metamode/v2/db/prod'     // Production-only stripped database (TASK 85)
  *
  * The flat map provides backward-compatible access by file path.
  * The tree provides a hierarchical view where metadata structure is primary
@@ -22,6 +24,10 @@
  *
  * MetaMode v2.0: Added @mm: annotation parsing via virtual:metamode/annotations
  * Supports dual-read mode: both metamode.json (v1.x) and @mm: annotations (v2.0)
+ *
+ * TASK 85: Production optimization — tree-shaking internal entries, stripped virtual module
+ * virtual:metamode/v2/db automatically strips internal entries in production builds.
+ * virtual:metamode/v2/db/prod always returns the production-optimized database.
  */
 
 import * as fs from 'node:fs'
@@ -39,6 +45,7 @@ import {
 } from './metamode-annotation-parser'
 import { compileV2Database } from './metamode-db-compiler'
 import { validateAnnotations, formatValidationReport } from './metamode-semantic-validator'
+import { optimizeForProduction } from './metamode-prod-optimizer'
 
 interface FileDescriptor {
   description: string
@@ -117,12 +124,14 @@ const VIRTUAL_AI_MODULE_ID = 'virtual:metamode/ai'
 const VIRTUAL_DB_MODULE_ID = 'virtual:metamode/db'
 const VIRTUAL_ANNOTATIONS_MODULE_ID = 'virtual:metamode/annotations'
 const VIRTUAL_V2_DB_MODULE_ID = 'virtual:metamode/v2/db'
+const VIRTUAL_V2_DB_PROD_MODULE_ID = 'virtual:metamode/v2/db/prod'
 const RESOLVED_VIRTUAL_MODULE_ID = '\0' + VIRTUAL_MODULE_ID
 const RESOLVED_VIRTUAL_TREE_MODULE_ID = '\0' + VIRTUAL_TREE_MODULE_ID
 const RESOLVED_VIRTUAL_AI_MODULE_ID = '\0' + VIRTUAL_AI_MODULE_ID
 const RESOLVED_VIRTUAL_DB_MODULE_ID = '\0' + VIRTUAL_DB_MODULE_ID
 const RESOLVED_VIRTUAL_ANNOTATIONS_MODULE_ID = '\0' + VIRTUAL_ANNOTATIONS_MODULE_ID
 const RESOLVED_VIRTUAL_V2_DB_MODULE_ID = '\0' + VIRTUAL_V2_DB_MODULE_ID
+const RESOLVED_VIRTUAL_V2_DB_PROD_MODULE_ID = '\0' + VIRTUAL_V2_DB_PROD_MODULE_ID
 
 function loadJson(filePath: string): MetamodeJson | null {
   try {
@@ -627,12 +636,14 @@ function compileAnnotationIndex(rootDir: string): Record<string, ParsedAnnotatio
  */
 export default function metamodePlugin(): Plugin {
   let rootDir: string
+  let isProduction = false
 
   return {
     name: 'vite-plugin-metamode',
 
     configResolved(config) {
       rootDir = config.root
+      isProduction = config.command === 'build' && config.mode !== 'development'
     },
 
     /**
@@ -706,6 +717,9 @@ export default function metamodePlugin(): Plugin {
       if (id === VIRTUAL_V2_DB_MODULE_ID) {
         return RESOLVED_VIRTUAL_V2_DB_MODULE_ID
       }
+      if (id === VIRTUAL_V2_DB_PROD_MODULE_ID) {
+        return RESOLVED_VIRTUAL_V2_DB_PROD_MODULE_ID
+      }
     },
 
     load(id) {
@@ -732,10 +746,25 @@ export default function metamodePlugin(): Plugin {
       }
       if (id === RESOLVED_VIRTUAL_V2_DB_MODULE_ID) {
         // MetaMode v2.0, Phase 1: full annotation-based database with runtime API
+        // Phase 4: In production builds, automatically strip internal entries (tree-shaking)
         const v2db = compileV2Database(rootDir)
+        const dbToExpose = isProduction ? optimizeForProduction(v2db) : v2db
         return [
           `import { MmRuntimeApi } from '../../scripts/metamode-db-compiler';`,
-          `const _db = ${JSON.stringify(v2db, null, 0)};`,
+          `const _db = ${JSON.stringify(dbToExpose, null, 0)};`,
+          `const mm = new MmRuntimeApi(_db);`,
+          `export default mm;`,
+          `export { mm };`,
+        ].join('\n')
+      }
+      if (id === RESOLVED_VIRTUAL_V2_DB_PROD_MODULE_ID) {
+        // MetaMode v2.0, Phase 4: always production-optimized database (no internal entries)
+        // Safe to import in any build mode — always returns stripped data
+        const v2db = compileV2Database(rootDir)
+        const prodDb = optimizeForProduction(v2db)
+        return [
+          `import { MmRuntimeApi } from '../../scripts/metamode-db-compiler';`,
+          `const _db = ${JSON.stringify(prodDb, null, 0)};`,
           `const mm = new MmRuntimeApi(_db);`,
           `export default mm;`,
           `export { mm };`,

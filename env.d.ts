@@ -214,3 +214,34 @@ declare module 'virtual:metamode/v2/db' {
   export default mm
   export { mm }
 }
+
+// MetaMode v2.0 production-optimized database types (Phase 4, TASK 85)
+interface MmProdEntry {
+  id: string
+  name?: string
+  desc?: string
+  tags?: string[]
+  deps?: {
+    runtime?: string[]
+    build?: string[]
+    optional?: string[]
+  }
+  /** AI summary (string only, collapsed from objects) */
+  ai?: string
+  version?: string
+  phase?: number
+  status?: string
+}
+
+/**
+ * Production-optimized v2 database (virtual:metamode/v2/db/prod).
+ * - All `visibility: 'internal'` entries are removed
+ * - Dev-only fields (filePath, line, source, entityName) are stripped
+ * - AI objects collapsed to summary strings
+ * - Compatible with MmRuntimeApiInterface (findById, findAll, etc.)
+ */
+declare module 'virtual:metamode/v2/db/prod' {
+  const mm: MmRuntimeApiInterface
+  export default mm
+  export { mm }
+}
