@@ -380,6 +380,8 @@ const context = mm.exportForLLM({ scope: ['ui'], format: 'compact' })
 | `npm run metamode:ai:context`     | AI-контекст для codegen-агента (Phase 3)       |
 | `npm run metamode:prod:optimize`  | Анализ production-оптимизации (Phase 4)        |
 | `npm run metamode:prod:analyze`   | Генерация production БД в файл (Phase 4)       |
+| `npm run metamode:status`         | Обзор состояния MetaMode в проекте (Phase 5)   |
+| `npm run metamode:cli`            | Единый CLI MetaMode v2.0 (Phase 5)             |
 
 ### MetaMode v2.0: Валидация схемы и генерация тестов (Phase 2)
 
@@ -518,6 +520,65 @@ npm run metamode:prod:optimize
 npm run metamode:prod:analyze
 ```
 
+### MetaMode v2.0: Единый CLI и полная миграция (Phase 5)
+
+MetaMode v2.0 Phase 5 предоставляет единый CLI-инструмент для управления всей системой MetaMode, верифицирует полную миграцию v1→v2 и обеспечивает dual-mode работу обеих версий.
+
+#### Единый CLI MetaMode v2.0
+
+Все команды доступны через единый инструмент:
+
+```bash
+npx tsx scripts/metamode-cli.ts [command] [options]
+```
+
+| Команда | Описание |
+|---------|---------|
+| `status` | Обзор состояния MetaMode в проекте |
+| `parse [path]` | Парсинг `@mm:` аннотаций |
+| `validate` | Семантическая и схемная валидация |
+| `migrate [--apply]` | Миграция `metamode.json` → `@mm:` |
+| `compile [--stats]` | Компиляция v2.0 БД |
+| `context [--agent ...]` | Построение AI-контекста |
+| `optimize [--stats]` | Production-оптимизация |
+| `generate-tests` | Генерация тестов |
+| `help` | Справка по командам |
+
+#### Быстрый старт
+
+```bash
+# Проверить состояние MetaMode в проекте
+npm run metamode:status
+
+# Просмотр плана миграции v1 → v2
+npm run metamode:migrate
+
+# Применить миграцию
+npm run metamode:migrate:apply
+
+# Скомпилировать v2.0 БД
+npm run metamode:db:compile
+```
+
+#### Dual-Mode (v1.x и v2.0 параллельно)
+
+MetaMode поддерживает **dual-mode**: оба формата работают одновременно без конфликтов.
+
+```typescript
+// v1.x API (metamode.json файлы)
+import metamode from 'virtual:metamode'
+import metamodeTree from 'virtual:metamode/tree'
+import metamodeDB from 'virtual:metamode/db'
+
+// v2.0 API (@mm: аннотации)
+import mm from 'virtual:metamode/v2/db'
+import mmProd from 'virtual:metamode/v2/db/prod'
+```
+
+#### Руководство по миграции
+
+Полная документация по миграции v1→v2: [docs/metamode-v2-migration.md](docs/metamode-v2-migration.md)
+
 ### Встроенная база данных (TASK 80)
 
 MetaMode компилирует все метаданные в единую базу данных, доступную в runtime:
@@ -645,6 +706,7 @@ npm run test:coverage
 - Тесты MetaMode LLM интеграции (Ollama, llama.cpp, OpenAI-compatible бэкенды, контекст-билдер, fallback — TASK 81)
 - Тесты MetaMode v2.0 DB Compiler (findById, findAll, findByTag, getDependencies, getDependents, detectCycle, findAllCycles, validate, exportForLLM, exportGraph — TASK 82)
 - Тесты MetaMode v2.0 Production Optimizer (stripEntry, rebuildGraph, computeProdStats, optimizeForProduction, analyzeBundleSize, integration — TASK 85)
+- Тесты MetaMode v2.0 CLI Integration (parse, validate, migrate, compile, context, optimize, generate-tests, dual-mode, migration workflow — TASK 86)
 
 ## Вклад в проект
 
