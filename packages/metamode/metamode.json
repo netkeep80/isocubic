@@ -5,7 +5,10 @@
   "languages": ["typescript", "vue"],
   "files": {
     "package.json": {
-      "description": "NPM package manifest for metamode"
+      "description": "NPM package manifest for metamode with build scripts"
+    },
+    "vite.config.ts": {
+      "description": "Vite Library Mode build configuration for npm publishing (TASK 88)"
     },
     "tsconfig.json": {
       "description": "TypeScript configuration for metamode package"

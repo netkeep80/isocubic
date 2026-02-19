@@ -45,6 +45,12 @@
     },
     "metamode-analysis.md": {
       "description": "Analysis of current MetaMode implementation and improvement plan"
+    },
+    "phase-13.md": {
+      "description": "Phase 13: MetaMode v2.0 — Semantic metadata with built-in AI (TASK 82-87)"
+    },
+    "phase-14.md": {
+      "description": "Phase 14: @isocubic/metamode NPM package — build system and publishing infrastructure"
     }
   }
 }
