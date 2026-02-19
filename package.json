@@ -26,6 +26,10 @@
     "metamode:migrate:apply": "tsx scripts/metamode-migrate.ts --apply",
     "metamode:db:compile": "tsx scripts/metamode-db-compiler.ts --stats",
     "metamode:db:graph": "tsx scripts/metamode-db-compiler.ts --graph",
+    "metamode:generate-tests": "tsx scripts/metamode-test-generator.ts",
+    "metamode:generate-tests:dry": "tsx scripts/metamode-test-generator.ts --dry-run",
+    "metamode:context": "tsx scripts/metamode-context-builder.ts",
+    "metamode:ai:context": "tsx scripts/metamode-context-builder.ts --agent codegen",
     "check:all": "npm run lint && npm run typecheck && npm run format:check && npm run metamode:validate && npm run test:run"
   },
   "dependencies": {

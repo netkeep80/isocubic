@@ -38,6 +38,7 @@ import {
   type ParsedAnnotation,
 } from './metamode-annotation-parser'
 import { compileV2Database } from './metamode-db-compiler'
+import { validateAnnotations, formatValidationReport } from './metamode-semantic-validator'
 
 interface FileDescriptor {
   description: string
@@ -632,6 +633,58 @@ export default function metamodePlugin(): Plugin {
 
     configResolved(config) {
       rootDir = config.root
+    },
+
+    /**
+     * Run MetaMode v2.0 semantic validation (including schema-validates rule) during build.
+     * Emits a warning if validation fails but does not abort the build, to allow
+     * gradual adoption of annotations.
+     *
+     * Phase 2: validation runs on every build, schema-validates rule included.
+     */
+    buildStart() {
+      const srcDir = path.join(rootDir, 'src')
+      const scanDir = fs.existsSync(srcDir) ? srcDir : rootDir
+
+      const results = scanDirectoryForAnnotations(scanDir, {
+        extensions: ['.ts', '.js', '.vue'],
+        recursive: true,
+        // Exclude test files to avoid false positives from intentionally incomplete test annotations
+        exclude: ['node_modules', 'dist', '.git', 'coverage', 'test', 'e2e', '__tests__'],
+      })
+
+      // Filter out test files by name pattern
+      const filteredResults = results.filter(
+        (r) =>
+          !r.filePath.endsWith('.test.ts') &&
+          !r.filePath.endsWith('.test.js') &&
+          !r.filePath.endsWith('.spec.ts')
+      )
+
+      if (filteredResults.length === 0) return
+
+      const totalAnnotations = filteredResults.reduce((s, r) => s + r.annotations.length, 0)
+      if (totalAnnotations === 0) return
+
+      const validationResult = validateAnnotations(filteredResults, {
+        rules: [
+          'unique-id-per-scope',
+          'no-circular-runtime-deps',
+          'required-fields-present',
+          'schema-validates',
+        ],
+        // deps-must-exist and visibility-consistency are warnings only during build
+        // to allow partial annotation coverage
+        includeWarnings: true,
+      })
+
+      if (!validationResult.passed) {
+        const report = formatValidationReport(validationResult)
+        // Use this.warn to emit a build warning (non-fatal) instead of this.error
+        this.warn(
+          `MetaMode v2.0 semantic validation found ${validationResult.errors.length} error(s):\n${report}`
+        )
+      }
     },
 
     resolveId(id) {

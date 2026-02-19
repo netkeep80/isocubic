@@ -1,0 +1,140 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "mm-annotation.schema.json",
+  "title": "MetaMode v2.0 Annotation",
+  "description": "JSON Schema for validating @mm: inline annotation fields parsed from source code comments and runtime __mm properties.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for this annotated entity within the project.",
+      "pattern": "^[a-zA-Z_][a-zA-Z0-9_/-]*$",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name for the entity.",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "desc": {
+      "type": "string",
+      "description": "Description of the entity's purpose.",
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "tags": {
+      "type": "array",
+      "description": "Tags for categorization, filtering, and discovery.",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9_-]+$",
+        "minLength": 1,
+        "maxLength": 64
+      },
+      "uniqueItems": true,
+      "maxItems": 32
+    },
+    "deps": {
+      "description": "Dependency declarations. Can be a simple list of IDs (all treated as runtime) or a structured object with typed categories.",
+      "oneOf": [
+        {
+          "type": "array",
+          "description": "Simple list of dependency IDs (treated as runtime deps).",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        {
+          "type": "object",
+          "description": "Structured dependency declaration by type.",
+          "properties": {
+            "runtime": {
+              "type": "array",
+              "description": "Runtime dependencies — required at application runtime.",
+              "items": { "type": "string", "minLength": 1 },
+              "uniqueItems": true
+            },
+            "build": {
+              "type": "array",
+              "description": "Build-time dependencies — required only during compilation.",
+              "items": { "type": "string", "minLength": 1 },
+              "uniqueItems": true
+            },
+            "optional": {
+              "type": "array",
+              "description": "Optional dependencies — enhances functionality but not required.",
+              "items": { "type": "string", "minLength": 1 },
+              "uniqueItems": true
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "ai": {
+      "description": "AI-related metadata. Can be a short summary string or a structured object.",
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Short AI summary (max 200 characters).",
+          "maxLength": 200
+        },
+        {
+          "type": "object",
+          "description": "Structured AI metadata.",
+          "properties": {
+            "summary": {
+              "type": "string",
+              "description": "Short summary for LLM context (max 200 chars).",
+              "maxLength": 200
+            },
+            "usage": {
+              "type": "string",
+              "description": "Usage hints for AI agents.",
+              "maxLength": 512
+            },
+            "examples": {
+              "type": "array",
+              "description": "Code examples demonstrating usage.",
+              "items": { "type": "string" },
+              "maxItems": 10
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "visibility": {
+      "type": "string",
+      "description": "Whether the entity is publicly accessible or internal.",
+      "enum": ["public", "internal"]
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version of the entity.",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(-[a-zA-Z0-9.]+)?(\\+[a-zA-Z0-9.]+)?$"
+    },
+    "phase": {
+      "type": "integer",
+      "description": "Development phase this entity belongs to.",
+      "minimum": 1,
+      "maximum": 99
+    },
+    "status": {
+      "type": "string",
+      "description": "Lifecycle status of the entity.",
+      "enum": ["stable", "beta", "experimental", "deprecated", "exp", "dep"]
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

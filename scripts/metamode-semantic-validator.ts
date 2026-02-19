@@ -9,6 +9,7 @@
  * - `no-circular-runtime-deps` — No circular runtime dependency chains
  * - `required-fields-present` — Required fields (id, name/desc) are present
  * - `visibility-consistency` — Internal entities don't reference public ones unexpectedly
+ * - `schema-validates`      — Annotation fields conform to mm-annotation.schema.json (Phase 2)
  *
  * Usage (build-time via Vite plugin or CLI):
  * ```ts
@@ -19,6 +20,7 @@
  * ```
  */
 
+import * as fs from 'node:fs'
 import * as path from 'node:path'
 import type {
   ParsedAnnotation,
@@ -92,6 +94,7 @@ const ALL_RULES = [
   'no-circular-runtime-deps',
   'required-fields-present',
   'visibility-consistency',
+  'schema-validates',
 ]
 
 // ============================================================================
@@ -407,6 +410,262 @@ function checkVisibilityConsistency(annotations: IndexedAnnotation[]): Validatio
 }
 
 // ============================================================================
+// Rule: schema-validates (Phase 2)
+// ============================================================================
+
+/**
+ * Parsed JSON Schema for @mm: annotations.
+ * Loaded once and cached for performance.
+ */
+let _mmAnnotationSchema: Record<string, unknown> | null | undefined = undefined
+
+/**
+ * Load the mm-annotation.schema.json schema from disk.
+ * Searches for it in common locations relative to this script.
+ */
+export function loadMmAnnotationSchema(): Record<string, unknown> | null {
+  if (_mmAnnotationSchema !== undefined) return _mmAnnotationSchema
+
+  // Try to find the schema relative to this file (scripts/ -> schemas/)
+  const candidates = [
+    path.join(
+      path.dirname(new URL(import.meta.url).pathname),
+      '..',
+      'schemas',
+      'mm-annotation.schema.json'
+    ),
+    path.join(process.cwd(), 'schemas', 'mm-annotation.schema.json'),
+  ]
+
+  for (const candidate of candidates) {
+    try {
+      const content = fs.readFileSync(candidate, 'utf-8')
+      _mmAnnotationSchema = JSON.parse(content) as Record<string, unknown>
+      return _mmAnnotationSchema
+    } catch {
+      // Try next candidate
+    }
+  }
+
+  _mmAnnotationSchema = null
+  return null
+}
+
+/**
+ * Simple JSON Schema Draft-07 validator for @mm: annotation fields.
+ * Validates a single annotation object against the mm-annotation.schema.json schema.
+ *
+ * Returns an array of validation error messages.
+ * This is a lightweight validator focused on the specific schema structure
+ * and avoids adding heavy external schema validation dependencies.
+ */
+export function validateAnnotationAgainstSchema(
+  annotation: MmAnnotation,
+  schema: Record<string, unknown>
+): string[] {
+  const errors: string[] = []
+  const properties = schema.properties as Record<string, Record<string, unknown>> | undefined
+  if (!properties) return errors
+
+  const obj = annotation as Record<string, unknown>
+
+  // Check additionalProperties: false
+  if (schema.additionalProperties === false) {
+    for (const key of Object.keys(obj)) {
+      if (!(key in properties)) {
+        errors.push(`Unknown property "@mm:${key}" is not allowed by the annotation schema.`)
+      }
+    }
+  }
+
+  for (const [propName, propSchema] of Object.entries(properties)) {
+    const value = obj[propName]
+    if (value === undefined || value === null) continue
+
+    const pSchema = propSchema as Record<string, unknown>
+
+    // Type check
+    if (pSchema.type === 'string' && typeof value !== 'string') {
+      errors.push(`"@mm:${propName}" must be a string, got ${typeof value}.`)
+    } else if (pSchema.type === 'integer' && !Number.isInteger(value)) {
+      errors.push(`"@mm:${propName}" must be an integer, got ${typeof value}.`)
+    } else if (pSchema.type === 'array' && !Array.isArray(value)) {
+      errors.push(`"@mm:${propName}" must be an array, got ${typeof value}.`)
+    }
+
+    // String constraints
+    if (typeof value === 'string') {
+      if (typeof pSchema.minLength === 'number' && value.length < pSchema.minLength) {
+        errors.push(`"@mm:${propName}" must have at least ${pSchema.minLength} character(s).`)
+      }
+      if (typeof pSchema.maxLength === 'number' && value.length > pSchema.maxLength) {
+        errors.push(
+          `"@mm:${propName}" exceeds maximum length of ${pSchema.maxLength} characters (got ${value.length}).`
+        )
+      }
+      if (typeof pSchema.pattern === 'string') {
+        const re = new RegExp(pSchema.pattern)
+        if (!re.test(value)) {
+          errors.push(
+            `"@mm:${propName}" value "${value}" does not match required pattern ${pSchema.pattern}.`
+          )
+        }
+      }
+      if (Array.isArray(pSchema.enum) && !(pSchema.enum as string[]).includes(value)) {
+        errors.push(
+          `"@mm:${propName}" must be one of [${(pSchema.enum as string[]).join(', ')}], got "${value}".`
+        )
+      }
+    }
+
+    // Number constraints
+    if (typeof value === 'number') {
+      if (typeof pSchema.minimum === 'number' && value < pSchema.minimum) {
+        errors.push(`"@mm:${propName}" must be >= ${pSchema.minimum}, got ${value}.`)
+      }
+      if (typeof pSchema.maximum === 'number' && value > pSchema.maximum) {
+        errors.push(`"@mm:${propName}" must be <= ${pSchema.maximum}, got ${value}.`)
+      }
+    }
+
+    // Array constraints
+    if (Array.isArray(value)) {
+      if (typeof pSchema.maxItems === 'number' && value.length > pSchema.maxItems) {
+        errors.push(
+          `"@mm:${propName}" must have at most ${pSchema.maxItems} items, got ${value.length}.`
+        )
+      }
+      if (pSchema.uniqueItems === true) {
+        const seen = new Set<unknown>()
+        for (const item of value) {
+          const key = JSON.stringify(item)
+          if (seen.has(key)) {
+            errors.push(`"@mm:${propName}" must have unique items (duplicate found: "${item}").`)
+            break
+          }
+          seen.add(key)
+        }
+      }
+      // Items schema
+      const itemsSchema = pSchema.items as Record<string, unknown> | undefined
+      if (itemsSchema) {
+        for (const item of value) {
+          if (itemsSchema.type === 'string' && typeof item !== 'string') {
+            errors.push(`"@mm:${propName}" items must be strings, got ${typeof item}.`)
+          }
+          if (typeof item === 'string' && typeof itemsSchema.pattern === 'string') {
+            const re = new RegExp(itemsSchema.pattern as string)
+            if (!re.test(item)) {
+              errors.push(`"@mm:${propName}" item "${item}" does not match required pattern.`)
+            }
+          }
+          if (
+            typeof item === 'string' &&
+            typeof itemsSchema.maxLength === 'number' &&
+            item.length > itemsSchema.maxLength
+          ) {
+            errors.push(
+              `"@mm:${propName}" item "${item}" exceeds max length of ${itemsSchema.maxLength}.`
+            )
+          }
+        }
+      }
+    }
+
+    // Handle oneOf for deps and ai (simplified: just check types match)
+    if (Array.isArray(pSchema.oneOf)) {
+      // For deps: allow array or object with optional runtime/build/optional
+      if (propName === 'deps') {
+        if (!Array.isArray(value) && typeof value !== 'object') {
+          errors.push(
+            `"@mm:deps" must be an array of IDs or an object with runtime/build/optional keys.`
+          )
+        } else if (typeof value === 'object' && !Array.isArray(value)) {
+          const depsObj = value as Record<string, unknown>
+          const allowedKeys = new Set(['runtime', 'build', 'optional'])
+          for (const key of Object.keys(depsObj)) {
+            if (!allowedKeys.has(key)) {
+              errors.push(
+                `"@mm:deps" object has unknown key "${key}". Allowed: runtime, build, optional.`
+              )
+            }
+          }
+        }
+      }
+      // For ai: allow string or object with summary/usage/examples
+      if (propName === 'ai') {
+        if (typeof value === 'string') {
+          if (value.length > 200) {
+            errors.push(`"@mm:ai" string summary exceeds maximum length of 200 characters.`)
+          }
+        } else if (typeof value === 'object' && !Array.isArray(value)) {
+          const aiObj = value as Record<string, unknown>
+          const allowedKeys = new Set(['summary', 'usage', 'examples'])
+          for (const key of Object.keys(aiObj)) {
+            if (!allowedKeys.has(key)) {
+              errors.push(
+                `"@mm:ai" object has unknown key "${key}". Allowed: summary, usage, examples.`
+              )
+            }
+          }
+          if (typeof aiObj.summary === 'string' && aiObj.summary.length > 200) {
+            errors.push(`"@mm:ai.summary" exceeds maximum length of 200 characters.`)
+          }
+        } else {
+          errors.push(`"@mm:ai" must be a string or an object with summary/usage/examples.`)
+        }
+      }
+    }
+  }
+
+  return errors
+}
+
+/**
+ * Rule: schema-validates
+ * Validate each annotation against the mm-annotation.schema.json JSON Schema.
+ * Reports schema violations as errors (build-breaking).
+ */
+export function checkSchemaValidates(results: FileParseResult[]): ValidationIssue[] {
+  const issues: ValidationIssue[] = []
+
+  const schema = loadMmAnnotationSchema()
+  if (!schema) {
+    // Schema not found — emit a single warning but don't break the build
+    issues.push({
+      rule: 'schema-validates',
+      severity: 'warning',
+      message:
+        'mm-annotation.schema.json not found. Schema validation skipped. Expected at schemas/mm-annotation.schema.json.',
+    })
+    return issues
+  }
+
+  for (const result of results) {
+    for (const parsed of result.annotations) {
+      const schemaErrors = validateAnnotationAgainstSchema(parsed.annotation, schema)
+      for (const msg of schemaErrors) {
+        const entityRef = parsed.annotation.id
+          ? `"${parsed.annotation.id}"`
+          : parsed.entityName
+            ? `"${parsed.entityName}"`
+            : `at line ${parsed.line}`
+        issues.push({
+          rule: 'schema-validates',
+          severity: 'error',
+          message: `Annotation ${entityRef} in ${path.basename(result.filePath)} failed schema validation: ${msg}`,
+          annotationId: parsed.annotation.id,
+          filePath: result.filePath,
+          line: parsed.line,
+        })
+      }
+    }
+  }
+
+  return issues
+}
+
+// ============================================================================
 // Main Validation Function
 // ============================================================================
 
@@ -453,6 +712,10 @@ export function validateAnnotations(
 
   if (rulesSet.has('visibility-consistency')) {
     allIssues.push(...checkVisibilityConsistency(allAnnotations))
+  }
+
+  if (rulesSet.has('schema-validates')) {
+    allIssues.push(...checkSchemaValidates(results))
   }
 
   // Apply warnOnly overrides
