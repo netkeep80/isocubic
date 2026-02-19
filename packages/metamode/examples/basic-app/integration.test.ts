@@ -281,7 +281,10 @@ describe('@isocubic/metamode — integration tests (dist/ build)', () => {
   describe('DEFAULT_METAMODE_CONFIG (from dist/)', () => {
     it('should have github configuration as optional (can be undefined)', () => {
       // github is an optional field in MetaModeConfig
-      expect(DEFAULT_METAMODE_CONFIG.github === undefined || typeof DEFAULT_METAMODE_CONFIG.github === 'object').toBe(true)
+      expect(
+        DEFAULT_METAMODE_CONFIG.github === undefined ||
+          typeof DEFAULT_METAMODE_CONFIG.github === 'object'
+      ).toBe(true)
     })
 
     it('should have tabs array', () => {
