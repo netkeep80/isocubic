@@ -615,7 +615,8 @@ const file = getByPath('src/components/ParamEditor.vue')
 | 10   | [Переход на Vue.js 3.0 + TypeScript](docs/phase-10.md)          | ✅ Завершена  |
 | 11   | [Новый пользовательский интерфейс isocubic](docs/phase-11.md)   | ✅ Завершена  |
 | 12   | [MetaMode — Унификация систем метаинформации](docs/phase-12.md) | ✅ Завершена  |
-| 13   | [MetaMode v2.0 — Семантические метаданные с встроенным AI](docs/phase-13.md) | 🔄 В процессе |
+| 13   | [MetaMode v2.0 — Семантические метаданные с встроенным AI](docs/phase-13.md) | ✅ Завершена  |
+| 14   | [@isocubic/metamode NPM-пакет — система сборки и публикация](docs/phase-14.md) | 🔄 В процессе |
 
 ## Деплой
 
@@ -648,7 +649,9 @@ npm run preview
 ## Документация
 
 - [API Reference](docs/API.md) — полное описание компонентов и модулей
-- [MetaMode](metamode.md) — унифицированная система метаинформации (Phase 12, TASK 70-78)
+- [MetaMode](metamode.md) — унифицированная система метаинформации v1.x и v2.0 (Phase 12-13, TASK 70-87)
+- [MetaMode v2.0 Migration Guide](docs/metamode-v2-migration.md) — руководство по миграции с v1.x на v2.0
+- [Phase 14: @isocubic/metamode NPM-пакет](docs/phase-14.md) — система сборки Vite Library Mode и публикация (TASK 88-92)
 - [ANALYSIS.md](ANALYSIS.md) — анализ подходов к реализации
 
 ## Тестирование
@@ -668,7 +671,7 @@ npm run test:coverage
 
 **Текущее покрытие:**
 
-- 3622+ тестов (115 тестовых файлов, все компоненты на @vue/test-utils)
+- 3939+ тестов (116+ тестовых файлов, все компоненты на @vue/test-utils)
 - Тесты 3D-компонентов Vue.js (ParametricCube, EnergyCube, CubePreview, CubeGrid, CubeStack, LODCubeGrid, LODStatisticsDisplay, MagicCubeDemo — TASK 62)
 - Тесты UI-компонентов редактора Vue.js (UnifiedEditor, ParamEditor, FFTParamEditor, FFTChannelEditor, EnergyVisualizationEditor, LODConfigEditor, StackEditor, StackPresetPicker, PromptGenerator — TASK 63)
 - Тесты компонентов галереи, экспорта и шаринга Vue.js (Gallery, CommunityGallery, ExportPanel, SharePanel, CommentsSection, SubscriptionButton, NotificationPanel, ActionHistory — TASK 64)
@@ -707,6 +710,7 @@ npm run test:coverage
 - Тесты MetaMode v2.0 DB Compiler (findById, findAll, findByTag, getDependencies, getDependents, detectCycle, findAllCycles, validate, exportForLLM, exportGraph — TASK 82)
 - Тесты MetaMode v2.0 Production Optimizer (stripEntry, rebuildGraph, computeProdStats, optimizeForProduction, analyzeBundleSize, integration — TASK 85)
 - Тесты MetaMode v2.0 CLI Integration (parse, validate, migrate, compile, context, optimize, generate-tests, dual-mode, migration workflow — TASK 86)
+- Примеры MetaMode v2.0 (inline-аннотации @mm:, runtime API, context-builder, dual-mode — TASK 87)
 
 ## Вклад в проект
 

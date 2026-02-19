@@ -5,22 +5,27 @@
   "author": "netkeep80",
   "license": "Unlicense",
   "type": "module",
-  "main": "./src/index.ts",
-  "module": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./dist/metamode.cjs",
+  "module": "./dist/metamode.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./src/index.ts",
-      "import": "./src/index.ts",
-      "default": "./src/index.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/metamode.js",
+      "require": "./dist/metamode.cjs",
+      "default": "./dist/metamode.js"
     }
   },
   "files": [
-    "src",
-    "examples",
+    "dist",
     "README.md"
   ],
   "sideEffects": false,
+  "scripts": {
+    "build": "vite build",
+    "build:types": "vue-tsc --declaration --emitDeclarationOnly --outDir dist",
+    "prepublishOnly": "npm run build"
+  },
   "keywords": [
     "vue",
     "vue3",
@@ -54,7 +59,10 @@
     "vue": ">=3.5.0"
   },
   "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.3",
+    "vite": "^7.2.4",
     "vue": "^3.5.0",
+    "vue-tsc": "^2.2.8",
     "typescript": "~5.9.3"
   },
   "engines": {
