@@ -616,7 +616,7 @@ const file = getByPath('src/components/ParamEditor.vue')
 | 11   | [Новый пользовательский интерфейс isocubic](docs/phase-11.md)   | ✅ Завершена  |
 | 12   | [MetaMode — Унификация систем метаинформации](docs/phase-12.md) | ✅ Завершена  |
 | 13   | [MetaMode v2.0 — Семантические метаданные с встроенным AI](docs/phase-13.md) | ✅ Завершена  |
-| 14   | [@isocubic/metamode NPM-пакет — система сборки и публикация](docs/phase-14.md) | 🔄 В процессе (TASK 88-89 ✅) |
+| 14   | [@isocubic/metamode NPM-пакет — система сборки и публикация](docs/phase-14.md) | 🔄 В процессе (TASK 88-91 ✅) |
 
 ## Деплой
 
@@ -671,7 +671,7 @@ npm run test:coverage
 
 **Текущее покрытие:**
 
-- 4069+ тестов (116+ тестовых файлов основного проекта + 130 тестов пакета @isocubic/metamode, все компоненты на @vue/test-utils)
+- 4069+ тестов (116+ тестовых файлов основного проекта + 130 тестов пакета @isocubic/metamode + 35 интеграционных тестов из dist/, все компоненты на @vue/test-utils)
 - Тесты 3D-компонентов Vue.js (ParametricCube, EnergyCube, CubePreview, CubeGrid, CubeStack, LODCubeGrid, LODStatisticsDisplay, MagicCubeDemo — TASK 62)
 - Тесты UI-компонентов редактора Vue.js (UnifiedEditor, ParamEditor, FFTParamEditor, FFTChannelEditor, EnergyVisualizationEditor, LODConfigEditor, StackEditor, StackPresetPicker, PromptGenerator — TASK 63)
 - Тесты компонентов галереи, экспорта и шаринга Vue.js (Gallery, CommunityGallery, ExportPanel, SharePanel, CommentsSection, SubscriptionButton, NotificationPanel, ActionHistory — TASK 64)
@@ -697,6 +697,7 @@ npm run test:coverage
 - Тесты Screen Capture & Annotation (захват экрана, Canvas API, аннотации, ScreenCaptureManager)
 - Тесты библиотеки @isocubic/metamode (типы, утилиты, хранилище, MetaModeProvider, useMetaMode — TASK 72)
 - Собственные тесты пакета @isocubic/metamode (Vitest + @vue/test-utils, 130 тестов независимо от основного проекта — TASK 90)
+- Интеграционные тесты @isocubic/metamode (35 тестов, импорт из dist/, верификация всех публичных экспортов собранного пакета — TASK 91)
 - Тесты MetaMode компонентов Vue.js (MetaModeQueryPanel, ComponentContextPanel, ExtendedSearchPanel, ComponentInfo, AnnotationCanvas — TASK 66, 72)
 - Тесты компонентов оконной системы Vue.js (DraggableWindow, WindowTaskbar, CommandBar — TASK 70-73)
 - Тесты touch-жестов и адаптивного layout (useTouchGestures, useResponsiveLayout — TASK 75)

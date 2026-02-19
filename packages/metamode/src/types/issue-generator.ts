@@ -12,7 +12,7 @@
  */
 
 import type { QueryLanguage } from './common'
-import type { ConversationMessage } from './god-mode'
+import type { ConversationMessage } from './metamode'
 
 /**
  * Issue type categories
