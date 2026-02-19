@@ -88,7 +88,14 @@ describe('getDefaultLabels', () => {
   })
 
   it('should always return at least 2 labels (type + priority)', () => {
-    const types = ['bug', 'feature', 'improvement', 'documentation', 'question', 'maintenance'] as const
+    const types = [
+      'bug',
+      'feature',
+      'improvement',
+      'documentation',
+      'question',
+      'maintenance',
+    ] as const
     const priorities = ['low', 'medium', 'high', 'critical'] as const
 
     for (const type of types) {
@@ -144,15 +151,21 @@ describe('validateIssueDraft', () => {
   })
 
   it('should fail when type is missing', () => {
-    const { type: _type, ...withoutType } = validDraft
-    const result = validateIssueDraft(withoutType)
+    const result = validateIssueDraft({
+      title: validDraft.title,
+      body: validDraft.body,
+      priority: validDraft.priority,
+    })
     expect(result.isValid).toBe(false)
     expect(result.errors).toContain('Issue type is required')
   })
 
   it('should fail when priority is missing', () => {
-    const { priority: _priority, ...withoutPriority } = validDraft
-    const result = validateIssueDraft(withoutPriority)
+    const result = validateIssueDraft({
+      title: validDraft.title,
+      body: validDraft.body,
+      type: validDraft.type,
+    })
     expect(result.isValid).toBe(false)
     expect(result.errors).toContain('Priority is required')
   })
