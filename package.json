@@ -32,6 +32,9 @@
     "metamode:ai:context": "tsx scripts/metamode-context-builder.ts --agent codegen",
     "metamode:prod:optimize": "tsx scripts/metamode-prod-optimizer.ts --stats",
     "metamode:prod:analyze": "tsx scripts/metamode-prod-optimizer.ts --stats --output metamode.prod.json",
+    "metamode": "tsx scripts/metamode-cli.ts",
+    "metamode:status": "tsx scripts/metamode-cli.ts status",
+    "metamode:cli": "tsx scripts/metamode-cli.ts",
     "check:all": "npm run lint && npm run typecheck && npm run format:check && npm run metamode:validate && npm run test:run"
   },
   "dependencies": {
