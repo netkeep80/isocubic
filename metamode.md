@@ -644,7 +644,189 @@ ollama pull llama3.2:3b
 
 ---
 
-## 14. Дальнейшее развитие
+## 14. MetaMode v2.0: Inline-аннотации `@mm:` (Phase 13)
+
+MetaMode v2.0 — система семантических метаданных нового поколения с полноценным встроенным AI. Переход от файловой системы `metamode.json` к inline-аннотациям `@mm:`, где метаданные живут прямо в исходном коде.
+
+### 14.1 Формат аннотаций `@mm:`
+
+```typescript
+/**
+ * @mm:id=param_editor
+ * @mm:name=ParametricEditor
+ * @mm:desc=Visual editor for parametric cube properties
+ * @mm:tags=ui,stable
+ * @mm:deps=runtime:lib/shader-utils,build:types/cube
+ * @mm:visibility=public
+ * @mm:phase=5
+ * @mm:status=stable
+ */
+export function ParametricEditor() { /* ... */ }
+```
+
+#### Поддерживаемые поля `@mm:`
+
+| Поле | Обязательное | Описание |
+|------|:---:|---------|
+| `@mm:id` | ✓ | Уникальный идентификатор (snake_case) |
+| `@mm:desc` | ✓ | Описание сущности |
+| `@mm:name` | | Отображаемое имя |
+| `@mm:tags` | | Теги через запятую |
+| `@mm:deps` | | Зависимости: `runtime:path`, `build:path`, `optional:path` |
+| `@mm:visibility` | | `public` (по умолчанию) или `internal` |
+| `@mm:phase` | | Номер фазы разработки |
+| `@mm:status` | | `stable`, `beta`, `draft`, `deprecated` |
+| `@mm:ai` | | AI-summary (макс. 200 символов) |
+
+#### Альтернативный формат (`__mm` runtime-свойство)
+
+```typescript
+export const ShaderUtils = {
+  __mm: {
+    id: 'shader_utils',
+    desc: 'GLSL shader utilities for cube rendering',
+    visibility: 'public',
+    tags: ['shaders', 'lib'],
+    refs: {
+      types: 'types/cube',
+    }
+  },
+  // ... module implementation
+}
+```
+
+### 14.2 Runtime API (`virtual:metamode/v2/db`)
+
+```typescript
+import mm from 'virtual:metamode/v2/db'
+
+// Поиск по ID
+const editor = mm.findById('param_editor')
+
+// Поиск с фильтрами
+const stableUI = mm.findAll({ tags: ['ui'], status: 'stable' })
+const publicMods = mm.findByTag('lib', { visibility: 'public' })
+
+// Граф зависимостей
+const deps = mm.getDependencies('param_editor', { type: 'runtime' })
+const allDeps = mm.getDependencies('param_editor', { type: 'all', recursive: true })
+const dependents = mm.getDependents('shader_utils')
+
+// Циклы зависимостей
+const cycle = mm.detectCycle('param_editor')
+const allCycles = mm.findAllCycles()
+
+// Валидация (в dev-режиме)
+const { valid, errors, warnings } = mm.validate()
+
+// Экспорт для AI/LLM
+const context = mm.exportForLLM({ scope: ['ui'], format: 'compact', limit: 50 })
+
+// Граф
+const dotGraph = mm.exportGraph({ format: 'dot' })
+const jsonGraph = mm.exportGraph({ format: 'json', edgeType: 'runtime' })
+
+// Статистика
+console.log(mm.stats.totalAnnotations)
+console.log(mm.buildInfo.version) // '2.0.0'
+```
+
+### 14.3 Production-оптимизация (`virtual:metamode/v2/db/prod`)
+
+```typescript
+// Dev: полные данные; Prod: internal-записи удалены, dev-only поля вырезаны
+import mm from 'virtual:metamode/v2/db'
+
+// Всегда production-stripped (без internal-записей)
+import mmProd from 'virtual:metamode/v2/db/prod'
+```
+
+Оптимизатор автоматически применяется при `vite build`:
+- `visibility: 'internal'` записи удаляются из production-бандла
+- Dev-only поля (filePath, line, source) не попадают в prod
+- AI-объекты (`.summary`) коллапсируются до строк
+- Граф зависимостей обновляется (рёбра к internal удаляются)
+
+### 14.4 Единый CLI MetaMode v2.0
+
+```bash
+npx tsx scripts/metamode-cli.ts [command] [options]
+```
+
+| Команда | Описание |
+|---------|---------|
+| `status` | Обзор состояния MetaMode в проекте |
+| `parse [path]` | Парсинг `@mm:` аннотаций |
+| `validate` | Семантическая и схемная валидация |
+| `migrate [--apply]` | Миграция `metamode.json` → `@mm:` |
+| `compile [--stats] [--graph]` | Компиляция v2.0 БД |
+| `context [--agent <type>]` | Построение AI-контекста |
+| `optimize [--stats]` | Production-оптимизация |
+| `generate-tests [--dry-run]` | Генерация тестов для аннотаций |
+| `help` | Справка по командам |
+
+### 14.5 Контекст-билдер для AI-агентов
+
+```typescript
+import { buildContext, buildContextForAgent, suggestAnnotation, runPreCommitCheck } from './scripts/metamode-context-builder'
+import { compileV2Database } from './scripts/metamode-db-compiler'
+
+const db = compileV2Database(process.cwd())
+
+// Собрать контекст для codegen-агента
+const ctx = buildContext(db, {
+  agentType: 'codegen',   // 'codegen' | 'refactor' | 'docgen' | 'review' | 'generic'
+  scope: ['ui', 'lib'],   // фильтр по тегам
+  format: 'markdown',     // 'markdown' | 'json' | 'text'
+  tokenBudget: 4000,      // лимит токенов (авто-обрезка)
+  includeDeps: true,      // включить транзитивные зависимости
+})
+console.log(ctx.prompt)   // готовый промпт для LLM
+
+// Pre-commit: предложить аннотацию для нового файла
+const suggestion = suggestAnnotation('/project/src/lib/new-module.ts', db)
+// /**
+//  * @mm:id new_module
+//  * @mm:desc TODO: Add description
+//  * @mm:tags lib
+//  * @mm:status draft
+//  */
+```
+
+### 14.6 Dual-Mode (v1.x и v2.0 параллельно)
+
+MetaMode поддерживает одновременную работу обеих версий без конфликтов:
+
+```typescript
+// v1.x API (metamode.json файлы)
+import metamode from 'virtual:metamode'
+import metamodeTree from 'virtual:metamode/tree'
+import metamodeDB from 'virtual:metamode/db'
+
+// v2.0 API (@mm: аннотации)
+import mm from 'virtual:metamode/v2/db'
+import mmProd from 'virtual:metamode/v2/db/prod'
+```
+
+### 14.7 Команды v2.0
+
+| Команда | Описание |
+|---------|---------|
+| `npm run metamode:status` | Обзор состояния MetaMode |
+| `npm run metamode:cli` | Единый CLI v2.0 |
+| `npm run metamode:db:compile` | Компиляция v2.0 БД |
+| `npm run metamode:db:graph` | Экспорт графа зависимостей |
+| `npm run metamode:generate-tests` | Генерация тестов |
+| `npm run metamode:context` | Сборка AI-контекста |
+| `npm run metamode:prod:optimize` | Анализ production-оптимизации |
+| `npm run metamode:migrate` | Предпросмотр миграции v1→v2 |
+| `npm run metamode:migrate:apply` | Применить миграцию v1→v2 |
+
+Полное руководство по миграции: [docs/metamode-v2-migration.md](docs/metamode-v2-migration.md)
+
+---
+
+## 15. Дальнейшее развитие
 
 1. **TASK 71**: Рефакторинг именования metanet → metamode ✅
 2. **TASK 72**: Унификация DevMode + GodMode → MetaMode ✅
@@ -652,6 +834,12 @@ ollama pull llama3.2:3b
 4. **TASK 75**: Реализация inline metamode атрибутов ✅
 5. **TASK 80**: Компиляция в встроенную БД ✅
 6. **TASK 81**: Интеграция с локальными LLM ✅
+7. **TASK 82**: MetaMode v2.0 DB Compiler (Phase 1) ✅
+8. **TASK 83**: Расширенная валидация и генерация тестов (Phase 2) ✅
+9. **TASK 84**: Контекст-билдер для AI-агентов (Phase 3) ✅
+10. **TASK 85**: Production-оптимизация (Phase 4) ✅
+11. **TASK 86**: Единый CLI и полная миграция (Phase 5) ✅
+12. **TASK 87**: Документация и релиз (Phase 6) ✅
 
 ---
 
