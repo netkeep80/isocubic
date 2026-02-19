@@ -378,6 +378,8 @@ const context = mm.exportForLLM({ scope: ['ui'], format: 'compact' })
 | `npm run metamode:generate-tests:dry` | Предпросмотр генерации тестов (без записи файлов) |
 | `npm run metamode:context`        | Сборка AI-контекста из v2.0 БД (Phase 3)      |
 | `npm run metamode:ai:context`     | AI-контекст для codegen-агента (Phase 3)       |
+| `npm run metamode:prod:optimize`  | Анализ production-оптимизации (Phase 4)        |
+| `npm run metamode:prod:analyze`   | Генерация production БД в файл (Phase 4)       |
 
 ### MetaMode v2.0: Валидация схемы и генерация тестов (Phase 2)
 
@@ -479,6 +481,43 @@ const missing = runPreCommitCheck(stagedFiles, db)
 // Возвращает файлы без @mm:id + предложения аннотаций
 ```
 
+### MetaMode v2.0: Production-оптимизация (Phase 4)
+
+MetaMode v2.0 Phase 4 добавляет tree-shaking для production-сборок: `internal`-записи удаляются из бандла, dev-only поля (filePath, line, source) вырезаются.
+
+#### Автоматическое применение
+
+Vite-плагин автоматически применяет оптимизацию при production-сборке:
+
+```typescript
+// Оба импорта работают в любом режиме:
+import mm from 'virtual:metamode/v2/db'        // dev: полные данные; prod: stripped
+import mmProd from 'virtual:metamode/v2/db/prod' // всегда production-stripped
+```
+
+#### Ручная оптимизация
+
+```typescript
+import { optimizeForProduction, analyzeBundleSize } from './scripts/metamode-prod-optimizer'
+import { compileV2Database } from './scripts/metamode-db-compiler'
+
+const devDb = compileV2Database(process.cwd())
+const prodDb = optimizeForProduction(devDb)
+
+const report = analyzeBundleSize(devDb, prodDb)
+console.log(`Сэкономлено ${report.savedBytes} байт (${report.reductionPercent.toFixed(1)}%)`)
+```
+
+#### CLI использование
+
+```bash
+# Анализ размеров dev vs prod базы
+npm run metamode:prod:optimize
+
+# Генерация production БД в файл
+npm run metamode:prod:analyze
+```
+
 ### Встроенная база данных (TASK 80)
 
 MetaMode компилирует все метаданные в единую базу данных, доступную в runtime:
@@ -568,7 +607,7 @@ npm run test:coverage
 
 **Текущее покрытие:**
 
-- 3583+ тестов (114 тестовых файлов, все компоненты на @vue/test-utils)
+- 3622+ тестов (115 тестовых файлов, все компоненты на @vue/test-utils)
 - Тесты 3D-компонентов Vue.js (ParametricCube, EnergyCube, CubePreview, CubeGrid, CubeStack, LODCubeGrid, LODStatisticsDisplay, MagicCubeDemo — TASK 62)
 - Тесты UI-компонентов редактора Vue.js (UnifiedEditor, ParamEditor, FFTParamEditor, FFTChannelEditor, EnergyVisualizationEditor, LODConfigEditor, StackEditor, StackPresetPicker, PromptGenerator — TASK 63)
 - Тесты компонентов галереи, экспорта и шаринга Vue.js (Gallery, CommunityGallery, ExportPanel, SharePanel, CommentsSection, SubscriptionButton, NotificationPanel, ActionHistory — TASK 64)
@@ -605,6 +644,7 @@ npm run test:coverage
 - Тесты MetaMode терминологии (миграция DevMode/GodMode → MetaMode во всех тестах — TASK 77)
 - Тесты MetaMode LLM интеграции (Ollama, llama.cpp, OpenAI-compatible бэкенды, контекст-билдер, fallback — TASK 81)
 - Тесты MetaMode v2.0 DB Compiler (findById, findAll, findByTag, getDependencies, getDependents, detectCycle, findAllCycles, validate, exportForLLM, exportGraph — TASK 82)
+- Тесты MetaMode v2.0 Production Optimizer (stripEntry, rebuildGraph, computeProdStats, optimizeForProduction, analyzeBundleSize, integration — TASK 85)
 
 ## Вклад в проект
 
