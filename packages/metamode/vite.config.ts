@@ -1,8 +1,8 @@
 /**
- * Vite Library Mode configuration for @isocubic/metamode package
+ * Vite Library Mode configuration for @netkeep80/metamode package
  *
- * TASK 88: @isocubic/metamode Phase 1 — Vite Library Mode build configuration
- * Phase 14: @isocubic/metamode NPM Package — Build System & Publishing Infrastructure
+ * TASK 88: @netkeep80/metamode Phase 1 — Vite Library Mode build configuration
+ * Phase 14: @netkeep80/metamode NPM Package — Build System & Publishing Infrastructure
  *
  * Builds the package in Library Mode for npm publishing:
  * - ES Module output (dist/metamode.js) for modern bundlers with tree-shaking

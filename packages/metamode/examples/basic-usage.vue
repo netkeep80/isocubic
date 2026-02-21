@@ -1,5 +1,5 @@
 <!--
-  Basic Usage Example for @isocubic/metamode
+  Basic Usage Example for @netkeep80/metamode
 
   Demonstrates how to integrate MetaMode into a Vue.js 3.0 application.
 

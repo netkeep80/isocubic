@@ -1,5 +1,5 @@
 /**
- * Advanced TypeScript Usage Patterns for @isocubic/metamode
+ * Advanced TypeScript Usage Patterns for @netkeep80/metamode
  *
  * Demonstrates advanced usage patterns including:
  * - Custom component registry integration
@@ -391,7 +391,7 @@ function utilityFunctionsExample(): void {
 // ============================================================================
 
 export function runAllExamples(): void {
-  console.log('=== Running @isocubic/metamode Advanced Examples ===\n')
+  console.log('=== Running @netkeep80/metamode Advanced Examples ===\n')
 
   console.log('--- Example 1: Custom Component Registry ---')
   // Registry already demonstrated above

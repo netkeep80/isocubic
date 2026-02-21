@@ -1,24 +1,23 @@
-# CI/CD workflow for automatic npm publishing of @isocubic/metamode
+# CI/CD workflow for automatic publishing of @netkeep80/metamode to GitHub Packages
 #
-# TASK 89: @isocubic/metamode Phase 2 — CI/CD workflow for npm publishing
-# Phase 14: @isocubic/metamode NPM Package — Build System & Publishing Infrastructure
+# TASK 89: @netkeep80/metamode Phase 2 — CI/CD workflow for GitHub Packages publishing
+# Phase 14: @netkeep80/metamode — Build System & Publishing to GitHub Packages
 #
 # Triggers:
 # - On push of a tag matching "metamode-v*" (e.g. metamode-v0.1.0)
 # - On creation of a GitHub Release with tag matching "metamode-v*"
 #
 # Required secrets:
-# - NPM_TOKEN: npm automation token with publish access to @isocubic/metamode
-#   Create at: https://www.npmjs.com/settings/<username>/tokens
-#   Type: "Automation" (for CI use, bypasses 2FA)
+# - GITHUB_TOKEN: automatically provided by GitHub Actions
+#   No additional secrets needed — GitHub Packages uses GITHUB_TOKEN
 #
 # Usage:
 #   # Bump version in packages/metamode/package.json, then:
 #   git tag metamode-v0.2.0
 #   git push origin metamode-v0.2.0
-#   # This workflow will build, test and publish @isocubic/metamode@0.2.0 to npm
+#   # This workflow will build, test and publish @netkeep80/metamode@0.2.0 to GitHub Packages
 
-name: Publish @isocubic/metamode
+name: Publish @netkeep80/metamode
 
 on:
   push:
@@ -57,7 +56,7 @@ jobs:
         working-directory: packages/metamode
         run: npm install
 
-      - name: Build @isocubic/metamode
+      - name: Build @netkeep80/metamode
         working-directory: packages/metamode
         run: npm run build
 
@@ -79,30 +78,31 @@ jobs:
           path: packages/metamode/dist/
           retention-days: 7
 
-  # === PUBLISH TO NPM ===
-  # Publishes the package after successful build and tests
+  # === PUBLISH TO GITHUB PACKAGES ===
+  # Publishes the package to GitHub Packages after successful build and tests
   publish:
-    name: Publish to npm
+    name: Publish to GitHub Packages
     runs-on: ubuntu-latest
     needs: [build-and-test]
     permissions:
       contents: read
-      id-token: write  # Required for npm provenance (npm publish --provenance)
+      packages: write  # Required for publishing to GitHub Packages
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js with npm registry
+      - name: Setup Node.js with GitHub Packages registry
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@netkeep80'
           cache: 'npm'
 
       - name: Install package dependencies
         working-directory: packages/metamode
         run: npm install
 
-      - name: Build @isocubic/metamode
+      - name: Build @netkeep80/metamode
         working-directory: packages/metamode
         run: npm run build
 
@@ -129,19 +129,19 @@ jobs:
           fi
           echo "✓ Version match confirmed: $PKG_VERSION"
 
-      - name: Publish to npm
+      - name: Publish to GitHub Packages
         working-directory: packages/metamode
-        run: npm publish --provenance --access public
+        run: npm publish --access public
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish summary
         run: |
-          echo "## ✅ Published @isocubic/metamode@${{ steps.version.outputs.version }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "## ✅ Published @netkeep80/metamode@${{ steps.version.outputs.version }}" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "**npm page:** https://www.npmjs.com/package/@isocubic/metamode" >> "$GITHUB_STEP_SUMMARY"
+          echo "**GitHub Packages page:** https://github.com/netkeep80/metamode/pkgs/npm/metamode" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "### Install" >> "$GITHUB_STEP_SUMMARY"
           echo "\`\`\`bash" >> "$GITHUB_STEP_SUMMARY"
-          echo "npm install @isocubic/metamode" >> "$GITHUB_STEP_SUMMARY"
+          echo "npm install @netkeep80/metamode --registry=https://npm.pkg.github.com" >> "$GITHUB_STEP_SUMMARY"
           echo "\`\`\`" >> "$GITHUB_STEP_SUMMARY"

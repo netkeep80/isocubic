@@ -1,8 +1,8 @@
 /**
- * Integration test for @isocubic/metamode
+ * Integration test for @netkeep80/metamode
  *
- * TASK 91: @isocubic/metamode Phase 4 — Интеграционный тест использования пакета
- * Phase 14: @isocubic/metamode NPM Package — Build System & Publishing Infrastructure
+ * TASK 91: @netkeep80/metamode Phase 4 — Интеграционный тест использования пакета
+ * Phase 14: @netkeep80/metamode NPM Package — Build System & Publishing Infrastructure
  *
  * Tests that the built dist/ artifact exports work correctly,
  * simulating real-world usage of the published npm package.
@@ -14,7 +14,7 @@
 
 import { describe, it, expect } from 'vitest'
 
-// Import from built dist/ artifact — simulates `import from '@isocubic/metamode'`
+// Import from built dist/ artifact — simulates `import from '@netkeep80/metamode'`
 // after the package is installed from npm
 import {
   // Core composables
@@ -54,7 +54,7 @@ import {
 // Integration tests: verify dist/ exports are functional
 // ============================================================================
 
-describe('@isocubic/metamode — integration tests (dist/ build)', () => {
+describe('@netkeep80/metamode — integration tests (dist/ build)', () => {
   describe('package exports', () => {
     it('should export provideMetaMode function', () => {
       expect(typeof provideMetaMode).toBe('function')

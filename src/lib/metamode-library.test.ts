@@ -1,7 +1,7 @@
 /**
  * MetaMode Library Extraction Tests
  *
- * Tests verifying the extracted @isocubic/metamode library package
+ * Tests verifying the extracted @netkeep80/metamode library package
  * works correctly as a standalone unit.
  *
  * TASK 59: MetaMode Library Extraction (Phase 9)
@@ -67,7 +67,7 @@ import type {
   IssuePriority,
 } from '../../packages/metamode/src'
 
-describe('MetaMode Library (@isocubic/metamode)', () => {
+describe('MetaMode Library (@netkeep80/metamode)', () => {
   beforeEach(() => {
     localStorage.clear()
   })
