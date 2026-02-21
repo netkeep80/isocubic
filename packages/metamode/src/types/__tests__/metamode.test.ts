@@ -1,5 +1,5 @@
 /**
- * Unit tests for @isocubic/metamode — metamode types and utilities
+ * Unit tests for @netkeep80/metamode — metamode types and utilities
  *
  * Tests: storage helpers, tab utilities, constraints, keyboard shortcuts,
  *        conversation utilities

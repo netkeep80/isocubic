@@ -1,5 +1,5 @@
 /**
- * Unit tests for @isocubic/metamode — common types and utilities
+ * Unit tests for @netkeep80/metamode — common types and utilities
  *
  * Tests: detectLanguage, DEFAULT_COMPONENT_REGISTRY
  *

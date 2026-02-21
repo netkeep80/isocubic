@@ -1,5 +1,5 @@
 {
-  "name": "@isocubic/metamode",
+  "name": "@netkeep80/metamode",
   "version": "0.1.0",
   "description": "MetaMode — unified floating development window with AI conversation, GitHub issue generation, screen capture & annotations for Vue.js 3.0 apps",
   "author": "netkeep80",
@@ -49,14 +49,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/netkeep80/isocubic.git",
-    "directory": "packages/metamode"
+    "url": "https://github.com/netkeep80/metamode.git"
   },
-  "homepage": "https://github.com/netkeep80/isocubic/tree/main/packages/metamode#readme",
+  "homepage": "https://github.com/netkeep80/metamode#readme",
   "bugs": {
-    "url": "https://github.com/netkeep80/isocubic/issues"
+    "url": "https://github.com/netkeep80/metamode/issues"
   },
   "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
     "access": "public"
   },
   "peerDependencies": {

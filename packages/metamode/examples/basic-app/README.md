@@ -1,6 +1,6 @@
-# @isocubic/metamode — Integration Test Example
+# @netkeep80/metamode — Integration Test Example
 
-This directory contains an integration test that demonstrates and verifies usage of `@isocubic/metamode` from the **built `dist/` artifact** (not from `src/`).
+This directory contains an integration test that demonstrates and verifies usage of `@netkeep80/metamode` from the **built `dist/` artifact** (not from `src/`).
 
 ## Purpose
 
@@ -8,7 +8,7 @@ Unlike unit tests (which import from `src/`), this integration test:
 
 - Imports all public API from `dist/metamode.js` — the actual built package file
 - Verifies that the build process produces working, correctly exported modules
-- Simulates how a real consumer would use `@isocubic/metamode` after installing it from npm
+- Simulates how a real consumer would use `@netkeep80/metamode` after installing it from npm
 
 ## Running the Integration Test
 
@@ -40,11 +40,11 @@ The integration test covers all major public exports from `dist/`:
 
 ## Vue.js Integration
 
-To use `@isocubic/metamode` in a real Vue.js 3.0 application:
+To use `@netkeep80/metamode` in a real Vue.js 3.0 application:
 
 ```vue
 <script setup lang="ts">
-import { provideMetaMode, useMetaMode } from '@isocubic/metamode'
+import { provideMetaMode, useMetaMode } from '@netkeep80/metamode'
 
 // In your root App.vue component:
 provideMetaMode({
@@ -57,7 +57,7 @@ provideMetaMode({
 
 ```vue
 <script setup lang="ts">
-import { useMetaMode } from '@isocubic/metamode'
+import { useMetaMode } from '@netkeep80/metamode'
 
 // In any child component:
 const { toggleWindow, isVisible } = useMetaMode()

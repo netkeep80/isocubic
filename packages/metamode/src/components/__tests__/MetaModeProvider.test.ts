@@ -1,5 +1,5 @@
 /**
- * Unit tests for @isocubic/metamode — MetaModeProvider composable
+ * Unit tests for @netkeep80/metamode — MetaModeProvider composable
  *
  * Tests: provideMetaMode, useMetaMode, backward-compat aliases
  *

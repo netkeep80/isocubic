@@ -50,7 +50,7 @@
       "description": "Phase 13: MetaMode v2.0 — Semantic metadata with built-in AI (TASK 82-87)"
     },
     "phase-14.md": {
-      "description": "Phase 14: @isocubic/metamode NPM package — build system and publishing infrastructure"
+      "description": "Phase 14: @netkeep80/metamode NPM package — build system and publishing infrastructure"
     }
   }
 }

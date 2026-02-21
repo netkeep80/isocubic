@@ -1,8 +1,8 @@
 /**
- * Vitest configuration for @isocubic/metamode package tests
+ * Vitest configuration for @netkeep80/metamode package tests
  *
- * TASK 90: @isocubic/metamode Phase 3 — Тесты пакета с @vue/test-utils
- * Phase 14: @isocubic/metamode NPM Package — Build System & Publishing Infrastructure
+ * TASK 90: @netkeep80/metamode Phase 3 — Тесты пакета с @vue/test-utils
+ * Phase 14: @netkeep80/metamode NPM Package — Build System & Publishing Infrastructure
  */
 
 import { defineConfig } from 'vitest/config'

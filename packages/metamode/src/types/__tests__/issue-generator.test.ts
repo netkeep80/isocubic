@@ -1,5 +1,5 @@
 /**
- * Unit tests for @isocubic/metamode — issue-generator types and utilities
+ * Unit tests for @netkeep80/metamode — issue-generator types and utilities
  *
  * Tests: getDefaultLabels, validateIssueDraft, generateDraftId, createIssueDraft,
  *        getIssueDraftStorageKey, constants

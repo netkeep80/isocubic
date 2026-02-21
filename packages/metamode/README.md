@@ -1,4 +1,4 @@
-# @isocubic/metamode
+# @netkeep80/metamode
 
 MetaMode — unified floating development window with AI conversation, GitHub issue generation, screen capture & annotations for Vue.js 3.0 applications.
 
@@ -16,9 +16,19 @@ MetaMode — unified floating development window with AI conversation, GitHub is
 
 ## Installation
 
-```bash
-npm install @isocubic/metamode
-```
+This package is published to [GitHub Packages](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry).
+
+1. Add the following to your project's `.npmrc` file:
+
+   ```
+   @netkeep80:registry=https://npm.pkg.github.com
+   ```
+
+2. Install the package:
+
+   ```bash
+   npm install @netkeep80/metamode
+   ```
 
 ## Quick Start
 
@@ -26,7 +36,7 @@ npm install @isocubic/metamode
 
 ```vue
 <script setup lang="ts">
-import { provideMetaMode } from '@isocubic/metamode'
+import { provideMetaMode } from '@netkeep80/metamode'
 
 // Provide MetaMode context to all child components
 provideMetaMode({
@@ -46,7 +56,7 @@ provideMetaMode({
 
 ```vue
 <script setup lang="ts">
-import { useMetaMode } from '@isocubic/metamode'
+import { useMetaMode } from '@netkeep80/metamode'
 
 const { toggleWindow, isVisible, windowState, setActiveTab } = useMetaMode()
 </script>
@@ -79,7 +89,7 @@ const { toggleWindow, isVisible, windowState, setActiveTab } = useMetaMode()
 To connect your application's component metadata with MetaMode:
 
 ```typescript
-import type { ComponentRegistry, ComponentMeta } from '@isocubic/metamode'
+import type { ComponentRegistry, ComponentMeta } from '@netkeep80/metamode'
 
 const myRegistry: ComponentRegistry = {
   getAllComponents: (): ComponentMeta[] => [

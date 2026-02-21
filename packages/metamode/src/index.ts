@@ -1,5 +1,5 @@
 /**
- * @isocubic/metamode
+ * @netkeep80/metamode
  *
  * MetaMode — Unified floating development window with AI conversation,
  * GitHub issue generation, screen capture & annotations for Vue.js 3.0 apps.
@@ -10,7 +10,7 @@
  *
  * ```vue
  * <script setup lang="ts">
- * import { provideMetaMode, useMetaMode } from '@isocubic/metamode'
+ * import { provideMetaMode, useMetaMode } from '@netkeep80/metamode'
  *
  * // In root component (App.vue)
  * provideMetaMode({

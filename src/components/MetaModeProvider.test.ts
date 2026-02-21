@@ -1,7 +1,7 @@
 /**
  * MetaModeProvider Tests
  *
- * Tests for the MetaMode Vue provide/inject provider from @isocubic/metamode library.
+ * Tests for the MetaMode Vue provide/inject provider from @netkeep80/metamode library.
  *
  * TASK 59: MetaMode Library Extraction (Phase 9)
  * TASK 61: Migrated from React testing to Vue testing (Phase 10)

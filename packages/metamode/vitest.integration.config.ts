@@ -1,8 +1,8 @@
 /**
- * Vitest integration test configuration for @isocubic/metamode
+ * Vitest integration test configuration for @netkeep80/metamode
  *
- * TASK 91: @isocubic/metamode Phase 4 — Интеграционный тест использования пакета
- * Phase 14: @isocubic/metamode NPM Package — Build System & Publishing Infrastructure
+ * TASK 91: @netkeep80/metamode Phase 4 — Интеграционный тест использования пакета
+ * Phase 14: @netkeep80/metamode NPM Package — Build System & Publishing Infrastructure
  *
  * Runs integration tests from examples/basic-app/ that import from dist/.
  * Run `npm run build` before running integration tests.
