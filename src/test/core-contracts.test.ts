@@ -11,7 +11,7 @@ describe('core cube contracts', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-01-02T03:04:05.000Z'))
 
-    const cube = createDefaultCube('contract-cube')
+    const cube = createDefaultCube('contract_cube')
 
     expect(validateCube(cube)).toEqual({ valid: true, errors: [] })
     expect(cube.meta?.created).toBe('2026-01-02T03:04:05.000Z')
