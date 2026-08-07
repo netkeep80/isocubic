@@ -85,19 +85,40 @@ describe('canonical SpectralCube characterization', () => {
     }
 
     for (const type of noiseTypes) {
-      expect(validateCube({ id: `noise_${type}`, base: { color: [0.5, 0.5, 0.5] }, noise: { type } }).valid).toBe(true)
+      expect(
+        validateCube({ id: `noise_${type}`, base: { color: [0.5, 0.5, 0.5] }, noise: { type } })
+          .valid
+      ).toBe(true)
     }
 
     for (const material of materials) {
-      expect(validateCube({ id: `material_${material}`, base: { color: [0.5, 0.5, 0.5] }, physics: { material } }).valid).toBe(true)
+      expect(
+        validateCube({
+          id: `material_${material}`,
+          base: { color: [0.5, 0.5, 0.5] },
+          physics: { material },
+        }).valid
+      ).toBe(true)
     }
 
     for (const break_pattern of breakPatterns) {
-      expect(validateCube({ id: `break_${break_pattern}`, base: { color: [0.5, 0.5, 0.5] }, physics: { break_pattern } }).valid).toBe(true)
+      expect(
+        validateCube({
+          id: `break_${break_pattern}`,
+          base: { color: [0.5, 0.5, 0.5] },
+          physics: { break_pattern },
+        }).valid
+      ).toBe(true)
     }
 
     for (const mode of boundaryModes) {
-      expect(validateCube({ id: `boundary_${mode}`, base: { color: [0.5, 0.5, 0.5] }, boundary: { mode } }).valid).toBe(true)
+      expect(
+        validateCube({
+          id: `boundary_${mode}`,
+          base: { color: [0.5, 0.5, 0.5] },
+          boundary: { mode },
+        }).valid
+      ).toBe(true)
     }
   })
 
@@ -135,7 +156,10 @@ describe('canonical SpectralCube characterization', () => {
     const invalidCases: unknown[] = [
       { ...base, unexpected: true },
       { ...base, base: { ...base.base, unexpected: true } },
-      { ...base, gradients: [{ axis: 'x', factor: 0.5, color_shift: [0, 0, 0], unexpected: true }] },
+      {
+        ...base,
+        gradients: [{ axis: 'x', factor: 0.5, color_shift: [0, 0, 0], unexpected: true }],
+      },
       { ...base, noise: { type: 'perlin', unexpected: true } },
       { ...base, physics: { material: 'stone', unexpected: true } },
       { ...base, boundary: { mode: 'smooth', unexpected: true } },
@@ -178,7 +202,9 @@ describe('canonical SpectralCube characterization', () => {
     expect(cube.physics?.density).toBe(properties.physics.properties.density.default)
     expect(cube.physics?.break_pattern).toBe(properties.physics.properties.break_pattern.default)
     expect(cube.boundary?.mode).toBe(properties.boundary.properties.mode.default)
-    expect(cube.boundary?.neighbor_influence).toBe(properties.boundary.properties.neighbor_influence.default)
+    expect(cube.boundary?.neighbor_influence).toBe(
+      properties.boundary.properties.neighbor_influence.default
+    )
 
     expect(CUBE_DEFAULTS.base.roughness).toBe(properties.base.properties.roughness.default)
     expect(CUBE_DEFAULTS.base.transparency).toBe(properties.base.properties.transparency.default)
