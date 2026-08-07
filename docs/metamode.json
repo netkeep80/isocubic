@@ -6,6 +6,9 @@
     "API.md": {
       "description": "API documentation and reference"
     },
+    "testing-strategy.md": {
+      "description": "Test-first development contract, test taxonomy, deterministic testing rules and CI quality gates"
+    },
     "phase-1.md": {
       "description": "Phase 1: Core cube rendering and basic parameters"
     },

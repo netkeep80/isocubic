@@ -1,12 +1,7 @@
-# CI/CD workflow implementing best practices for AI-driven development
-# Based on: https://github.com/link-assistant/hive-mind/blob/main/docs/BEST-PRACTICES.md
+# CI quality gate for isocubic.
 #
-# Key improvements:
-# - Cross-platform testing (Ubuntu, macOS, Windows)
-# - Node.js 22 (LTS version)
-# - File size limits enforcement (max 1500 lines)
-# - Code coverage reporting to Codecov
-# - Format checking with Prettier
+# Phase 15 principle: refactoring is allowed only behind executable tests and
+# strict checks. Warnings are not substitutes for required validation.
 
 name: CI
 
@@ -22,16 +17,13 @@ on:
       - '**/*.md'
       - 'docs/**'
 
-# Cancel in-progress runs for the same branch
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  # === LINT AND FORMAT CHECK ===
-  # Fast check that runs independently
   lint:
-    name: Lint & Format
+    name: Lint, Types, Format & Metadata
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -49,58 +41,30 @@ jobs:
         run: npm run lint
 
       - name: Type check
-        run: npx vue-tsc --noEmit
+        run: npm run typecheck
 
       - name: Check formatting
-        run: npx prettier --check "src/**/*.{ts,tsx,vue,js,jsx,json,css}" "*.{ts,js,json}" || echo "::warning::Some files need formatting. Run 'npx prettier --write' to fix."
+        run: npm run format:check
 
-      - name: Validate MetaMode
+      - name: Validate MetaMode metadata
         run: npm run metamode:validate
 
-  # === FILE SIZE CHECK ===
-  # Enforce maximum file size to keep code maintainable for both AI and humans
-  # Currently issues a warning for existing oversized files
-  # TODO: Refactor src/lib/tinyLLM.ts (1771 lines) to be under 1500 lines
   file-size-check:
-    name: File Size Check
+    name: Source File Size Gate
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check file sizes (max 1500 lines)
-        run: |
-          echo "Checking for files exceeding 1500 lines..."
-          oversized_files=""
-          oversized_count=0
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
 
-          # Find all TypeScript/JavaScript files and check line count
-          while IFS= read -r file; do
-            if [ -f "$file" ]; then
-              lines=$(wc -l < "$file")
-              if [ "$lines" -gt 1500 ]; then
-                oversized_files="$oversized_files  - $file ($lines lines)\n"
-                oversized_count=$((oversized_count + 1))
-              fi
-            fi
-          done < <(find src -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.vue" -o -name "*.js" -o -name "*.jsx" \) 2>/dev/null)
+      - name: Enforce source file size policy
+        run: node scripts/check-file-size.mjs
 
-          if [ -n "$oversized_files" ]; then
-            echo "::warning::Files exceeding 1500 lines limit (should be refactored):"
-            echo -e "$oversized_files"
-            echo ""
-            echo "Large files should be split into smaller modules for better maintainability."
-            echo "This limit ensures code stays readable for both AI and human developers."
-            echo ""
-            echo "Note: This is currently a warning. Consider creating issues to refactor these files."
-          else
-            echo "✓ All source files are within the 1500 line limit."
-          fi
-
-  # === TEST MATRIX ===
-  # Cross-platform testing on multiple OS
-  # Note: Only Node.js 22 is used for faster CI/CD runs
   test:
-    name: Test (${{ matrix.os }})
+    name: Root Tests (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     needs: [lint]
     strategy:
@@ -119,13 +83,28 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run tests
-        run: npm run test -- --run
+      - name: Run unit and integration tests
+        run: npm run test:ci
 
-  # === COVERAGE ===
-  # Generate and upload code coverage to Codecov
+  metamode-package:
+    name: MetaMode Package Contract
+    runs-on: ubuntu-latest
+    needs: [lint]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: packages/metamode/package-lock.json
+
+      - name: Build and test standalone package
+        run: npm run package:ci
+
   coverage:
-    name: Code Coverage
+    name: Coverage Baseline
     runs-on: ubuntu-latest
     needs: [lint]
     steps:
@@ -143,7 +122,7 @@ jobs:
       - name: Run tests with coverage
         run: npm run test:coverage
 
-      - name: Upload coverage to Codecov
+      - name: Upload coverage baseline to Codecov
         uses: codecov/codecov-action@v4
         with:
           files: ./coverage/coverage-final.json
@@ -152,12 +131,10 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-  # === BUILD ===
-  # Ensure the project builds successfully
   build:
-    name: Build
+    name: Production Build Gate
     runs-on: ubuntu-latest
-    needs: [lint, test, file-size-check]
+    needs: [lint, file-size-check, test, metamode-package]
     steps:
       - uses: actions/checkout@v4
 
