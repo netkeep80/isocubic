@@ -6,6 +6,9 @@
     "generate-icons.cjs": {
       "description": "Script to generate PWA icon sets from SVG source"
     },
+    "check-file-size.mjs": {
+      "description": "Strict source file size quality gate with bounded explicit legacy debt"
+    },
     "metamode-preprocessor.ts": {
       "description": "MetaMode preprocessor: validates metamode.json files, compiles tree, and generates AI-optimized format (TASK 74)"
     },
