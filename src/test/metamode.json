@@ -1,10 +1,13 @@
 {
   "$schema": "../../metamode.schema.json",
   "name": "test",
-  "description": "Test setup and configuration for Vitest",
+  "description": "Test setup and cross-module contract tests for Vitest",
   "files": {
     "setup.ts": {
       "description": "Global test setup: JSDOM environment, test utilities, mocks"
+    },
+    "core-contracts.test.ts": {
+      "description": "Core cube characterization contracts for schema validity, deterministic defaults and independent mutable state"
     }
   }
 }
