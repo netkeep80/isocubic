@@ -14,6 +14,9 @@
     },
     "example-cube-contracts.test.ts": {
       "description": "Schema validation and canonical JSON round-trip contracts for every shipped cube preset in examples/"
+    },
+    "cube-format-versioning.test.ts": {
+      "description": "Test-first contracts for explicit cube format versioning, legacy migration, rejection of unsupported versions and canonical serialization"
     }
   }
 }
