@@ -8,6 +8,9 @@
     },
     "core-contracts.test.ts": {
       "description": "Core cube characterization contracts for schema validity, deterministic defaults and independent mutable state"
+    },
+    "cube-domain-characterization.test.ts": {
+      "description": "SpectralCube schema parity, numeric boundary, malformed input, unknown field and JSON round-trip characterization contracts"
     }
   }
 }
