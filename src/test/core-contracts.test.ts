@@ -1,10 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { validateCube } from '../lib/validation'
-import {
-  createDefaultCube,
-  createDefaultFFTCube,
-  type FFTCoefficient,
-} from '../types/cube'
+import { createDefaultCube, createDefaultFFTCube, type FFTCoefficient } from '../types/cube'
 
 afterEach(() => {
   vi.useRealTimers()
