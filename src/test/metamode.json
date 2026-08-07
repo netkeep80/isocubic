@@ -11,6 +11,9 @@
     },
     "cube-domain-characterization.test.ts": {
       "description": "SpectralCube schema parity, numeric boundary, malformed input, unknown field and JSON round-trip characterization contracts"
+    },
+    "example-cube-contracts.test.ts": {
+      "description": "Schema validation and canonical JSON round-trip contracts for every shipped cube preset in examples/"
     }
   }
 }
