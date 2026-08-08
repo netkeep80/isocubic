@@ -32,6 +32,10 @@
       "description": "Vue composables for reusable reactive logic",
       "metamode": "composables/metamode.json"
     },
+    "domain": {
+      "description": "Framework-agnostic canonical persisted-data domain boundaries",
+      "metamode": "domain/metamode.json"
+    },
     "lib": {
       "description": "TypeScript library modules (core logic, utilities, AI)",
       "metamode": "lib/metamode.json"

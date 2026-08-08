@@ -140,7 +140,7 @@ describe('MetaMode CLI Integration (TASK 86)', () => {
 
     it('should find metamode.json files in the project', () => {
       const report = analyzeMigration(PROJECT_ROOT)
-      // isocubic has 32 metamode.json files
+      // isocubic has 33 metamode.json files
       expect(report.totalFiles).toBeGreaterThan(0)
     })
 
@@ -409,7 +409,7 @@ describe('MetaMode CLI Integration (TASK 86)', () => {
 
       expect(report.mode).toBe('dry-run')
       expect(report.errors).toHaveLength(0) // No parse errors expected
-      expect(report.totalFiles).toBe(32) // isocubic has 32 metamode.json files
+      expect(report.totalFiles).toBe(33) // isocubic has 33 metamode.json files
       expect(report.totalAnnotations).toBeGreaterThan(100) // Many file annotations
     })
 

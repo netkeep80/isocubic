@@ -1,0 +1,10 @@
+{
+  "$schema": "../../metamode.schema.json",
+  "name": "domain",
+  "description": "Framework-agnostic canonical domain boundaries for persisted isocubic data",
+  "files": {
+    "cube-format.ts": {
+      "description": "Canonical SpectralCube format version, legacy migration, validation parse boundary and serialization"
+    }
+  }
+}
