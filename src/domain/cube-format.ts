@@ -41,12 +41,13 @@ export function migrateCubeDocument(input: unknown): unknown {
 export function parseCubeDocument(input: unknown): CanonicalSpectralCube {
   const migrated = migrateCubeDocument(input)
   const cube = validateAndParseCube(migrated)
+  const versionedCube = cube as SpectralCube & { format_version?: unknown }
 
-  if (cube.format_version !== CURRENT_CUBE_FORMAT_VERSION) {
+  if (versionedCube.format_version !== CURRENT_CUBE_FORMAT_VERSION) {
     throw new Error('Cube migration did not produce the current canonical format')
   }
 
-  return cube as CanonicalSpectralCube
+  return versionedCube as CanonicalSpectralCube
 }
 
 export function serializeCubeDocument(cube: CanonicalSpectralCube): string {
