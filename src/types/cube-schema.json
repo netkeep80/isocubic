@@ -11,6 +11,11 @@
       "pattern": "^[a-z0-9_]+$",
       "examples": ["stone_moss_001", "wood_oak_002", "metal_rust_003"]
     },
+    "format_version": {
+      "type": "integer",
+      "description": "Explicit persisted cube format version. Legacy unversioned documents are migrated before canonical use.",
+      "const": 1
+    },
     "prompt": {
       "type": "string",
       "description": "Text prompt used to generate this cube configuration",
