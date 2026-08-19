@@ -17,6 +17,12 @@
     },
     "cube-format-versioning.test.ts": {
       "description": "Test-first contracts for explicit cube format versioning, legacy migration, rejection of unsupported versions and canonical serialization"
+    },
+    "storage-canonical-boundary.test.ts": {
+      "description": "Test-first contracts for canonical v1 migration and future-version rejection across LocalStorage and JSON import boundaries"
+    },
+    "storage-history-canonical-boundary.test.ts": {
+      "description": "Test-first contracts for canonical v1 history persistence, legacy migration and invalid entry filtering"
     }
   }
 }
