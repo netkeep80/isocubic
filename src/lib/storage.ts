@@ -3,8 +3,8 @@
  * Provides LocalStorage persistence, JSON file export/import, and undo/redo history
  */
 
+import { parseCubeDocument, serializeCubeDocument } from '../domain/cube-format'
 import type { SpectralCube } from '../types/cube'
-import { validateCube, isValidCube } from './validation'
 
 // Storage keys
 const STORAGE_KEY_CONFIGS = 'isocubic_configs'
@@ -51,6 +51,29 @@ export class StorageError extends Error {
   }
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function tryParseCube(value: unknown): SpectralCube | null {
+  try {
+    return parseCubeDocument(value)
+  } catch {
+    return null
+  }
+}
+
+function parseCubeList(value: unknown): SpectralCube[] {
+  if (!Array.isArray(value)) return []
+
+  const cubes: SpectralCube[] = []
+  for (const entry of value) {
+    const cube = tryParseCube(entry)
+    if (cube) cubes.push(cube)
+  }
+  return cubes
+}
+
 // ============================================================================
 // LocalStorage Functions
 // ============================================================================
@@ -63,9 +86,14 @@ export class StorageError extends Error {
 export function saveCubeToStorage(cube: SpectralCube): void {
   try {
     const configs = getAllConfigsFromStorage()
+    const now = new Date().toISOString()
+    const canonicalCube = parseCubeDocument({
+      ...cube,
+      meta: { ...cube.meta, modified: now },
+    })
     const storedConfig: StoredConfig = {
-      cube: { ...cube, meta: { ...cube.meta, modified: new Date().toISOString() } },
-      savedAt: new Date().toISOString(),
+      cube: canonicalCube,
+      savedAt: now,
     }
     configs[cube.id] = storedConfig
     localStorage.setItem(STORAGE_KEY_CONFIGS, JSON.stringify(configs))
@@ -97,7 +125,24 @@ export function getAllConfigsFromStorage(): Record<string, StoredConfig> {
   try {
     const data = localStorage.getItem(STORAGE_KEY_CONFIGS)
     if (!data) return {}
-    return JSON.parse(data) as Record<string, StoredConfig>
+
+    const parsed: unknown = JSON.parse(data)
+    if (!isRecord(parsed)) return {}
+
+    const configs: Record<string, StoredConfig> = {}
+    for (const [id, value] of Object.entries(parsed)) {
+      if (!isRecord(value)) continue
+
+      const cube = tryParseCube(value.cube)
+      if (!cube) continue
+
+      configs[id] = {
+        ...(value as unknown as StoredConfig),
+        cube,
+      }
+    }
+
+    return configs
   } catch {
     return {}
   }
@@ -148,7 +193,8 @@ export function clearAllConfigs(): void {
  */
 export function saveCurrentCube(cube: SpectralCube): void {
   try {
-    localStorage.setItem(STORAGE_KEY_CURRENT, JSON.stringify(cube))
+    const canonicalCube = parseCubeDocument(cube)
+    localStorage.setItem(STORAGE_KEY_CURRENT, serializeCubeDocument(canonicalCube))
   } catch {
     // Silently fail for autosave
   }
@@ -162,8 +208,7 @@ export function loadCurrentCube(): SpectralCube | null {
   try {
     const data = localStorage.getItem(STORAGE_KEY_CURRENT)
     if (!data) return null
-    const parsed = JSON.parse(data)
-    return isValidCube(parsed) ? parsed : null
+    return parseCubeDocument(JSON.parse(data))
   } catch {
     return null
   }
@@ -236,18 +281,17 @@ export async function importCubeFromFile(file: File): Promise<ImportResult> {
     // Handle array of cubes (return first one)
     const cubeData = Array.isArray(parsed) ? parsed[0] : parsed
 
-    const validation = validateCube(cubeData)
-    if (!validation.valid) {
-      const errorMessages = validation.errors.map((e) => `${e.path}: ${e.message}`).join('; ')
+    try {
+      return {
+        success: true,
+        cube: parseCubeDocument(cubeData),
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error'
       return {
         success: false,
-        error: `Invalid cube configuration: ${errorMessages}`,
+        error: `Invalid cube configuration: ${message}`,
       }
-    }
-
-    return {
-      success: true,
-      cube: cubeData as SpectralCube,
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
@@ -272,12 +316,11 @@ export async function importCubesFromFile(file: File): Promise<ImportResult[]> {
     const results: ImportResult[] = []
 
     for (const cubeData of cubes) {
-      const validation = validateCube(cubeData)
-      if (validation.valid) {
-        results.push({ success: true, cube: cubeData as SpectralCube })
-      } else {
-        const errorMessages = validation.errors.map((e) => `${e.path}: ${e.message}`).join('; ')
-        results.push({ success: false, error: `Invalid cube: ${errorMessages}` })
+      try {
+        results.push({ success: true, cube: parseCubeDocument(cubeData) })
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error'
+        results.push({ success: false, error: `Invalid cube: ${message}` })
       }
     }
 
@@ -323,7 +366,17 @@ export function getHistoryState(): HistoryState {
     if (!data) {
       return { past: [], present: null, future: [] }
     }
-    return JSON.parse(data) as HistoryState
+
+    const parsed: unknown = JSON.parse(data)
+    if (!isRecord(parsed)) {
+      return { past: [], present: null, future: [] }
+    }
+
+    return {
+      past: parseCubeList(parsed.past),
+      present: parsed.present === null ? null : tryParseCube(parsed.present),
+      future: parseCubeList(parsed.future),
+    }
   } catch {
     return { past: [], present: null, future: [] }
   }
@@ -335,11 +388,11 @@ export function getHistoryState(): HistoryState {
  */
 function saveHistoryState(state: HistoryState): void {
   try {
-    // Limit history size
+    // Limit history size and keep every persisted cube on the canonical boundary.
     const limitedState: HistoryState = {
-      past: state.past.slice(-MAX_HISTORY_SIZE),
-      present: state.present,
-      future: state.future.slice(0, MAX_HISTORY_SIZE),
+      past: parseCubeList(state.past.slice(-MAX_HISTORY_SIZE)),
+      present: state.present === null ? null : tryParseCube(state.present),
+      future: parseCubeList(state.future.slice(0, MAX_HISTORY_SIZE)),
     }
     localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(limitedState))
   } catch {
